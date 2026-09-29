@@ -1,0 +1,16 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc = "0.8.24"
+optimizer = true
+optimizer_runs = 200
+
+[rpc_endpoints]
+bsc_testnet = "https://data-seed-prebsc-1-s1.bnbchain.org:8545"
+bsc = "https://bsc-dataseed.bnbchain.org"
+
+[etherscan]
+# BscScan is served through the Etherscan V2 multichain API (one key for all chains).
+bsc_testnet = { key = "${ETHERSCAN_API_KEY}", chain = 97 }
+bsc = { key = "${ETHERSCAN_API_KEY}", chain = 56 }

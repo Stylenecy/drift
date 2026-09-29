@@ -1,0 +1,13 @@
+{
+  "chainId": 97,
+  "network": "bsc-testnet",
+  "deployedAt": "2026-09-25",
+  "explorer": "https://testnet.bscscan.com",
+  "contracts": {
+    "MacroGuard": "0x8F2CbB56Cc9A46EfC3997146369257Ff9450Fe5A"
+  },
+  "deployTx": "0xd5a98f89e24d30f1d828e50753d7146fad4aa078cd16af831dc81763b6d66056",
+  "agent": "0xE85f64383Fd58ddC0b7eC64EF1557317B91Ac0B1",
+  "maxDrawdownBps": 2000,
+  "broadcast": "contracts/broadcast/Deploy.s.sol/97/run-latest.json"
+}
