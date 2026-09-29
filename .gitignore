@@ -9,3 +9,5 @@ coverage/
 npm-debug.log*
 .env*
 !.env.example
+# Foundry simulation output (dry-run only; real broadcast receipts stay tracked as evidence)
+contracts/broadcast/**/dry-run/
