@@ -52,6 +52,21 @@ _ABI = [
         "inputs": [],
         "outputs": [{"name": "", "type": "uint8"}],
     },
+    *[
+        {
+            "type": "function",
+            "name": name,
+            "stateMutability": "view",
+            "inputs": [],
+            "outputs": [{"name": "", "type": output_type}],
+        }
+        for name, output_type in (
+            ("agent", "address"),
+            ("halted", "bool"),
+            ("maxDrawdownBps", "uint32"),
+            ("decisionCount", "uint64"),
+        )
+    ],
     {
         "type": "function",
         "name": "setRegime",
@@ -69,17 +84,19 @@ class ChainGuard:
         self.enabled = False
         self.address: Optional[str] = None
         self._lock = threading.Lock()
-        if not (MACROGUARD_ADDRESS and ETH_PRIVATE_KEY):
+        if not MACROGUARD_ADDRESS:
             return
         try:
             from web3 import Web3
-            from eth_account import Account
 
             self._w3 = Web3(Web3.HTTPProvider(BSC_RPC_URL))
-            self._account = Account.from_key(ETH_PRIVATE_KEY)
             self.address = Web3.to_checksum_address(MACROGUARD_ADDRESS)
             self._contract = self._w3.eth.contract(address=self.address, abi=_ABI)
-            self.enabled = True
+            if ETH_PRIVATE_KEY:
+                from eth_account import Account
+
+                self._account = Account.from_key(ETH_PRIVATE_KEY)
+                self.enabled = True
         except Exception as e:  # missing dep / bad key — stay inert
             print(f"[drift] chain guard disabled: {e}")
 
@@ -92,6 +109,48 @@ class ChainGuard:
             "explorer": f"{BSC_EXPLORER}/address/{self.address}" if self.address else None,
             "explorer_base": BSC_EXPLORER,
         }
+
+    def state(self) -> dict:
+        """Read public contract state without requiring the agent's private key."""
+        result = {
+            "connected": False,
+            "address": self.address,
+            "chain_id": BSC_CHAIN_ID,
+            "explorer": f"{BSC_EXPLORER}/address/{self.address}" if self.address else None,
+            "agent": None,
+            "regime": None,
+            "halted": None,
+            "max_drawdown_bps": None,
+            "decision_count": None,
+            "allowed": None,
+            "error": None,
+        }
+        if not self.address:
+            result["error"] = "MACROGUARD_ADDRESS is not configured"
+            return result
+        try:
+            actual_chain_id = self._w3.eth.chain_id
+            if actual_chain_id != BSC_CHAIN_ID:
+                raise ValueError(f"RPC chain {actual_chain_id} does not match configured chain {BSC_CHAIN_ID}")
+            if not self._w3.eth.get_code(self.address):
+                raise ValueError("No contract code exists at this address")
+            contract = self._contract.functions
+            result.update(
+                connected=True,
+                agent=contract.agent().call(),
+                regime=int(contract.regime().call()),
+                halted=bool(contract.halted().call()),
+                max_drawdown_bps=int(contract.maxDrawdownBps().call()),
+                decision_count=int(contract.decisionCount().call()),
+                allowed={
+                    "flat": bool(contract.allowed(0).call()),
+                    "long": bool(contract.allowed(1).call()),
+                    "short": bool(contract.allowed(2).call()),
+                },
+            )
+        except Exception as e:
+            result["error"] = str(e)
+        return result
 
     def allowed(self, target: int) -> bool:
         """On-chain veto check (free). Fails open so chain trouble never blocks."""
@@ -142,7 +201,7 @@ class ChainGuard:
 
     def current_regime(self) -> Optional[int]:
         """Read the regime currently enforced on-chain, or None if unavailable."""
-        if not self.enabled:
+        if not self.address:
             return None
         try:
             return int(self._contract.functions.regime().call())

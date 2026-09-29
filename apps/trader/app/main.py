@@ -234,6 +234,12 @@ def chain() -> dict:
     return chain_guard.info()
 
 
+@app.get("/guard/state")
+def guard_state() -> dict:
+    """Public MacroGuard state for the transparency panel; no key needed."""
+    return chain_guard.state()
+
+
 @app.get("/regime")
 def regime() -> dict:
     """Current macro regime (cached from the loop; computed on demand if cold)."""

@@ -117,11 +117,11 @@ function GuardBanner({ chain, regime }: { chain: ChainInfo; regime: RegimeInfo |
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-lg border border-[#9aa8f0]/25 bg-[#9aa8f0]/[0.06] px-3.5 py-2.5 text-[12px]">
       <Badge tone="green" dot>
-        on-chain
+        configured
       </Badge>
       <span className="text-white/70">
-        MacroGuard enforcing risk on{" "}
-        <span className="text-white/90">BNB Chain</span> · every decision recorded on-chain
+        MacroGuard signal check on{" "}
+        <span className="text-white/90">BNB Chain</span> · writes are best effort
       </span>
       {regime && (
         <span className="flex items-center gap-1.5">

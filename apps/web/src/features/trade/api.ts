@@ -4,6 +4,7 @@ import type {
   BotConfig,
   BotStatus,
   ChainInfo,
+  GuardState,
   ConnectionStatus,
   KlinesResponse,
   Market,
@@ -37,6 +38,10 @@ export async function fetchStrategies(signal?: AbortSignal): Promise<StrategyInf
 
 export async function getChain(signal?: AbortSignal): Promise<ChainInfo> {
   return json(await fetch(`${TRADER_URL}/chain`, { signal }));
+}
+
+export async function getGuardState(signal?: AbortSignal): Promise<GuardState> {
+  return json(await fetch(`${TRADER_URL}/guard/state`, { signal }));
 }
 
 export async function getRegime(signal?: AbortSignal): Promise<RegimeInfo> {

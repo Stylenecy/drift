@@ -21,7 +21,10 @@ export const navGroups: NavGroup[] = [
   },
   {
     title: "Research",
-    items: [{ label: "Research", href: "/dashboard/backtest", icon: BookIcon }],
+    items: [
+      { label: "Research", href: "/dashboard/backtest", icon: BookIcon },
+      { label: "MacroGuard", href: "/dashboard/macroguard", icon: AgentIcon },
+    ],
   },
   {
     title: "Account",

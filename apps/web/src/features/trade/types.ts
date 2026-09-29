@@ -164,6 +164,20 @@ export type ChainInfo = {
   explorer_base: string;
 };
 
+export type GuardState = {
+  connected: boolean;
+  address: string | null;
+  chain_id: number;
+  explorer: string | null;
+  agent: string | null;
+  regime: number | null;
+  halted: boolean | null;
+  max_drawdown_bps: number | null;
+  decision_count: number | null;
+  allowed: { flat: boolean; long: boolean; short: boolean } | null;
+  error: string | null;
+};
+
 export type RegimeInfo = {
   regime: number;
   label: string; // "risk-off" | "neutral" | "risk-on"
