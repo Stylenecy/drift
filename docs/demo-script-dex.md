@@ -44,3 +44,22 @@ Placeholders must stay empty until real receipts exist. Never invent hashes.
   "BNB Chain stores and enforces the public risk state; the Python runner and exchange execution remain off-chain. RPC fail-open behavior and unverified live trading are disclosed."
 
 Suggested screenshots (final only): dashboard panel on Dex contract, BscScan contract page, deploy receipt, RiskOff receipt, halt receipt, resume receipt.
+
+## Verified values (2026-09-30, BSC Testnet chain 97)
+
+- `<DEX_CONTRACT_ADDRESS>` = `0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D`
+- `<DEPLOY_TX_HASH>` = `0x2d8cce2de583424a45e8de176c1b79438cdf54f7a016ae0cfc6c4ca86078c044` (block 133995398)
+- `<RISKOFF_TX_HASH>` = `0x563f1eee78fee6a0b532c6ae50ab5de05667e7d64bb573ddc21596b9d2376858` (block 134042196)
+- safe decision tx = `0x7a5185e4beb1c51f6c1fcaeb7614df88a5dd72357caa38ab7e15956500ab4810` (block 134042256)
+- `<HALT_TX_HASH>` = `0x8e346d74c06c53f2f8914c86c4be9e45c49ea99a54e41ece6fc53a018e3b62ef` (block 134042283)
+- `<RESUME_TX_HASH>` = `0xda579ebbf2969b855fe50b4520593fb267e33f4db062e0c71c48ca64b18d18ae` (block 134042318)
+- Neutral tx = `0xa846652354020a77b8c24ef8bb3e088ccecb63f4c2c3267c0a4377c57a39486b` (block 134042328)
+- Final on-chain state: Neutral, not halted, Long allowed, 2 decisions
+- BscScan base: `https://testnet.bscscan.com` (append `/address/...` or `/tx/...`)
+
+## Manual recording runbook for Dex
+
+1. Start backend: `cd drift/apps/trader && .venv/Scripts/python -m uvicorn app.main:app --port 3113` (already repointed at Dex contract via local `.env.local`)
+2. Start web: `cd drift && npm install` (first time only) + `npm run dev`, open `/dashboard/macroguard`
+3. Record 60–75s following FINAL script above; show panel refresh after each receipt; open each BscScan tx link on camera
+4. Narrate the honest boundary (off-chain runner, fail-open RPC, no live-trading claims)

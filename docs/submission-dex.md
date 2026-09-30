@@ -6,7 +6,7 @@ Status: **draft, not submitted** · Updated 2026-09-29 · Deadline date: 2026-09
 
 - Base project: [`bcc-ukdw/seed-bnb/drift`](https://github.com/bcc-ukdw/seed-bnb/tree/main/drift), commit `52671ce`, including the quant engine, web app, MacroGuard contract, and BNB migration. Do not present these as Dex's original work.
 - Dex fork and contribution: [`Stylenecy/seed-bnb`, branch `dex/drift`](https://github.com/Stylenecy/seed-bnb/tree/dex/drift), commit `a22b057`: read-only MacroGuard transparency panel and `/guard/state` API, plus honest copy corrections.
-- Own BSC Testnet deployment: **pending**. The upstream contract in `contracts/deployments/bsc-testnet.json` belongs to the migration team's wallet; it is not Dex's deployment.
+- Own BSC Testnet deployment: **DEPLOYED 2026-09-30** — Dex contract `0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D`, deploy tx `0x2d8cce2de583424a45e8de176c1b79438cdf54f7a016ae0cfc6c4ca86078c044`, block 133995398, receipt status 1, agent() matches Dex deployer, maxDrawdownBps() 2000. The upstream contract in `contracts/deployments/bsc-testnet.json` belongs to the migration team's wallet; it is not Dex's deployment.
 
 ## Submission copy
 
@@ -24,19 +24,18 @@ Status: **draft, not submitted** · Updated 2026-09-29 · Deadline date: 2026-09
 
 ## Evidence available now
 
-Previously verified evidence vs this-session checks are kept separate.
-`forge`/`cast` are not available in the current OpenCode environment, so
-build/test claims below are previously verified, not reproduced here.
+Build/test re-verified in the deployment session with Foundry 1.5.1
+(discovered at `$env:USERPROFILE\.foundry\bin`, not via PATH).
 
 | Item | Result |
 |---|---|
-| `forge build` | Previously verified: passed with Solc 0.8.24; not re-run in this session |
-| `forge test -vv` | Previously verified: 7 passed, 0 failed; not re-run in this session |
-| `npm run build` | Previously verified: passed; `/dashboard/macroguard` present. File confirmed present in this session: `apps/web/src/app/dashboard/macroguard/page.tsx` |
+| `forge build` | Verified this session: exit 0 (Solc 0.8.24, compilation cached; 2 style lint notes only) |
+| `forge test -vv` | Verified this session: 7 passed, 0 failed |
+| `npm run build` | Previously verified: passed; `/dashboard/macroguard` present. File confirmed present: `apps/web/src/app/dashboard/macroguard/page.tsx` |
 | FastAPI `/health`, `/chain`, `/strategies` | Previously verified: HTTP 200 locally; not re-run in this session |
-| New `/guard/state` | Previously verified: HTTP 200 reading upstream BSC Testnet contract with no private key; chain 97, Neutral, not halted, 20% threshold, 3 decisions at test time. Route confirmed present in this session: `apps/trader/app/main.py` |
+| New `/guard/state` | Previously verified: HTTP 200 reading upstream BSC Testnet contract with no private key; chain 97, Neutral, not halted, 20% threshold, 3 decisions at test time. Route present: `apps/trader/app/main.py`. Repoint at Dex contract pending smoke test |
 | Backtest on public Bybit data | NOT VERIFIED: HTTP 502 locally because `api.bybit.com` timed out |
-| Dex own deploy and transaction receipts | PENDING: wallet unfunded, no broadcast executed in this session |
+| Dex own deploy and transaction receipts | DEPLOYED: contract `0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D`, tx `0x2d8cce2de583424a45e8de176c1b79438cdf54f7a016ae0cfc6c4ca86078c044`, block 133995398, status 1, gas 449207 at 0.1 gwei (~0.0000449207 tBNB). Smoke-test txs still PENDING |
 | Demo video | PENDING |
 
 ## 75-second demo outline
@@ -65,12 +64,12 @@ Portal FAQ: <https://indonesiaweb3hack.xyz/en/faq>. Public event page: <https://
 
 ## Remaining before final submission
 
-- [ ] Fund Dex BSC Testnet wallet sufficiently for deployment + smoke-test transactions (no invented minimum)
-- [ ] Deploy Dex-owned MacroGuard (BSC Testnet, chain 97, maxDrawdownBps 2000) with Dex approval
-- [ ] Run on-chain smoke test (RiskOff, halt, resume, unauthorized-caller check)
+- [x] Fund Dex BSC Testnet wallet (0.1 tBNB received, tx 0x2f2326086fc0d8b234e500a105afd68a7b31c33b25ce128ace52dcda5e03e157, receipt status 1)
+- [x] Deploy Dex-owned MacroGuard (BSC Testnet, chain 97, maxDrawdownBps 2000) with Dex approval (contract 0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D, tx 0x2d8cce2de583424a45e8de176c1b79438cdf54f7a016ae0cfc6c4ca86078c044)
+- [x] Run on-chain smoke test (RiskOff, halt, resume, unauthorized-caller check) — executed 2026-09-30, all receipts status 1, see `deployment-dex.md`
 - [ ] Point dashboard/backend at Dex contract and re-verify `/guard/state`
 - [ ] Collect BscScan evidence (deploy tx, smoke-test txs)
-- [ ] Prepare pitch deck (portable build; Codex-only script does not run in OpenCode env)
+- [x] Prepare pitch deck (portable `docs/build-deck.py` via python-pptx; output `docs/submission/DRIFT-Dex-pitch-draft.pptx`, 4 slides, Dex deploy facts included)
 - [ ] Record demo (use pre-deploy script until post-deploy evidence exists)
 - [ ] Complete portal/team (Luma, profile, GitHub, track)
 - [ ] Submit and save proof (project visible under My Projects + public Projects; edit code stored privately)
