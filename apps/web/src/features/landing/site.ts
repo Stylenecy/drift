@@ -6,7 +6,7 @@ export interface NavLink {
 export const site = {
   name: "DRIFT",
   tagline: "Deterministic, risk-bounded trading for AI quant strategies.",
-  contact: "daiwikmahesh@gmail.com",
+  contact: "dex.bennett28@gmail.com",
   x: "https://x.com",
   nav: [
     { label: "DRIFT", href: "/" },
