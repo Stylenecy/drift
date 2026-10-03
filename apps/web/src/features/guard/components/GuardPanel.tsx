@@ -187,6 +187,8 @@ export function GuardPanel({ variant = "cockpit" }: { variant?: "public" | "cock
       {/* ------------------------------------------------ state + proof row */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         <Panel
+          reveal="load"
+          delay={0.5}
           className="flex flex-col p-5 pt-6 sm:p-7 lg:col-span-7"
           label={<Eyebrow>(live risk state)</Eyebrow>}
           aside={status === "loading" ? <Skeleton className="h-7 w-48" /> : live ? <HaltChip halted={live.halted} /> : null}
@@ -215,6 +217,8 @@ export function GuardPanel({ variant = "cockpit" }: { variant?: "public" | "cock
 
         <Panel
           chain
+          reveal="load"
+          delay={0.62}
           className="p-5 pt-6 sm:p-7 lg:col-span-5"
           label={<Eyebrow chain>(on-chain proof)</Eyebrow>}
           aside={

@@ -14,6 +14,7 @@ export function Panel({
   aside,
   id,
   reveal = true,
+  delay,
 }: {
   children: ReactNode;
   className?: string;
@@ -21,7 +22,9 @@ export function Panel({
   label?: ReactNode;
   aside?: ReactNode;
   id?: string;
-  reveal?: boolean;
+  /** true: opens when scrolled into view · "load": opens on first paint (above the fold) · false: static. */
+  reveal?: boolean | "load";
+  delay?: number;
 }) {
   const cls = `hud ${chain ? "hud-chain" : ""} relative scroll-mt-24 bg-slate-1/35 ${className}`;
   const inner = (
@@ -36,12 +39,19 @@ export function Panel({
     </>
   );
   // One element, so grid placement classes (lg:col-span-*) land on the grid item.
-  return reveal ? (
-    <Reveal as="section" kind="clip" id={id} className={cls}>
-      {inner}
-    </Reveal>
-  ) : (
-    <section id={id} className={cls}>
+  if (reveal === true) {
+    return (
+      <Reveal as="section" kind="clip" id={id} className={cls} delay={delay}>
+        {inner}
+      </Reveal>
+    );
+  }
+  return (
+    <section
+      id={id}
+      className={`${cls} ${reveal === "load" ? "ld-clip" : ""}`}
+      style={reveal === "load" ? ({ "--d": `${delay ?? 0.5}s` } as CSSProperties) : undefined}
+    >
       {inner}
     </section>
   );
