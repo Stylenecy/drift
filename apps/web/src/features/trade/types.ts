@@ -34,12 +34,16 @@ export type Market = {
   high24h: number;
   low24h: number;
   volume24h: number;
+  // Where the market data came from: "bybit", or "binance" on the engine's public-data fallback.
+  source?: string | null;
 };
 
 export type KlinesResponse = {
   symbol: string;
   timeframe: string;
   candles: Candle[];
+  // Where the market data came from: "bybit", or "binance" on the engine's public-data fallback.
+  source?: string | null;
 };
 
 export type EquityPoint = {
@@ -70,6 +74,8 @@ export type BacktestResponse = {
   equity_curve: EquityPoint[];
   trades: TradeMarker[];
   metrics: Metrics;
+  // Where the market data came from: "bybit", or "binance" on the engine's public-data fallback.
+  source?: string | null;
 };
 
 export type SliceMetrics = {
@@ -95,6 +101,8 @@ export type OptimizeResponse = {
   timeframe: string;
   train_frac: number;
   results: OptimizeResult[];
+  // Where the market data came from: "bybit", or "binance" on the engine's public-data fallback.
+  source?: string | null;
 };
 
 export type BacktestRequest = {
@@ -186,4 +194,6 @@ export type RegimeInfo = {
   price: number;
   on_chain: number | null;
   synced: boolean;
+  // Where the market data came from: "bybit", or "binance" on the engine's public-data fallback.
+  source?: string | null;
 };

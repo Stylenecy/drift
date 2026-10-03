@@ -3,11 +3,13 @@ import { pct } from "@/lib/format";
 import { Card, StatTile } from "@/features/dashboard/components/primitives";
 import { EquityChart, DrawdownChart } from "./EquityChart";
 import { PriceChart } from "./PriceChart";
+import { DataSourceNote } from "./DataSourceNote";
 
 export function BacktestResult({ result }: { result: BacktestResponse }) {
   const m = result.metrics;
   return (
     <div className="space-y-4">
+      <DataSourceNote source={result.source} />
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
         <StatTile
           label="Total return"

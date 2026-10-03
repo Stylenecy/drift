@@ -33,6 +33,8 @@ class Regime:
     vol_z: float
     trend: float
     price: float
+    # Where the BTC candles came from: "bybit", or "binance" on the public-data fallback.
+    source: str | None = None
 
     def as_dict(self) -> dict:
         return {
@@ -41,6 +43,7 @@ class Regime:
             "vol_z": round(self.vol_z, 3),
             "trend": round(self.trend, 5),
             "price": self.price,
+            "source": self.source,
         }
 
 
@@ -70,4 +73,6 @@ def classify(df: pd.DataFrame) -> Regime:
 def current(client: BybitClient) -> Regime:
     """Classify the live regime from fresh BTC klines."""
     df = client.klines(MACRO_SYMBOL, MACRO_TIMEFRAME, BARS)
-    return classify(df)
+    reg = classify(df)
+    reg.source = df.attrs.get("source")
+    return reg

@@ -6,6 +6,7 @@ import { getConnection, runOptimize, startBot } from "../api";
 import type { EquityPoint, OptimizeResult, OptimizeResponse } from "../types";
 import { pct } from "@/lib/format";
 import { Card, Button, Badge, StatTile } from "@/features/dashboard/components/primitives";
+import { DataSourceNote } from "./DataSourceNote";
 
 const SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"];
 const TIMEFRAMES = ["1h", "4h", "1d"];
@@ -89,6 +90,9 @@ export function AutoResearch() {
               Not connected — add Bybit keys on Connection to deploy a result.
             </div>
           )}
+          <div className="mb-3">
+            <DataSourceNote source={res.source} />
+          </div>
           <div className="space-y-2">
             {res.results.map((r, i) => (
               <ResultRow

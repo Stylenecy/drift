@@ -51,7 +51,9 @@ app.add_middleware(
 
 # Public market data needs no keys. Backtests always read mainnet history (testnet
 # klines are sparse); only live trading respects the BYBIT_TESTNET default.
-_public = BybitClient(testnet=False)
+# If Bybit is unreachable, public data falls back to Binance's public market-data
+# API; responses name their source. Live bots use their own client (no fallback).
+_public = BybitClient(testnet=False, data_fallback=True)
 
 # Live trading state (in-memory; keys never persisted).
 _connection = Connection()
@@ -289,7 +291,7 @@ def analyze(symbol: str = "BTCUSDT") -> dict:
         text = llm.analyze(symbol, reg, float(change24h) if change24h is not None else None)
     except Exception as e:
         raise HTTPException(status_code=502, detail=f"analyze: {e}")
-    return {"symbol": symbol, "regime": reg.label, "analysis": text}
+    return {"symbol": symbol, "regime": reg.label, "analysis": text, "source": df.attrs.get("source")}
 
 
 @app.get("/strategies", response_model=list[StrategyInfo])
@@ -309,7 +311,7 @@ def markets() -> list[Market]:
     try:
         rows = _public.tickers()
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"bybit: {e}")
+        raise HTTPException(status_code=502, detail=f"market data: {e}")
     out: list[Market] = []
     for sym in MARKET_SYMBOLS:
         r = rows.get(sym)
@@ -323,6 +325,7 @@ def markets() -> list[Market]:
                 high24h=float(r["highPrice24h"]),
                 low24h=float(r["lowPrice24h"]),
                 volume24h=float(r["turnover24h"]),
+                source=r.get("source"),
             )
         )
     return out
@@ -333,7 +336,7 @@ def klines(symbol: str = "BTCUSDT", timeframe: str = "1h", bars: int = 200) -> K
     try:
         df = _public.klines(symbol, timeframe, bars)
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"bybit: {e}")
+        raise HTTPException(status_code=502, detail=f"market data: {e}")
     candles = [
         Candle(
             time=int(r.time),
@@ -345,7 +348,7 @@ def klines(symbol: str = "BTCUSDT", timeframe: str = "1h", bars: int = 200) -> K
         )
         for r in df.itertuples()
     ]
-    return KlinesResponse(symbol=symbol, timeframe=timeframe, candles=candles)
+    return KlinesResponse(symbol=symbol, timeframe=timeframe, candles=candles, source=df.attrs.get("source"))
 
 
 @app.post("/backtest", response_model=BacktestResponse)
@@ -357,8 +360,9 @@ def backtest(req: BacktestRequest) -> BacktestResponse:
     try:
         df = _public.klines(req.symbol, req.timeframe, req.bars)
     except Exception as e:  # network / bad symbol / bad timeframe
-        raise HTTPException(status_code=502, detail=f"bybit: {e}")
-    return run_backtest(strat, df, req.symbol, req.timeframe)
+        raise HTTPException(status_code=502, detail=f"market data: {e}")
+    result = run_backtest(strat, df, req.symbol, req.timeframe)
+    return result.model_copy(update={"source": df.attrs.get("source")})
 
 
 # Convenience GET for quick verification: /backtest?strategy=macd&symbol=BTCUSDT
@@ -379,8 +383,9 @@ def optimize(req: OptimizeRequest) -> OptimizeResponse:
     try:
         df = _public.klines(req.symbol, req.timeframe, req.bars)
     except Exception as e:
-        raise HTTPException(status_code=502, detail=f"bybit: {e}")
-    return run_optimize(df, req.symbol, req.timeframe, req.train_frac)
+        raise HTTPException(status_code=502, detail=f"market data: {e}")
+    result = run_optimize(df, req.symbol, req.timeframe, req.train_frac)
+    return result.model_copy(update={"source": df.attrs.get("source")})
 
 
 # ----------------------------------------------------------------- live ----

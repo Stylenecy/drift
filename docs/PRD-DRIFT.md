@@ -1,6 +1,6 @@
 # PRD — DRIFT · MacroGuard Transparency
 
-Owner: Dex Bennett · Updated 2026-10-02 · Event: Indonesia Web3 Hackathon 2026 (BNB Chain)
+Owner: Dex Bennett · Updated 2026-10-03 · Event: Indonesia Web3 Hackathon 2026 (BNB Chain)
 Status: locked for the submission window (UI freeze Mon 5 Oct 12.00 WIB, submit Tue 6 Oct).
 
 ## 1. Problem
@@ -41,13 +41,16 @@ classification, LLM analyst, Telegram control, the web app.
    address, agent, "live contract read" badge.
 3. **MacroGuard panel (0:50–1:50).** Regime and halt state badges, Long/Short/Flat verdict with the
    reason, drawdown gauge against the 20% limit, decision count, and the verified smoke-test
-   timeline (RiskOff → decision → halt → resume → Neutral).
+   timeline (RiskOff → decision → halt → resume → Neutral). "Ask the contract": pick a signal and a
+   drawdown, and the live contract answers through an `eth_call` of `recordDecision` from the agent
+   address, labelled as a simulation (nothing signed or written, decision count unchanged).
 4. **BscScan (1:50–2:30).** Every address and tx hash on the panel opens BscScan in a new tab.
 5. **Honest research boundary (2:30–3:00).** The quant engine (backtests, optimizer) runs on the
    user's own machine. The hosted demo is read-only: its cockpit routes show one notice linking to
    `/macroguard` and the README quick start. Run locally, the research page shows a point-in-time
    backtest with return, Sharpe, max drawdown — explicitly "research, not a profit claim". If Bybit
-   public data is unreachable, the page says so instead of showing a fake curve.
+   public data is unreachable, the engine falls back to Binance public data and labels it; if both
+   are unreachable, the page says so instead of showing a fake curve.
 
 ## 6. Screens and acceptance criteria
 
@@ -55,13 +58,18 @@ classification, LLM analyst, Telegram control, the web app.
 |---|---|---|
 | `/` landing | Explain DRIFT in 5 s and route the judge to proof | Above the fold at 1440×900 and 390×844: headline, one-line promise, "Inspect MacroGuard" CTA, BscScan link. No claim of profit or trustless execution. Hero copy ≤ 30 words. |
 | `/macroguard` (public) and `/dashboard/macroguard` | Star screen: live risk state + evidence | Regime, halt, threshold, decision count, per-signal verdict visible without scrolling at 1440×900. Every address/tx is a BscScan link. Live values name their source (public RPC + block, or DRIFT engine); the hosted demo reads the chain from the browser, with no engine. Loading and live-read-failed states each render a distinct, honest message and still show the static verified evidence. No login required for `/macroguard`. |
-| `/dashboard/backtest` | Show research honesty | Hosted demo: one notice that the engine runs locally, linking to `/macroguard` and the README quick start; no request to localhost. Local: metrics labelled as historical simulation; error state explains the Bybit data timeout. |
+| `/dashboard/backtest` | Show research honesty | Hosted demo: one notice that the engine runs locally, linking to `/macroguard` and the README quick start; no request to localhost. Local: metrics labelled as historical simulation; the data source is named (Bybit, or the Binance public-data fallback); the error state names both sources when both fail. |
 | `/dashboard` markets | Context for the cockpit | Unchanged logic; inherits shared visual tokens. |
 | All screens | Quality bar | `npm run build` and `npm run lint` pass. Visible focus ring on every interactive element. Text contrast ≥ 4.5:1 (AA). Motion off under `prefers-reduced-motion`. No horizontal scroll at 390 px. |
 
 ## 7. Non-goals
 
-- No change to engine logic, contract code, or API response shapes.
+- No change to engine logic, contract code, or API response shapes, with one exception relaxed
+  on 3 Oct 2026 at Dex's request: when Bybit is unreachable, the engine's public market data
+  (klines, tickers) falls back to Binance public data (`data-api.binance.vision`), and the
+  affected responses gain an optional `source` field (`bybit` or `binance`) that the cockpit and
+  the terminal show. Orders still go to Bybit testnet, and the live runner never trades on
+  fallback data. The contract code is unchanged.
 - No new transactions, redeploys, or mainnet anything.
 - No live Bybit trading demo; no wallet-connect flow.
 - No new data source for the decision timeline: it shows the documented smoke-test receipts

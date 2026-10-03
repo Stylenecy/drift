@@ -48,12 +48,16 @@ class Market(BaseModel):
     high24h: float
     low24h: float
     volume24h: float  # quote turnover
+    # Where the market data came from: "bybit", or "binance" when the public-data fallback answered.
+    source: Optional[str] = None
 
 
 class KlinesResponse(BaseModel):
     symbol: str
     timeframe: str
     candles: list[Candle]
+    # Where the market data came from: "bybit", or "binance" when the public-data fallback answered.
+    source: Optional[str] = None
 
 
 class EquityPoint(BaseModel):
@@ -106,6 +110,8 @@ class OptimizeResponse(BaseModel):
     timeframe: str
     train_frac: float
     results: list[OptimizeResult]
+    # Where the market data came from: "bybit", or "binance" when the public-data fallback answered.
+    source: Optional[str] = None
 
 
 class BacktestResponse(BaseModel):
@@ -116,6 +122,8 @@ class BacktestResponse(BaseModel):
     equity_curve: list[EquityPoint]
     trades: list[TradeMarker]
     metrics: Metrics
+    # Where the market data came from: "bybit", or "binance" when the public-data fallback answered.
+    source: Optional[str] = None
 
 
 # ---- live trading (Phase 3) ----

@@ -69,7 +69,11 @@ export function MarketsView() {
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-[300px_minmax(0,1fr)]">
       {/* market list */}
-      <Card title="Markets" subtitle="Live · Bybit perpetuals" bodyClassName="!p-1.5">
+      <Card
+        title="Markets"
+        subtitle={markets[0]?.source === "binance" ? "Binance spot · public-data fallback" : "Live · Bybit perpetuals"}
+        bodyClassName="!p-1.5"
+      >
         <ul className="space-y-0.5">
           {markets.length === 0 && (
             <li className="px-2 py-6 text-center text-sm text-white/30">Loading…</li>

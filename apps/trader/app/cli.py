@@ -63,7 +63,9 @@ MARKET_SYMBOLS = [
 # Assets whose live rate rides along the bottom status bar.
 FOOTER_SYMS = ["BTC", "ETH", "SOL"]
 
-_data = BybitClient(testnet=False)
+# Public market data; falls back to Binance public data if Bybit is unreachable
+# (labelled in each view). The live bot loop reads candles with fallback=False.
+_data = BybitClient(testnet=False, data_fallback=True)
 _trade: Optional[BybitClient] = None
 _testnet = BYBIT_TESTNET
 _status = {"wallet": None, "tickers": {}, "bots": 0}
@@ -346,6 +348,13 @@ def err(msg: str) -> None:
     console.print(f"[{DOWN}]error[/] [dim]·[/] {msg}")
 
 
+def source_line(source: Optional[str]) -> Text:
+    """Where the market data came from, so a fallback is never silent."""
+    if source == "binance":
+        return Text("data · Binance public market data (fallback: Bybit unreachable) · spot, not Bybit perps", style=AMBER)
+    return Text("data · Bybit V5 public market data", style="dim")
+
+
 # ------------------------------------------------------------ connection --
 
 def connect_from_env() -> None:
@@ -429,6 +438,7 @@ def cmd_markets() -> None:
             f"{fmt(float(r['lowPrice24h']))} – {fmt(float(r['highPrice24h']))}",
         )
     console.print(t)
+    console.print(source_line(next(iter(tk.values()), {}).get("source")))
     refresh_footer_price()
 
 
@@ -453,7 +463,8 @@ def cmd_chart(sym: str, tf: str = "1h") -> None:
     closes = df["close"].tolist()
     col = UP if closes[-1] >= closes[0] else DOWN
     sub = Text(f"{fmt(min(closes))} – {fmt(max(closes))}   last {fmt(closes[-1])}", style="dim")
-    console.print(Panel(Group(line_chart(closes, color=col), sub), title=f"{sym} · {tf}", border_style=col, box=box.ROUNDED))
+    console.print(Panel(Group(line_chart(closes, color=col), sub, source_line(df.attrs.get("source"))),
+                        title=f"{sym} · {tf}", border_style=col, box=box.ROUNDED))
 
 
 def cmd_backtest(strat: str, sym: str, tf: str = "1h") -> None:
@@ -483,7 +494,7 @@ def cmd_backtest(strat: str, sym: str, tf: str = "1h") -> None:
         _stat("trades", str(m.num_trades)),
     )
     eq = [p.equity for p in res.equity_curve]
-    console.print(Panel(Group(grid, Text(""), line_chart(eq, color=col)),
+    console.print(Panel(Group(grid, Text(""), line_chart(eq, color=col), source_line(df.attrs.get("source"))),
                         title=f"backtest · {res.strategy} · {sym} {tf}", border_style=col, box=box.ROUNDED))
 
 
@@ -513,6 +524,7 @@ def cmd_research(sym: str, tf: str = "1h") -> None:
             Text(r.verdict, style=vstyle.get(r.verdict, "white")),
         )
     console.print(t)
+    console.print(source_line(df.attrs.get("source")))
     if res.results:
         best = res.results[0]
         console.print(f"[dim]› deploy the winner:[/] [bold {ACCENT}]bot {best.strategy} {sym.replace('USDT','').lower()} {tf}[/]")
@@ -580,7 +592,7 @@ def cmd_bot(strat: str, sym: str, tf: str = "1h", qty: float = 0.001, max_dd: fl
     try:
         with Live(render(), console=console, refresh_per_second=4) as live:
             while True:
-                df = _data.klines(sym, tf, 200)
+                df = _data.klines(sym, tf, 200, fallback=False)
                 target = int(strat_obj.positions(df).iloc[-1])
                 last_price = float(df["close"].iloc[-1])
                 signal_name = {1: "long", -1: "short", 0: "flat"}[target]
