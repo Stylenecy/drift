@@ -1,20 +1,26 @@
 import Nav from "@/features/landing/components/Nav";
 import Hero from "@/features/landing/components/Hero";
-import { GuardStory } from "@/features/landing/components/GuardStory";
-import { PlatformShowcase } from "@/features/landing/components/PlatformShowcase";
-import { Security } from "@/features/landing/components/Security";
-import { DeployAgents } from "@/features/landing/components/DeployAgents";
+import { LiveTicker } from "@/features/landing/components/LiveTicker";
+import { Proof } from "@/features/landing/components/Proof";
+import { HowItWorks } from "@/features/landing/components/HowItWorks";
+import { Halt } from "@/features/landing/components/Halt";
+import { Engine } from "@/features/landing/components/Engine";
+import { Limits } from "@/features/landing/components/Limits";
 import Footer from "@/features/landing/components/Footer";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-ink text-bone">
       <Nav />
-      <Hero />
-      <GuardStory />
-      <PlatformShowcase />
-      <Security />
-      <DeployAgents />
+      <main>
+        <Hero />
+        <LiveTicker />
+        <Proof />
+        <HowItWorks />
+        <Halt />
+        <Engine />
+        <Limits />
+      </main>
       <Footer />
     </div>
   );
