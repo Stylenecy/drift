@@ -84,12 +84,12 @@ DRIFT's core (the quant engine, the cockpit and `MacroGuard.sol`) comes from the
 | 29 Sep | Read-only MacroGuard transparency panel and the `/guard/state` API |
 | 30 Sep | Own MacroGuard deployment on BSC Testnet and a five-transaction smoke test, all status 1 |
 | 1 Oct | PRD and visual direction; redesigned panel (live state, verdicts, receipt trail); landing story; phone layout; first deck |
-| 2 Oct | Source verified on Sourcify; contract reads straight from the browser; provenance and honest copy; public demo on Vercel |
-| 3 Oct | "Ask the contract"; labelled Binance data fallback; 23 contract tests, 47 engine tests and 8 web tests added; CI workflow; threat model; share card; this README; deck v2 |
+| 2 Oct | Source verified on Sourcify; contract reads straight from the browser, with its first 7 web tests; provenance and honest copy; public demo on Vercel |
+| 3 Oct | "Ask the contract"; labelled Binance data fallback; 23 contract tests, 48 engine tests and 8 web tests added; CI workflow; threat model; share card; this README; deck v2 |
 
 Commit history: [`dex/drift`, commits under `drift/`](https://github.com/Stylenecy/seed-bnb/commits/dex/drift/drift).
 
-### What came from upstream
+## What came from upstream
 
 The quant engine (`apps/trader`: strategies, backtester, optimizer, regime engine, live runner, LLM analyst, Telegram bot), the terminal, the web cockpit and `MacroGuard.sol`. The BNB Chain migration is the seed commit `52671ce` in `bcc-ukdw/seed-bnb` (29 Sep 2026), authored by `yeheskieltame`; its records are [`MIGRATION-BNB.md`](MIGRATION-BNB.md) and [`VERIFY-BNB.md`](VERIFY-BNB.md). The upstream code names no author of DRIFT: its landing page listed only a contact email (`apps/web/src/features/landing/site.ts` at `52671ce`), which this fork replaced with Dex's own contact for the demo. The original author's name and the license will be added once confirmed. The four strategies are ported from [je-suis-tm/quant-trading](https://github.com/je-suis-tm/quant-trading).
 
@@ -100,7 +100,7 @@ The quant engine (`apps/trader`: strategies, backtester, optimizer, regime engin
 | Layer | Command | Count | Notes |
 |---|---|---|---|
 | Contract | `cd contracts && forge test` | 30 (7 upstream + 23 added) | Unit and event tests, 5 fuzz tests, 7 invariants over random agent and stranger call sequences. `forge coverage`: 100% of lines, statements, branches and functions in `MacroGuard.sol`. The contract itself is unchanged. |
-| Engine | `cd apps && pip install -r trader/requirements-dev.txt && python -m pytest trader/tests -c trader/pytest.ini` | 47 passed, 1 strict xfail | Offline: `.env` loading is disabled and any non-loopback connection or DNS lookup fails the test. Covers no look-ahead as a property, the backtester's one-bar shift, the train/test split, the regime classifier, ChainGuard, the API and the data fallback. The xfail pins a known upstream bug (below). |
+| Engine | `cd apps && pip install -r trader/requirements-dev.txt && python -m pytest trader/tests -c trader/pytest.ini` | 48 passed, 1 strict xfail | Offline: `.env` loading is disabled and any non-loopback connection or DNS lookup fails the test. Covers no look-ahead as a property, the backtester's one-bar shift, the train/test split, the regime classifier, ChainGuard, the API and the data fallback. The xfail pins a known upstream bug (below). |
 | Web | `cd apps/web && npm test` | 15 (7 added on 2 Oct, 8 on 3 Oct) | Contract reads and the what-if encoder against `cast` fixtures, RPC fallback, reverts, wrong chain. |
 
 **No look-ahead, tested as a property.** For every strategy, `positions(df[:k])` equals `positions(df)[:k]` at every cut `k`, and rewriting future candles never changes a past position. A test strategy that cheats by trading on its own candle looks like a money machine without the backtester's one-bar shift and loses that edge with it (asserted on a seeded synthetic random walk in `apps/trader/tests/test_backtester.py`).

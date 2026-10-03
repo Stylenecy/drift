@@ -64,8 +64,9 @@ classification, LLM analyst, Telegram control, the web app.
 
 ## 7. Non-goals
 
-- No change to engine logic, contract code, or API response shapes, with one exception relaxed
-  on 3 Oct 2026 at Dex's request: when Bybit is unreachable, the engine's public market data
+- No change to engine logic, contract code, or API response shapes, with one exception opened
+  on 3 Oct 2026 so the research path can be proven from a network that cannot reach Bybit: when
+  Bybit is unreachable, the engine's public market data
   (klines, tickers) falls back to Binance public data (`data-api.binance.vision`), and the
   affected responses gain an optional `source` field (`bybit` or `binance`) that the cockpit and
   the terminal show. The fallback fires only when Bybit is unreachable. Orders still go to Bybit
