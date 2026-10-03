@@ -3,7 +3,14 @@
 Uses only verified facts: the real Dex deployment, its receipts (docs/deployment-dex.md),
 test counts from real runs, and the provenance sentence read from README.md.
 Business-model statements are labelled as hypotheses; no market figures are used.
-Output: docs/submission/DRIFT-pitch.pptx
+Output: docs/submission/DRIFT-pitch.pptx (a PDF with embedded fonts is exported from it).
+
+Visual rules (docs/VISUAL-DIRECTION.md): colours are the brand tokens; gold marks only what
+a judge can check on-chain (addresses, block numbers, the halt line, "exact match", the
+"check it yourself" links); periwinkle marks only the off-chain engine. Headings are white.
+Fonts: Calibri and Consolas stand in for Geist and Geist Mono, because a .pptx renders
+with the fonts installed on the viewer's machine and Geist is not a system font. Mono is
+used for machine-written values (addresses, blocks, calls, URLs).
 """
 import os
 import re
@@ -27,15 +34,31 @@ LIVE = "drift-macroguard.vercel.app/macroguard"
 REPO = "github.com/Stylenecy/seed-bnb/tree/dex/drift/drift"
 CONTRACT = "0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D"
 
-BG = RGBColor(0x0B, 0x0C, 0x0F)
-PANEL = RGBColor(0x16, 0x17, 0x1B)
-FG = RGBColor(0xF4, 0xF5, 0xF8)
-MUTED = RGBColor(0xA6, 0xAB, 0xB8)
-ACCENT = RGBColor(0xAE, 0xB9, 0xF4)  # periwinkle = off-chain engine
-GREEN = RGBColor(0x78, 0xD5, 0xAB)
-AMBER = RGBColor(0xE5, 0xBD, 0x71)
-ROSE = RGBColor(0xFB, 0x71, 0x85)
-GOLD = RGBColor(0xF0, 0xB9, 0x0B)  # on-chain / verifiable (see VISUAL-DIRECTION.md)
+SANS = "Calibri"
+MONO = "Consolas"
+
+
+def hex_rgb(value: str) -> RGBColor:
+    return RGBColor.from_string(value.lstrip("#"))
+
+
+def over_ink(value: str, alpha: float) -> RGBColor:
+    """A token at `alpha` opacity on the ink ground, as the web composes it (e.g. white/65)."""
+    top = [int(value.lstrip("#")[i : i + 2], 16) for i in (0, 2, 4)]
+    ink = [0x0B, 0x0C, 0x0F]
+    return RGBColor(*[round(t * alpha + b * (1 - alpha)) for t, b in zip(top, ink)])
+
+
+# Brand tokens (VISUAL-DIRECTION.md)
+BG = hex_rgb("#0B0C0F")  # ink
+FG = hex_rgb("#FFFFFF")
+MUTED = over_ink("#FFFFFF", 0.65)  # body text >= white/60
+PANEL = over_ink("#FFFFFF", 0.06)
+GOLD = hex_rgb("#F0B90B")  # on-chain / verifiable
+ACCENT = hex_rgb("#9AA8F0")  # periwinkle: off-chain engine
+GREEN = hex_rgb("#34D399")  # allowed / running / passing
+AMBER = hex_rgb("#FBBF24")  # attention
+ROSE = hex_rgb("#FB7185")  # halted / blocked
 
 prs = Presentation()
 prs.slide_width = Inches(13.333)
@@ -53,7 +76,7 @@ def slide(notes=None):
     return s
 
 
-def box(s, left, top, width, height, text, size=24, color=FG, bold=False):
+def box(s, left, top, width, height, text, size=24, color=FG, bold=False, font=SANS):
     tx = s.shapes.add_textbox(Inches(left), Inches(top), Inches(width), Inches(height))
     tf = tx.text_frame
     tf.word_wrap = True
@@ -63,7 +86,7 @@ def box(s, left, top, width, height, text, size=24, color=FG, bold=False):
         p.font.size = Pt(size)
         p.font.bold = bold
         p.font.color.rgb = color
-        p.font.name = "Calibri"
+        p.font.name = font
         p.space_after = Pt(size * 0.35)
     return tx
 
@@ -83,24 +106,26 @@ def shot(s, name, left, top, width):
     s.shapes.add_picture(path, Inches(left), Inches(top), width=Inches(width))
 
 
-def title(s, text, color=FG):
-    box(s, 0.7, 0.4, 11.9, 0.9, text, 36, color, True)
+def title(s, text):
+    box(s, 0.7, 0.4, 11.9, 0.9, text, 36, FG, True)
 
 
 # 1. Title
 s = slide("DRIFT in one line: the trading bot's risk rules live in a public contract on BNB Chain, so anyone can check them.")
-box(s, 0.7, 0.7, 11.9, 1.2, "DRIFT", 60, GOLD, True)
+box(s, 0.7, 0.7, 11.9, 1.2, "DRIFT", 60, FG, True)
 box(s, 0.7, 2.0, 11.9, 1.2, "A trading bot whose risk rules you can verify", 34, FG, True)
 box(s, 0.7, 3.2, 11.9, 0.8, "Off-chain quant research · on-chain risk gate on BNB Chain", 22, MUTED)
-box(s, 0.7, 4.6, 11.9, 0.5, f"Live: {LIVE}", 18, FG)
-box(s, 0.7, 5.2, 11.9, 0.5, f"Dex contract (BSC Testnet): {CONTRACT}", 16, GOLD)
-box(s, 0.7, 6.4, 11.9, 0.5, "Indonesia Web3 Hackathon 2026 · Dex Bennett", 18, MUTED)
+box(s, 0.7, 4.6, 11.9, 0.5, "Live demo", 16, MUTED)
+box(s, 0.7, 5.0, 11.9, 0.5, LIVE, 18, FG, font=MONO)
+box(s, 0.7, 5.6, 11.9, 0.5, "Dex's contract on BSC Testnet", 16, MUTED)
+box(s, 0.7, 6.0, 11.9, 0.5, CONTRACT, 18, GOLD, font=MONO)
+box(s, 0.7, 6.75, 11.9, 0.5, "Indonesia Web3 Hackathon 2026 · Dex Bennett", 16, MUTED)
 
 # 2. Problem and promise
 s = slide("Bots ask for trust. DRIFT replaces the promise with a public rule and a public record.")
 title(s, "The problem")
 box(s, 0.7, 1.6, 11.9, 1.6, "Trading bots ask users to trust risk rules nobody can see.\nSettings change silently; off-chain decision logs can be rewritten.", 24)
-box(s, 0.7, 3.6, 11.9, 0.7, "The promise", 28, GOLD, True)
+box(s, 0.7, 3.6, 11.9, 0.7, "The promise", 28, FG, True)
 box(s, 0.7, 4.4, 11.9, 1.6, "Anyone can check what DRIFT's bot is allowed to do right now,\nand every recorded decision is public on BscScan.", 24)
 
 # 3. Who needs it and the business model (hypotheses)
@@ -110,7 +135,7 @@ s = slide(
 )
 title(s, "Who needs it, and how it could pay")
 box(s, 0.7, 1.35, 11.9, 0.5, "HYPOTHESIS: not yet validated with users; no market figures claimed", 15, AMBER, True)
-box(s, 0.7, 2.0, 5.6, 0.6, "Who needs it", 24, ACCENT, True)
+box(s, 0.7, 2.0, 5.6, 0.6, "Who needs it", 24, FG, True)
 box(
     s, 0.7, 2.7, 5.6, 3.6,
     "Retail traders who follow or rent bots: proof that the risk stop is real\n"
@@ -118,12 +143,12 @@ box(
     "Communities and auditors: check a bot's rules without trusting its operator",
     18,
 )
-box(s, 6.9, 2.0, 5.7, 0.6, "How it could pay", 24, GOLD, True)
+box(s, 6.9, 2.0, 5.7, 0.6, "How it could pay", 24, FG, True)
 box(
     s, 6.9, 2.7, 5.7, 3.6,
     "A risk gate per bot: its own MacroGuard plus a public panel, as a monthly service\n"
     "The panel link as a trust badge for strategy sellers\n"
-    "No custody and no performance fee; on-chain cost per decision stays tiny (next slides)",
+    "No custody and no performance fee; on-chain cost per decision stays tiny (slide 7)",
     18,
 )
 
@@ -132,15 +157,16 @@ s = slide("Four steps: signal off-chain, ask the gate, trade on the exchange, re
 title(s, "How DRIFT works")
 steps = [
     ("1  Signal", "Python engine: four strategies, point-in-time, no look-ahead", ACCENT),
-    ("2  Ask the gate", "MacroGuard.allowed(signal) on BSC Testnet: regime + 20% halt", GOLD),
+    ("2  Ask the gate", "MacroGuard.allowed(signal) on BSC Testnet: regime + 20% halt", FG),
     ("3  Trade", "Runner places the order on Bybit testnet (vetoed signals go Flat)", ACCENT),
-    ("4  Record", "recordDecision(...) leaves a public receipt; a breach halts the contract", GOLD),
+    ("4  Record", "recordDecision(...) leaves a public receipt; a breach halts the contract", FG),
 ]
 for i, (head, body, color) in enumerate(steps):
     y = 1.6 + i * 1.15
     box(s, 0.7, y, 3.2, 0.6, head, 24, color, True)
     box(s, 4.0, y + 0.05, 8.6, 0.9, body, 20, FG)
-box(s, 0.7, 6.3, 11.9, 0.6, "The contract never executes orders; it is the public rule and the public record.", 18, MUTED)
+box(s, 0.7, 6.1, 11.9, 0.5, "Periwinkle: off-chain engine · white: on-chain contract", 14, MUTED)
+box(s, 0.7, 6.5, 11.9, 0.6, "The contract never executes orders; it is the public rule and the public record.", 18, MUTED)
 
 # 5. Product
 s = slide(
@@ -161,8 +187,8 @@ s = slide(
 title(s, "−25% recorded: the contract halted itself")
 # gauge: 0 → 30%, halt line at 20%, recorded −1% and −25%
 gx, gy, gw = 0.9, 2.05, 11.5
-rect(s, gx, gy, gw * 20 / 30, 0.22, RGBColor(0x1F, 0x4D, 0x3B))
-rect(s, gx + gw * 20 / 30, gy, gw * 10 / 30, 0.22, RGBColor(0x5A, 0x23, 0x2D))
+rect(s, gx, gy, gw * 20 / 30, 0.22, over_ink("#34D399", 0.25))
+rect(s, gx + gw * 20 / 30, gy, gw * 10 / 30, 0.22, over_ink("#FB7185", 0.25))
 rect(s, gx + gw * 20 / 30 - 0.02, gy - 0.25, 0.05, 0.72, GOLD)
 for pct, color in ((1, GREEN), (25, ROSE)):
     rect(s, gx + gw * pct / 30 - 0.17, gy - 0.06, 0.34, 0.34, color, MSO_SHAPE.OVAL)
@@ -180,8 +206,8 @@ for i, (block, call, outcome, color) in enumerate(rows):
     y = 3.15 + i * 0.68
     if color == ROSE:
         rect(s, 0.6, y - 0.05, 12.1, 0.64, PANEL)
-    box(s, 0.8, y, 2.3, 0.5, f"#{block}", 17, GOLD)
-    box(s, 3.2, y, 4.6, 0.5, call, 17, FG, color == ROSE)
+    box(s, 0.8, y, 2.3, 0.5, f"#{block}", 16, GOLD, font=MONO)
+    box(s, 3.2, y, 4.6, 0.5, call, 16, FG, color == ROSE, font=MONO)
     box(s, 7.9, y, 4.8, 0.5, outcome, 17, color)
 box(s, 0.7, 6.75, 11.9, 0.5, "Every row is a transaction with receipt status 1 on BscScan · block 134,042,283 is the halt", 14, MUTED)
 
@@ -191,11 +217,11 @@ s = slide(
     "The panel reads the chain from the browser because the public RPCs allow it."
 )
 title(s, "Why BNB Chain")
-box(s, 0.7, 1.6, 5.9, 0.9, "≈ 0.0000034 tBNB", 40, GOLD, True)
-box(s, 0.7, 2.5, 5.9, 1.2, "per recorded decision: 33,189–34,323 gas\nat 0.1 gwei (our receipts, BSC Testnet)", 18, FG)
-box(s, 0.7, 4.0, 5.9, 0.9, "≈ 0.00008 tBNB a day", 30, GOLD, True)
-box(s, 0.7, 4.8, 5.9, 1.0, "for an hourly bot (24 decisions);\ndeploy: 449,207 gas ≈ 0.000045 tBNB", 18, FG)
-box(s, 7.0, 1.6, 5.6, 0.6, "What else it gives us", 24, ACCENT, True)
+box(s, 0.7, 1.6, 5.9, 0.9, "≈ 0.0000034 tBNB", 40, FG, True)
+box(s, 0.7, 2.5, 5.9, 1.2, "per recorded decision: 33,189–34,323 gas\nat 0.1 gwei (our receipts, BSC Testnet)", 18, MUTED)
+box(s, 0.7, 4.0, 5.9, 0.9, "≈ 0.00008 tBNB a day", 30, FG, True)
+box(s, 0.7, 4.8, 5.9, 1.0, "for an hourly bot (24 decisions);\ndeploy: 449,207 gas ≈ 0.000045 tBNB", 18, MUTED)
+box(s, 7.0, 1.6, 5.6, 0.6, "What else it gives us", 24, FG, True)
 box(
     s, 7.0, 2.4, 5.6, 3.6,
     "EVM: Foundry tests and Sourcify verification on chain 97\n"
@@ -211,7 +237,7 @@ s = slide("Numbers from real runs on 3 Oct 2026. CI is set up and runs after the
 title(s, "Evidence and current limits")
 facts = [
     ("30 / 30", "contract tests: unit, fuzz, invariant\n100% coverage of MacroGuard.sol", GREEN),
-    ("45", "offline engine tests;\nno look-ahead tested as a property", GREEN),
+    ("47", "offline engine tests;\nno look-ahead tested as a property", GREEN),
     ("15", "web tests: contract reads and the\nwhat-if encoder against cast", GREEN),
     ("exact match", "source verified on Sourcify\n6 receipts, all status 1", GOLD),
 ]
@@ -231,20 +257,20 @@ box(
 s = slide(PROVENANCE)
 title(s, "What Dex added")
 box(s, 0.7, 1.5, 5.2, 0.7, "Upstream DRIFT project", 24, MUTED, True)
-box(s, 0.7, 2.3, 5.5, 2.8, "Quant engine, cockpit and MacroGuard.sol\nBuilt for a Mantle hackathon track (June 2026)\nMigrated to BNB Chain in bcc-ukdw/seed-bnb\n(commit 52671ce, 29 Sep 2026)", 18)
-box(s, 6.6, 1.5, 6.0, 0.7, "Dex's work in this fork", 24, GOLD, True)
+box(s, 0.7, 2.3, 5.5, 2.8, "Quant engine, cockpit and MacroGuard.sol\n7 contract tests\nBuilt for a Mantle hackathon track (June 2026)\nMigrated to BNB Chain in bcc-ukdw/seed-bnb\n(commit 52671ce, 29 Sep 2026)", 18)
+box(s, 6.6, 1.5, 6.0, 0.7, "Dex's work in this fork", 24, FG, True)
 box(
     s, 6.6, 2.3, 6.0, 4.0,
     "Own BSC Testnet deploy + 5-tx smoke test (status 1)\n"
     "Source verified on Sourcify (exact match)\n"
     "Public panel: live browser reads, receipts, limits\n"
     "Ask the contract: eth_call what-if, nothing signed\n"
-    "23 contract + 45 engine + 8 web tests, CI\n"
+    "+23 contract tests, 47 engine tests, 15 web tests, CI\n"
     "Labelled Binance data fallback · threat model\n"
     "Landing, visual system, PRD, this deck",
     17,
 )
-box(s, 0.7, 6.4, 11.9, 0.5, f"Code: {REPO}", 16, ACCENT)
+box(s, 0.7, 6.4, 11.9, 0.5, f"Code: {REPO}", 16, MUTED, font=MONO)
 
 # 10. Roadmap and links
 s = slide("Roadmap items are not built yet. The links are live today.")
@@ -261,7 +287,7 @@ box(
     18,
 )
 box(s, 7.4, 2.0, 5.2, 0.6, "Check it yourself", 24, GOLD, True)
-box(s, 7.4, 2.8, 5.2, 3.0, f"{LIVE}\n{REPO}\nBscScan: {CONTRACT[:10]}…{CONTRACT[-6:]}\nSourcify: repo.sourcify.dev/97/…", 16, FG)
+box(s, 7.4, 2.8, 5.4, 3.0, f"{LIVE}\n{REPO}\nBscScan: {CONTRACT[:10]}…{CONTRACT[-6:]}\nSourcify: repo.sourcify.dev/97/…", 15, FG, font=MONO)
 
 # Document properties: the library's template ships its own author and description.
 props = prs.core_properties
@@ -271,7 +297,7 @@ props.last_modified_by = "Dex Bennett"
 props.comments = "DRIFT pitch deck: public risk gate on BNB Chain"  # dc:description
 props.subject = "Indonesia Web3 Hackathon 2026 · BNB Chain"
 props.created = props.modified = datetime.now(timezone.utc).replace(tzinfo=None)
-props.revision = 2
+props.revision = 3
 
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 prs.save(OUT)

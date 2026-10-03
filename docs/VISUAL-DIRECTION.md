@@ -13,6 +13,10 @@ evidence (a live badge, a receipt hash, a halt line), not from glow effects or p
 
 **Type:** Geist Sans for prose and headlines (tight tracking, bold, short lines). Geist Mono for
 anything a machine wrote: addresses, hashes, bps, block numbers, chain IDs. Tabular numbers.
+*Deck (2026-10-03):* the .pptx uses Calibri and Consolas in place of Geist and Geist Mono, because
+a .pptx renders with the viewer's installed fonts and Geist is not a system font; the PDF export
+embeds them. Colours stay the tokens above, headings are white, and gold still means "checkable
+on-chain".
 
 **Motion:** one idea per screen. Live badge breathes (2 s pulse); timeline steps reveal in order;
 gauge marker slides to its value. All of it off under `prefers-reduced-motion`. No parallax on data.
