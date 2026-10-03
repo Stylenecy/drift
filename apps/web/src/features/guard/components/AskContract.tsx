@@ -219,8 +219,8 @@ export function AskContract({ live, thresholdBps }: { live: GuardState | null; t
             >
               <WarnIcon />
               <p className="min-w-0 [overflow-wrap:anywhere]">
-                <strong className="font-semibold">The contract could not be asked.</strong> {phase.error}. No transaction
-                was involved. Try again in a moment.
+                <strong className="font-semibold">The contract could not be asked.</strong> Reason: {phase.error}. No
+                transaction was involved. Try again in a moment.
               </p>
             </div>
           )}
