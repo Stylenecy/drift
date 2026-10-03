@@ -7,7 +7,7 @@ from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
 from .backtester import run_backtest
-from .bybit_client import BybitClient
+from .bybit_client import SOURCE_BYBIT, BybitClient
 from .chain import guard as chain_guard
 from .config import (
     ALLOWED_ORIGINS,
@@ -63,6 +63,13 @@ _bots = BotManager(_connection)
 _regime: regime_engine.Regime | None = None
 
 
+def should_push_regime(reg: regime_engine.Regime, onchain: int | None) -> bool:
+    """Write the regime on-chain only when it changed and was classified from Bybit
+    data. A regime computed from the Binance public-data fallback is shown (labelled)
+    but never written to MacroGuard, so fallback data never steers live trading."""
+    return onchain is not None and reg.regime != onchain and reg.source == SOURCE_BYBIT
+
+
 @app.on_event("startup")
 def _auto_connect() -> None:
     """Auto-connect from environment keys, if provided, so the cockpit shows
@@ -90,7 +97,10 @@ async def _regime_loop() -> None:
                 _regime = reg
                 if chain_guard.enabled:
                     onchain = await asyncio.to_thread(chain_guard.current_regime)
-                    if onchain is not None and reg.regime != onchain:
+                    if not should_push_regime(reg, onchain):
+                        if onchain is not None and reg.regime != onchain:
+                            print(f"[drift] regime {reg.label} from {reg.source} data: not written on-chain")
+                    else:
                         tx = await asyncio.to_thread(chain_guard.set_regime, reg.regime)
                         print(f"[drift] regime → {reg.label} (on-chain tx {tx})")
                         await asyncio.to_thread(

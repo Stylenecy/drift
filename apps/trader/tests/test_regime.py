@@ -46,3 +46,14 @@ def test_the_live_regime_names_its_data_source():
     reg = regime.current(FallbackClient())
     assert reg.source == "binance"
     assert reg.as_dict()["source"] == "binance"
+
+
+def test_a_regime_from_fallback_data_is_never_written_on_chain():
+    from app.main import should_push_regime
+
+    reg = regime.Regime(regime.RISK_OFF, "risk-off", 2.0, -0.01, 60000.0, source="binance")
+    assert should_push_regime(reg, regime.NEUTRAL) is False  # changed, but classified from Binance data
+    reg.source = "bybit"
+    assert should_push_regime(reg, regime.NEUTRAL) is True
+    assert should_push_regime(reg, regime.RISK_OFF) is False  # unchanged: nothing to write
+    assert should_push_regime(reg, None) is False  # on-chain regime unreadable

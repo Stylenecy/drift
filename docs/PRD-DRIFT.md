@@ -68,8 +68,9 @@ classification, LLM analyst, Telegram control, the web app.
   on 3 Oct 2026 at Dex's request: when Bybit is unreachable, the engine's public market data
   (klines, tickers) falls back to Binance public data (`data-api.binance.vision`), and the
   affected responses gain an optional `source` field (`bybit` or `binance`) that the cockpit and
-  the terminal show. Orders still go to Bybit testnet, and the live runner never trades on
-  fallback data. The contract code is unchanged.
+  the terminal show. The fallback fires only when Bybit is unreachable. Orders still go to Bybit
+  testnet, the live runner never trades on fallback data, and a regime classified from fallback
+  data is never written on-chain. The contract code is unchanged.
 - No new transactions, redeploys, or mainnet anything.
 - No live Bybit trading demo; no wallet-connect flow.
 - No new data source for the decision timeline: it shows the documented smoke-test receipts

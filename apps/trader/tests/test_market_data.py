@@ -10,13 +10,13 @@ from app import bybit_client as bc
 
 
 class DeadSession:
-    """pybit session for a network where Bybit is unreachable."""
+    """pybit session for a network where Bybit is unreachable (pybit re-raises requests' errors)."""
 
     def get_kline(self, **kwargs):
-        raise ConnectionError("api.bybit.com unreachable")
+        raise requests.exceptions.ConnectionError("api.bybit.com unreachable")
 
     def get_tickers(self, **kwargs):
-        raise ConnectionError("api.bybit.com unreachable")
+        raise requests.exceptions.ConnectionError("api.bybit.com unreachable")
 
 
 class FakeResponse:
@@ -76,11 +76,31 @@ def test_bybit_answers_first_when_it_is_reachable(monkeypatch):
 
 def test_trading_paths_never_fall_back(monkeypatch):
     monkeypatch.setattr(bc.requests, "get", lambda *a, **k: pytest.fail("Binance must not be called"))
-    with pytest.raises(ConnectionError):
+    with pytest.raises(requests.exceptions.ConnectionError):
         make_client(fallback=False).klines("BTCUSDT", "1h", 3)
     # The terminal's live bot loop opts out explicitly on the shared public client.
-    with pytest.raises(ConnectionError):
+    with pytest.raises(requests.exceptions.ConnectionError):
         make_client().klines("BTCUSDT", "1h", 3, fallback=False)
+
+
+def test_an_answer_from_bybit_is_never_replaced(monkeypatch):
+    """Only an unreachable Bybit triggers the fallback; an error answer (unknown symbol, no data) stands."""
+    from pybit.exceptions import InvalidRequestError
+
+    class RefusingSession:
+        def get_kline(self, **kwargs):
+            raise InvalidRequestError(request="GET /v5/market/kline", message="Not supported symbols",
+                                      status_code=10001, time="00:00:00", resp_headers={})
+
+    class EmptySession:
+        def get_kline(self, **kwargs):
+            return {"result": {"list": []}}
+
+    monkeypatch.setattr(bc.requests, "get", lambda *a, **k: pytest.fail("Binance must not be called"))
+    with pytest.raises(InvalidRequestError):
+        make_client(session=RefusingSession()).klines("NOPEUSDT", "1h", 3)
+    with pytest.raises(ValueError, match="no kline data"):
+        make_client(session=EmptySession()).klines("BTCUSDT", "1h", 3)
 
 
 def test_tickers_fall_back_in_bybit_field_names(monkeypatch):

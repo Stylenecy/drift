@@ -26,7 +26,7 @@ are public and checkable; its limits are listed here so nobody has to discover t
 | Only the agent writes | `onlyAgent` modifier; `agent` is `immutable` | A single EOA. If the key leaks, the holder controls regime, records and `resume()` | Fuzzed and invariant-tested (`testFuzz_NobodyButTheAgentCanWrite`, `invariant_StrangersNeverWrite`) · roadmap: multisig or timelock for `resume`/`setRegime`, key in a hardware signer |
 | A drawdown at or past the limit halts | `recordDecision` sets `halted` when `drawdownBps <= -maxDrawdownBps` (2000 bps) | The drawdown is **self-reported** by the agent; the contract cannot see the exchange account. A buggy or dishonest runner can report 0 | Boundary tested (−1999 vs −2000) · roadmap: attested equity (signed exchange snapshots or an oracle) |
 | A halt allows only Flat | `allowed()` returns `signal == Flat` while halted | `resume()` clears the halt at once, with no delay and no second signer. A halt is a recorded pause, not a lock | `Resumed` is logged on-chain · roadmap: timelock on `resume` |
-| Risk off vetoes new Longs | `allowed()` returns `signal != Long` in `RiskOff` | The regime is classified **off-chain** (BTC 1h realised-vol z-score + EWMA trend) and pushed by the agent; the contract trusts it | `RegimeSet` is logged · roadmap: EIP-712 signed regime verdicts with a hash of their inputs |
+| Risk off vetoes new Longs | `allowed()` returns `signal != Long` in `RiskOff` | The regime is classified **off-chain** (BTC 1h realised-vol z-score + EWMA trend) and pushed by the agent; the contract trusts it | `RegimeSet` is logged; only a regime classified from Bybit data is pushed (`should_push_regime`) · roadmap: EIP-712 signed regime verdicts with a hash of their inputs |
 | The runner checks the gate before ordering | `ChainGuard.allowed()` before every order | **Fails open**: if the RPC is unreachable or errors, the runner trades under its local drawdown stop only | Pinned by `test_allowed_fails_open_when_the_rpc_is_down`; shown on the panel · roadmap: a fail-closed mode |
 | Every decision is on the public record | `Decision` event and `decisionCount` | The record holds what the agent sends. The runner records the **post-veto** target, so a vetoed Long appears as Flat (allowed). Failed or skipped writes leave no record. Records are not linked to exchange fills | Pinned by `test_runner_records_the_post_veto_target` · roadmap: record the raw signal plus a veto flag; commit-then-attest hashes of fills |
 | The panel shows the real contract | Contract address and RPC URLs are code constants (`chainRead.ts`); chain id and code are checked; nothing in the URL or storage can redirect it | The panel trusts the first public RPC that answers; a lying RPC could show false state | Every value links to BscScan; the what-if shows a `cast call` to replay · roadmap: cross-check two RPCs |
@@ -34,7 +34,7 @@ are public and checkable; its limits are listed here so nobody has to discover t
 | Bad inputs are rejected | Solidity's ABI decoder rejects enum values above 2 | — | Fuzzed (`testFuzz_OutOfRangeSignalIsRejected`) |
 | The halt threshold is sane | Set once in the constructor (2000 bps on this deployment) | Not validated: `maxDrawdownBps = 0` would halt on the first non-positive drawdown; it cannot be changed after deploy | Tested (`test_ZeroThresholdHaltsOnTheFirstNonPositiveDrawdown`) · roadmap: bounded constructor argument |
 | The engine API stays private | The engine runs on the operator's machine; the hosted demo never calls it | Mutating endpoints (`POST /bots`, `/connection`, `/telegram`, `DELETE /bots/{id}`) have no auth | Never deployed or tunnelled · roadmap: auth before any hosting |
-| Market data is labelled | `source` on every frame and response (`bybit`, or `binance` on fallback) | Binance spot candles differ slightly from Bybit perpetuals | Live trading never uses fallback data; orders go to Bybit testnet only |
+| Market data is labelled | `source` on every frame and response (`bybit`, or `binance` on fallback); the fallback fires only when Bybit is unreachable, never to replace an error answer | Binance spot candles differ slightly from Bybit perpetuals | Live trading never uses fallback data, and a regime classified from it is never written on-chain (pinned by `test_a_regime_from_fallback_data_is_never_written_on_chain`); orders go to Bybit testnet only |
 
 **A note on the contract's own comment.** The NatSpec in `MacroGuard.sol` says the rules live on-chain
 "where the bot itself cannot override them". That overstates it: the agent key can `resume()` and
@@ -63,12 +63,12 @@ cast call 0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D "allowed(uint8)(bool)" 1 --
 cast call 0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D "recordDecision(string,uint8,uint256,int256)(bool)" \
   --from 0x2B07AfB54068042664074781Af36163aC6714b81 --rpc-url https://bsc-testnet-rpc.publicnode.com -- BTCUSDT 1 0 -2500
 
-# The same call from any other address reverts with NotAgent() (0x0d9ab13f)
+# A write from any other address reverts with NotAgent() (0x0d9ab13f)
 cast call 0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D "setRegime(uint8)" 2 \
   --from 0x000000000000000000000000000000000000dEaD --rpc-url https://bsc-testnet-rpc.publicnode.com
 
 # Tests: contract, engine (offline), web
 cd contracts && forge test
-cd apps/trader && python -m pytest
+cd apps && python -m pytest trader/tests -c trader/pytest.ini
 cd apps/web && npm test
 ```

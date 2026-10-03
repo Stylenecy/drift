@@ -348,11 +348,16 @@ def err(msg: str) -> None:
     console.print(f"[{DOWN}]error[/] [dim]·[/] {msg}")
 
 
-def source_line(source: Optional[str]) -> Text:
-    """Where the market data came from, so a fallback is never silent."""
+def source_line(source: Optional[str], df=None) -> Text:
+    """Where the market data came from, and which candles, so a fallback is never silent."""
+    span = ""
+    if df is not None and len(df):
+        first = time.strftime("%Y-%m-%d %H:%M", time.gmtime(int(df["time"].iloc[0])))
+        last = time.strftime("%Y-%m-%d %H:%M", time.gmtime(int(df["time"].iloc[-1])))
+        span = f"\n{len(df)} candles · {first} → {last} UTC"
     if source == "binance":
-        return Text("data · Binance public market data (fallback: Bybit unreachable) · spot, not Bybit perps", style=AMBER)
-    return Text("data · Bybit V5 public market data", style="dim")
+        return Text(f"data · Binance public market data (fallback: Bybit unreachable) · spot, not Bybit perps{span}", style=AMBER)
+    return Text(f"data · Bybit V5 public market data{span}", style="dim")
 
 
 # ------------------------------------------------------------ connection --
@@ -463,7 +468,7 @@ def cmd_chart(sym: str, tf: str = "1h") -> None:
     closes = df["close"].tolist()
     col = UP if closes[-1] >= closes[0] else DOWN
     sub = Text(f"{fmt(min(closes))} – {fmt(max(closes))}   last {fmt(closes[-1])}", style="dim")
-    console.print(Panel(Group(line_chart(closes, color=col), sub, source_line(df.attrs.get("source"))),
+    console.print(Panel(Group(line_chart(closes, color=col), sub, source_line(df.attrs.get("source"), df)),
                         title=f"{sym} · {tf}", border_style=col, box=box.ROUNDED))
 
 
@@ -494,7 +499,8 @@ def cmd_backtest(strat: str, sym: str, tf: str = "1h") -> None:
         _stat("trades", str(m.num_trades)),
     )
     eq = [p.equity for p in res.equity_curve]
-    console.print(Panel(Group(grid, Text(""), line_chart(eq, color=col), source_line(df.attrs.get("source"))),
+    scale = Text("equity curve scaled from its minimum to its maximum, not from zero", style="dim")
+    console.print(Panel(Group(grid, Text(""), line_chart(eq, color=col), scale, source_line(df.attrs.get("source"), df)),
                         title=f"backtest · {res.strategy} · {sym} {tf}", border_style=col, box=box.ROUNDED))
 
 
@@ -524,7 +530,7 @@ def cmd_research(sym: str, tf: str = "1h") -> None:
             Text(r.verdict, style=vstyle.get(r.verdict, "white")),
         )
     console.print(t)
-    console.print(source_line(df.attrs.get("source")))
+    console.print(source_line(df.attrs.get("source"), df))
     if res.results:
         best = res.results[0]
         console.print(f"[dim]› deploy the winner:[/] [bold {ACCENT}]bot {best.strategy} {sym.replace('USDT','').lower()} {tf}[/]")

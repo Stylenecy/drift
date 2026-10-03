@@ -17,6 +17,7 @@ from typing import Iterable, Optional
 
 import pandas as pd
 import requests
+from pybit.exceptions import FailedRequestError
 from pybit.unified_trading import HTTP
 
 from .config import TIMEFRAMES
@@ -31,6 +32,11 @@ BINANCE_DATA_URL = "https://data-api.binance.vision/api/v3"
 FALLBACK_TICKER_SYMBOLS = ("BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT", "XRPUSDT", "DOGEUSDT", "ARBUSDT")
 
 _FRAME_COLUMNS = ["time", "open", "high", "low", "close", "volume"]
+
+# "Bybit could not be reached": network, DNS, TLS, timeout, or an HTTP status such as
+# a regional 403. Only these trigger the fallback. An answer from Bybit, even an error
+# (unknown symbol, empty data), is never replaced by another source.
+UNREACHABLE = (requests.exceptions.RequestException, FailedRequestError)
 
 
 def _frame(rows: list, symbol: str, timeframe: str) -> pd.DataFrame:
@@ -120,14 +126,15 @@ class BybitClient:
         """Fetch the most recent `bars` candles, oldest-first.
 
         Bybit caps each request at 1000 candles, so a single call suffices here.
-        ``df.attrs["source"]`` is "bybit", or "binance" when the fallback answered.
+        ``df.attrs["source"]`` is "bybit", or "binance" when Bybit was unreachable
+        and the fallback answered.
         Pass ``fallback=False`` where a live trading decision reads the candles.
         """
         if timeframe not in TIMEFRAMES:
             raise ValueError(f"unsupported timeframe: {timeframe}")
         try:
             df = self._bybit_klines(symbol, timeframe, bars)
-        except Exception as primary:
+        except UNREACHABLE as primary:
             if not (self.data_fallback if fallback is None else fallback):
                 raise
             try:
@@ -157,7 +164,7 @@ class BybitClient:
         """All linear-perp tickers, keyed by symbol; each row carries its "source"."""
         try:
             resp = self.session.get_tickers(category="linear")
-        except Exception as primary:
+        except UNREACHABLE as primary:
             if not self.data_fallback:
                 raise
             try:
