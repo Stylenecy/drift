@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/components/AuthProvider";
+import { AUTH_ENABLED } from "@/lib/auth";
 import "@/styles/globals.css";
 
 const geistSans = Geist({
@@ -17,6 +18,8 @@ export const metadata: Metadata = {
   title: "DRIFT — AI quant strategies with honest backtests",
   description:
     "DRIFT runs transparent quant strategies on Bybit with point-in-time backtests and bounded, on-the-record risk. No look-ahead, no black box.",
+  // Public commit id of this build, so anyone can check which commit a deployment serves.
+  other: { "build-sha": process.env.NEXT_PUBLIC_BUILD_SHA ?? "local" },
 };
 
 export default function RootLayout({
@@ -28,7 +31,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full">
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider enabled={AUTH_ENABLED}>{children}</AuthProvider>
       </body>
     </html>
   );

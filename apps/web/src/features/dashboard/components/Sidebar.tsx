@@ -10,7 +10,7 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="flex h-full w-60 shrink-0 flex-col border-r border-white/10 bg-[#0a0b0e]">
+    <aside className="hidden h-full w-60 shrink-0 md:flex flex-col border-r border-white/10 bg-[#0a0b0e]">
       {/* brand → back to landing */}
       <div className="flex h-14 items-center gap-2.5 border-b border-white/10 px-5">
         <Link href="/">
@@ -26,7 +26,7 @@ export function Sidebar() {
         {navGroups.map((group, gi) => (
           <div key={gi} className={gi > 0 ? "mt-5" : ""}>
             {group.title && (
-              <div className="px-2 pb-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-white/30">
+              <div className="px-2 pb-1.5 font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-white/60">
                 {group.title}
               </div>
             )}

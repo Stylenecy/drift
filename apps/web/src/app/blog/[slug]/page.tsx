@@ -3,6 +3,7 @@ import Link from "next/link";
 import Nav from "@/features/landing/components/Nav";
 import Footer from "@/features/landing/components/Footer";
 import { posts, getPost, type ContentBlock } from "@/features/landing/blogs";
+import { ArchiveBanner } from "@/features/landing/components/ArchiveBanner";
 
 export function generateStaticParams() {
   return posts.map((p) => ({ slug: p.slug }));
@@ -35,7 +36,7 @@ function Block({ block }: { block: ContentBlock }) {
       );
     case "blockquote":
       return (
-        <blockquote className="my-8 border-l-2 border-white/20 pl-5 text-base italic leading-relaxed text-white/50">
+        <blockquote className="my-8 border-l-2 border-white/20 pl-5 text-base italic leading-relaxed text-white/60">
           {block.text}
         </blockquote>
       );
@@ -49,7 +50,7 @@ function Block({ block }: { block: ContentBlock }) {
       return (
         <ul className="mb-6 space-y-2.5 pl-1">
           {block.items.map((item, i) => (
-            <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-white/55">
+            <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-white/60">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-white/30" />
               {item}
             </li>
@@ -71,10 +72,12 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
       <main className="mx-auto max-w-2xl px-6 pb-32 pt-36">
         <Link
           href="/blog"
-          className="mb-10 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wide text-white/30 transition hover:text-white/60"
+          className="mb-10 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wide text-white/60 transition hover:text-white"
         >
-          ← Build log
+          ← Upstream archive
         </Link>
+
+        <ArchiveBanner />
 
         <div className="mb-10">
           <div className="mb-5 flex items-center gap-3">
@@ -84,10 +87,13 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
             >
               {post.tag}
             </span>
-            <span className="font-mono text-[11px] text-white/25">
+            <span className="font-mono text-[11px] text-white/60">
               {post.date} · {post.readTime} read
             </span>
           </div>
+          {post.note && (
+            <p className="mb-4 font-mono text-[11.5px] text-amber-200/85">Note: {post.note}.</p>
+          )}
 
           <h1 className="text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl">
             {post.title}
@@ -108,7 +114,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
         <div className="mt-16 border-t border-white/10 pt-10">
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wide text-white/30 transition hover:text-white/60"
+            className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wide text-white/60 transition hover:text-white"
           >
             ← All posts
           </Link>

@@ -1,0 +1,6 @@
+# Only the web app source is uploaded for the remote build.
+.next
+node_modules
+*.tsbuildinfo
+.env*
+railway.json

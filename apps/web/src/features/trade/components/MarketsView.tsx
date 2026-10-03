@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   fetchKlines,
@@ -44,6 +44,7 @@ export function MarketsView() {
   // candles for the selected symbol/timeframe
   useEffect(() => {
     const ac = new AbortController();
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- existing upstream behaviour, kept unchanged
     setLoadingChart(true);
     fetchKlines(symbol, timeframe, 160, ac.signal)
       .then((r) => setCandles(r.candles))

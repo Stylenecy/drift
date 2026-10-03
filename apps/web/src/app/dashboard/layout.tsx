@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { auth, AUTH_ENABLED } from "@/lib/auth";
 import { Sidebar } from "@/features/dashboard/components/Sidebar";
 import { Topbar } from "@/features/dashboard/components/Topbar";
+import { EngineGate } from "@/features/dashboard/components/EngineGate";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   // Gate the cockpit behind Google sign-in — but only once OAuth is configured,
@@ -17,8 +18,10 @@ export default async function DashboardLayout({ children }: { children: ReactNod
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar />
-        <main className="flex-1 overflow-y-auto px-6 py-6">
-          <div className="mx-auto max-w-[1100px]">{children}</div>
+        <main className="flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6">
+          <div className="mx-auto max-w-[1100px]">
+            <EngineGate>{children}</EngineGate>
+          </div>
         </main>
       </div>
     </div>

@@ -52,13 +52,8 @@ function CliTerminal() {
 
         {/* bot */}
         <p><span style={{ color: A }}>&gt; </span><span style={{ color: "rgba(255,255,255,0.8)" }}>bot rsi btc 1h</span></p>
-        <p style={{ color: DIM }}>  bot live · BTCUSDT 1h · qty 0.001 · Ctrl-C to stop &amp; flatten</p>
-        <p style={{ color: A }}>  ⛓ macroguard on bsc testnet · logged 0x9bdf82a0…</p>
-        <p>
-          <span style={{ color: DIM }}>  equity </span><span style={{ color: "rgba(255,255,255,0.8)" }}>1 024.38</span>
-          <span style={{ color: DIM }}>&nbsp;· position </span><span style={{ color: UP }}>long</span>
-          <span style={{ color: DIM }}>&nbsp;· signal </span><span style={{ color: UP }}>long</span>
-        </p>
+        <p style={{ color: DIM }}>  bot started · BTCUSDT 1h · qty 0.001 · Ctrl-C to stop &amp; flatten</p>
+        <p style={{ color: A }}>  ⛓ macroguard · allowed(signal) checked before each order</p>
 
         {/* prompt */}
         <p className="mt-1"><span style={{ color: A }}>&gt; </span><span className="inline-block h-[13px] w-[7px] animate-pulse bg-[#9aa8f0]/70 align-middle" /></p>
@@ -70,9 +65,7 @@ function CliTerminal() {
         <span style={{ color: FAINT }}>·</span>
         <span style={{ color: AMBER }}>testnet</span>
         <span style={{ color: FAINT }}>·</span>
-        <span style={{ color: UP }}>BTC ▲97,421</span>
-        <span style={{ color: FAINT }}>·</span>
-        <span style={{ color: UP }}>ETH ▲3,218</span>
+        <span style={{ color: DIM }}>BTC · ETH · SOL</span>
         <span style={{ color: FAINT }}>·</span>
         <span style={{ color: DIM }}>bots 1</span>
       </div>
@@ -99,7 +92,7 @@ const features = [
 
 export function PlatformShowcase() {
   return (
-    <section className="relative overflow-hidden py-24">
+    <section id="strategies" className="relative scroll-mt-20 overflow-hidden py-24">
       {/* spectrum band decoration */}
       <div className="pointer-events-none absolute inset-x-0 top-0 flex h-2 opacity-70">
         {["#3b82f6", "#38bdf8", "#a3e635", "#facc15", "#fb923c", "#f87171", "#ef4444"].map((c) => (
@@ -122,6 +115,9 @@ export function PlatformShowcase() {
           <p className="mt-3 text-[14px] text-white/40">One command. Full-screen terminal agent — markets, optimizer, AI analyst, live bots.</p>
           <div className="mt-6">
             <CliTerminal />
+            <p className="mt-2 font-mono text-[11px] text-white/60">
+              Illustrative session, not a recorded run. No live bot tick or profit is claimed.
+            </p>
           </div>
         </Reveal>
 
@@ -129,7 +125,7 @@ export function PlatformShowcase() {
           <div className="overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.05] to-transparent backdrop-blur-sm">
             <div className="border-b border-white/10 px-6 py-5">
               <h3 className="text-[15px] font-medium text-white">A transparent trading engine</h3>
-              <p className="mt-0.5 text-[13px] text-white/40">point-in-time backtests · live on Bybit</p>
+              <p className="mt-0.5 text-[13px] text-white/40">point-in-time backtests · Bybit testnet, run locally</p>
             </div>
             <div className="grid grid-cols-1 divide-y divide-white/10 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
               <div className="divide-y divide-white/10">

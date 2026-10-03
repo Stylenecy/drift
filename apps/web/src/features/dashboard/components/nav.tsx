@@ -1,5 +1,5 @@
 import type { ComponentType, SVGProps } from "react";
-import { ChartIcon, AgentIcon, GridIcon, BookIcon, GearIcon } from "./icons";
+import { ChartIcon, AgentIcon, GridIcon, BookIcon, GearIcon, ShieldIcon } from "./icons";
 
 export type NavItem = {
   label: string;
@@ -23,7 +23,7 @@ export const navGroups: NavGroup[] = [
     title: "Research",
     items: [
       { label: "Research", href: "/dashboard/backtest", icon: BookIcon },
-      { label: "MacroGuard", href: "/dashboard/macroguard", icon: AgentIcon },
+      { label: "MacroGuard", href: "/dashboard/macroguard", icon: ShieldIcon },
     ],
   },
   {

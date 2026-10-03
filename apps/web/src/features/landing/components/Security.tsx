@@ -11,7 +11,7 @@ function EquityBarsVisual() {
         1.00
       </span>
       <span className="absolute bottom-10 right-12 rounded-md bg-black/30 px-2 py-0.5 text-[11px] font-medium text-white">
-        +18%
+        bar t → t+1
       </span>
     </div>
   );
@@ -41,7 +41,7 @@ const rows = [
   {
     visual: <StopVisual />,
     title: "Risk that lives in code.",
-    body: "Position size and max-drawdown are enforced by the runner, not by willpower. On breach it flattens the position and halts the bot — automatically, every time.",
+    body: "Position size and max-drawdown are enforced by the runner, not by willpower. On breach it flattens the position and halts the bot. On BNB Chain, MacroGuard records the breach and allows only Flat until the agent resumes — in public.",
   },
 ];
 

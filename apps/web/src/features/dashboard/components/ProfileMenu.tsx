@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
 import BoringAvatar from "boring-avatars";
 import { getTelegram, testTelegram } from "@/features/trade/api";
+import { useAuthEnabled } from "@/components/AuthProvider";
 import type { TelegramStatus } from "@/features/trade/types";
 
 const AVATAR_COLORS = ["#9aa8f0", "#a855f7", "#6366f1", "#22d3ee", "#f472b6"];
@@ -93,6 +94,7 @@ export function ProfileMenu() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const { data: session, status } = useSession();
+  const authEnabled = useAuthEnabled();
   const router = useRouter();
 
   useEffect(() => {
@@ -102,6 +104,14 @@ export function ProfileMenu() {
     document.addEventListener("mousedown", onClick);
     return () => document.removeEventListener("mousedown", onClick);
   }, []);
+
+  if (!authEnabled) {
+    return (
+      <div className="border-t border-white/10 px-5 py-3 text-[12px] leading-relaxed text-white/60">
+        Sign-in is off: Google OAuth is not configured on this server.
+      </div>
+    );
+  }
 
   if (status !== "loading" && !session) {
     return (

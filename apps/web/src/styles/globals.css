@@ -16,6 +16,11 @@
   --amber-soft: #f3dca6;
   --yellow: #efe96a;
   --line: rgba(20, 33, 13, 0.12);
+
+  /* Meaningful accents: gold = on-chain / verifiable, periwinkle = off-chain engine */
+  --chain: #f0b90b;
+  --chain-soft: #f8d36a;
+  --engine: #9aa8f0;
 }
 
 @theme inline {
@@ -31,6 +36,9 @@
   --color-amber: var(--amber);
   --color-amber-soft: var(--amber-soft);
   --color-yellow: var(--yellow);
+  --color-chain: var(--chain);
+  --color-chain-soft: var(--chain-soft);
+  --color-engine: var(--engine);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -65,6 +73,44 @@ body {
   transform: none;
 }
 
+/* Visible keyboard focus everywhere */
+:where(a, button, [role="button"], input, select, textarea, summary):focus-visible {
+  outline: 2px solid var(--chain);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Live indicator: a slow breathing ring */
+@keyframes live-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(52, 211, 153, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+  }
+}
+.live-dot {
+  animation: live-ring 2s ease-out infinite;
+}
+
+/* Timeline steps reveal in order */
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.step-in {
+  animation: step-in 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -73,5 +119,9 @@ body {
     opacity: 1;
     transform: none;
     transition: none;
+  }
+  .live-dot,
+  .step-in {
+    animation: none;
   }
 }

@@ -14,6 +14,8 @@ export interface BlogPost {
   date: string
   readTime: string
   excerpt: string
+  // Shown next to the date when a post was changed after it was first published.
+  note?: string
   content: ContentBlock[]
 }
 
@@ -199,6 +201,7 @@ export const posts: BlogPost[] = [
 
     title: "Building on BNB Chain: AI Meets On-Chain Risk",
     date: "June 12, 2026",
+    note: "Rewritten in September 2026 during the BNB Chain migration",
     readTime: "4 min",
     excerpt:
       "DRIFT started as two ideas that converged: an on-chain yield optimizer and an AI trading layer. Here is the BNB Chain thesis and what we plan to build.",

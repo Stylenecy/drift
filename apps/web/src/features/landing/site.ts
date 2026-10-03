@@ -5,11 +5,12 @@ export interface NavLink {
 
 export const site = {
   name: "DRIFT",
-  tagline: "Deterministic, risk-bounded trading for AI quant strategies.",
+  tagline: "Off-chain quant research. An on-chain risk gate anyone can check.",
   contact: "dex.bennett28@gmail.com",
-  x: "https://x.com",
+  repo: "https://github.com/Stylenecy/seed-bnb/tree/dex/drift/drift",
   nav: [
     { label: "DRIFT", href: "/" },
-    { label: "Blog", href: "/blog" },
+    { label: "How it works", href: "/#how" },
+    { label: "MacroGuard", href: "/macroguard" },
   ] as NavLink[],
 } as const;

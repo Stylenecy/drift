@@ -2,10 +2,11 @@ import Link from "next/link";
 import Nav from "@/features/landing/components/Nav";
 import Footer from "@/features/landing/components/Footer";
 import { posts } from "@/features/landing/blogs";
+import { ArchiveBanner } from "@/features/landing/components/ArchiveBanner";
 
 export const metadata = {
   title: "Blog — DRIFT",
-  description: "Build log from the DRIFT team: inspiration, architecture, strategies, and ecosystem.",
+  description: "Archived build log from the upstream DRIFT project: inspiration, architecture, strategies, and ecosystem.",
 };
 
 export default function BlogIndex() {
@@ -15,17 +16,19 @@ export default function BlogIndex() {
 
       <main className="mx-auto max-w-5xl px-6 pb-32 pt-36">
         <div className="mb-14">
-          <span className="mb-4 inline-block font-mono text-[11px] uppercase tracking-[0.18em] text-white/35">
-            Build log
+          <span className="mb-4 inline-block font-mono text-[11px] uppercase tracking-[0.18em] text-white/60">
+            Upstream archive
           </span>
           <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
             From the lab.
           </h1>
-          <p className="mt-4 max-w-lg text-white/45">
-            How DRIFT was designed, built, and connected — from the first honest
-            backtest to the BNB Chain ecosystem.
+          <p className="mt-4 max-w-lg text-white/60">
+            How the upstream DRIFT team designed the engine — from the first honest
+            backtest to the on-chain risk guard.
           </p>
         </div>
+
+        <ArchiveBanner />
 
         <div className="grid gap-6 sm:grid-cols-2">
           {posts.map((post, i) => (
@@ -60,7 +63,7 @@ export default function BlogIndex() {
                   {post.tag}
                 </span>
                 {/* post index */}
-                <span className="absolute right-5 top-5 font-mono text-[11px] text-white/20">
+                <span className="absolute right-5 top-5 font-mono text-[11px] text-white/60">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 {/* tag pill */}
@@ -88,14 +91,15 @@ export default function BlogIndex() {
                 <h2 className="mb-2 text-[15px] font-semibold leading-snug text-white transition group-hover:text-white/90">
                   {post.title}
                 </h2>
-                <p className="mb-5 line-clamp-2 text-sm leading-relaxed text-white/40">
+                <p className="mb-5 line-clamp-2 text-sm leading-relaxed text-white/60">
                   {post.excerpt}
                 </p>
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-[11px] text-white/25">
+                  <span className="font-mono text-[11px] text-white/60">
                     {post.date} · {post.readTime} read
+                    {post.note && <span className="mt-1 block text-amber-200/80">{post.note}</span>}
                   </span>
-                  <span className="font-mono text-[11px] text-white/25 opacity-0 transition group-hover:opacity-100">
+                  <span className="font-mono text-[11px] text-white/60 opacity-0 transition group-hover:opacity-100">
                     Read →
                   </span>
                 </div>

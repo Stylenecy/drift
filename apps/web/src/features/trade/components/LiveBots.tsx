@@ -160,6 +160,7 @@ function LaunchForm({
   const [maxDd, setMaxDd] = useState(0.2);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- existing upstream behaviour, kept unchanged
     if (!strategy && strategies.length) setStrategy(strategies[0].id);
   }, [strategies, strategy]);
 

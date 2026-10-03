@@ -64,7 +64,7 @@ export function DeployAgents() {
       >
         <div className="pointer-events-none absolute inset-0 bg-black/55" />
         <h2 className="relative max-w-4xl text-center text-3xl font-semibold leading-[1.5] tracking-tight text-white sm:text-[40px] sm:leading-[1.45]">
-          Run <Pill p={pills[0]} /> <Pill p={pills[1]} /> <Pill p={pills[2]} /> and <Pill p={pills[3]} /> on Bybit — with risk you can see, and a stop you can&apos;t override.
+          Run <Pill p={pills[0]} /> <Pill p={pills[1]} /> <Pill p={pills[2]} /> and <Pill p={pills[3]} /> on Bybit testnet — with risk rules you can read on BNB Chain.
         </h2>
       </div>
     </section>
