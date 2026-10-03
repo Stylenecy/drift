@@ -54,19 +54,19 @@ The hero says what DRIFT is in one line and routes to the live gate. The proof s
 
 ## The terminal (`./drift`)
 
-Recorded on 3 Oct 2026 at 15.39 WIB by running the terminal's own commands and exporting Rich's output, with no keys configured. Bybit's API is unreachable from the recording network, so every view below ran on the **Binance public-data fallback** and says so in its last line.
+Recorded on 3 Oct 2026 at 16.17 WIB (09.17 UTC) by running the terminal's own commands and exporting Rich's output, with no keys configured. Bybit's API is unreachable from the recording network, so every view below ran on the **Binance public-data fallback** and says so, with the candle range it used, in its last lines.
 
 ### Auto-Research: optimised on 70%, scored on the held-out 30%
 
 ![Terminal: research btc 1h, leaderboard of four strategies with in-sample and out-of-sample Sharpe, out-of-sample return and verdict](docs/screens/cli/research-btc-1h.png)
 
-Historical simulation on 1,000 hourly BTCUSDT candles. Sharpe is annualised from hourly bars (×√8760), so a single month of data gives large values; "robust" only means both slices passed the 0.5 threshold on this one window. Research, not a profit claim.
+Historical simulation on 1,000 hourly BTCUSDT candles, 22 Aug 18.00 to 3 Oct 09.00 UTC (Binance spot). Sharpe is annualised from hourly bars (×√8760), so about six weeks of data gives large values; "robust" only means both slices passed the 0.5 threshold on this one window. Research, not a profit claim.
 
 ### Point-in-time backtest
 
 ![Terminal: backtest macd btc 1h with return, Sharpe, win rate, max drawdown, trade count and the equity chart](docs/screens/cli/backtest-macd-btc-1h.png)
 
-Historical simulation on 720 hourly candles; a position decided on one bar is earned on the next. Research, not a profit claim; past results do not predict future ones.
+Historical simulation on 720 hourly BTCUSDT candles, 3 Sep 10.00 to 3 Oct 09.00 UTC (Binance spot); a position decided on one bar is earned on the next. The equity chart is scaled from its own minimum to its maximum, not from zero, so a gain of a few percent fills the frame. Research, not a profit claim; past results do not predict future ones.
 
 ### Markets
 

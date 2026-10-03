@@ -6,7 +6,7 @@
 
 *Quant research runs off-chain. The risk gate, MacroGuard, is a public contract on BNB Smart Chain Testnet: anyone can read what the bot is allowed to do right now, ask the contract a what-if, and open every recorded decision on BscScan.*
 
-**[Live demo](https://drift-macroguard.vercel.app)** · **[Public risk gate: `/macroguard`](https://drift-macroguard.vercel.app/macroguard)** · Demo video: not published yet · **[Contract on BscScan (testnet)](https://testnet.bscscan.com/address/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)** · **[Source on Sourcify](https://repo.sourcify.dev/97/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)**
+**[Live demo](https://drift-macroguard.vercel.app)** · **[Public risk gate: `/macroguard`](https://drift-macroguard.vercel.app/macroguard)** · Demo video: not published yet · **[Contract on BscScan (testnet)](https://testnet.bscscan.com/address/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)** · **[Source on Sourcify](https://repo.sourcify.dev/97/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)** · **[Pitch deck (PDF)](docs/submission/DRIFT-pitch.pdf)**
 
 [![BNB Chain](https://img.shields.io/badge/Chain-BSC%20Testnet%20(97)-F0B90B?logo=binance&logoColor=white)](https://testnet.bscscan.com/address/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)
 [![Sourcify](https://img.shields.io/badge/Sourcify-exact%20match-2ea44f)](https://repo.sourcify.dev/97/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)
@@ -33,7 +33,7 @@ Dex Bennett's own MacroGuard deployment: [`0x8b09ebB85Be8Ed55Bb5132d29eABc567c42
 | 5 | `resume()` | Only the agent can resume, and it is on the record (`Resumed` event) | 134,042,318 · 27,030 | [`0xda57…18ae`](https://testnet.bscscan.com/tx/0xda579ebbf2969b855fe50b4520593fb267e33f4db062e0c71c48ca64b18d18ae) |
 | 6 | `setRegime(Neutral)` | Back to Neutral; Long allowed again; 2 decisions on-chain | 134,042,328 · 27,802 | [`0xa846…486b`](https://testnet.bscscan.com/tx/0xa846652354020a77b8c24ef8bb3e088ccecb63f4c2c3267c0a4377c57a39486b) |
 
-The same `setRegime(2)` sent from any other address (simulated with `eth_call` from `0x…dEaD`) reverts with `NotAgent()` (`0x0d9ab13f`). At the testnet gas price of 0.1 gwei, one recorded decision (33–34k gas) costs about 0.0000034 tBNB.
+A `setRegime(2)` sent from any other address (simulated with `eth_call` from `0x…dEaD`) reverts with `NotAgent()` (`0x0d9ab13f`). At the testnet gas price of 0.1 gwei, one recorded decision (33–34k gas) costs about 0.0000034 tBNB.
 
 **What this does not prove.** The contract does not execute exchange orders. The runner fails open to its local stop if the RPC is unreachable. The agent can `resume()` a halt at any time. The drawdown is reported by the agent, not measured by the contract. No live bot tick and no profit are claimed; backtests are research. Details: [`docs/THREAT-MODEL.md`](docs/THREAT-MODEL.md).
 
@@ -85,13 +85,13 @@ DRIFT's core (the quant engine, the cockpit and `MacroGuard.sol`) comes from the
 | 30 Sep | Own MacroGuard deployment on BSC Testnet and a five-transaction smoke test, all status 1 |
 | 1 Oct | PRD and visual direction; redesigned panel (live state, verdicts, receipt trail); landing story; phone layout; first deck |
 | 2 Oct | Source verified on Sourcify; contract reads straight from the browser; provenance and honest copy; public demo on Vercel |
-| 3 Oct | "Ask the contract"; labelled Binance data fallback; 23 contract tests, 45 engine tests and 8 web tests added; CI workflow; threat model; share card; this README; deck v2 |
+| 3 Oct | "Ask the contract"; labelled Binance data fallback; 23 contract tests, 47 engine tests and 8 web tests added; CI workflow; threat model; share card; this README; deck v2 |
 
 Commit history: [`dex/drift`, commits under `drift/`](https://github.com/Stylenecy/seed-bnb/commits/dex/drift/drift).
 
 ### What came from upstream
 
-The quant engine (`apps/trader`: strategies, backtester, optimizer, regime engine, live runner, LLM analyst, Telegram bot), the terminal, the web cockpit and `MacroGuard.sol`. The BNB Chain migration is the seed commit `52671ce` in `bcc-ukdw/seed-bnb` (29 Sep 2026), authored by `yeheskieltame`; its records are [`MIGRATION-BNB.md`](MIGRATION-BNB.md) and [`VERIFY-BNB.md`](VERIFY-BNB.md). The upstream repository does not name the original author of DRIFT. The four strategies are ported from [je-suis-tm/quant-trading](https://github.com/je-suis-tm/quant-trading).
+The quant engine (`apps/trader`: strategies, backtester, optimizer, regime engine, live runner, LLM analyst, Telegram bot), the terminal, the web cockpit and `MacroGuard.sol`. The BNB Chain migration is the seed commit `52671ce` in `bcc-ukdw/seed-bnb` (29 Sep 2026), authored by `yeheskieltame`; its records are [`MIGRATION-BNB.md`](MIGRATION-BNB.md) and [`VERIFY-BNB.md`](VERIFY-BNB.md). The upstream code names no author of DRIFT: its landing page listed only a contact email (`apps/web/src/features/landing/site.ts` at `52671ce`), which this fork replaced with Dex's own contact for the demo. The original author's name and the license will be added once confirmed. The four strategies are ported from [je-suis-tm/quant-trading](https://github.com/je-suis-tm/quant-trading).
 
 ---
 
@@ -100,10 +100,10 @@ The quant engine (`apps/trader`: strategies, backtester, optimizer, regime engin
 | Layer | Command | Count | Notes |
 |---|---|---|---|
 | Contract | `cd contracts && forge test` | 30 (7 upstream + 23 added) | Unit and event tests, 5 fuzz tests, 7 invariants over random agent and stranger call sequences. `forge coverage`: 100% of lines, statements, branches and functions in `MacroGuard.sol`. The contract itself is unchanged. |
-| Engine | `cd apps/trader && pip install -r requirements-dev.txt && python -m pytest` | 45 passed, 1 strict xfail | Offline: `.env` loading is disabled and any non-loopback connection fails the test. Covers no look-ahead as a property, the backtester's one-bar shift, the train/test split, the regime classifier, ChainGuard, the API and the data fallback. The xfail pins a known upstream bug (below). |
-| Web | `cd apps/web && npm test` | 15 (7 + 8 added) | Contract reads and the what-if encoder against `cast` fixtures, RPC fallback, reverts, wrong chain. |
+| Engine | `cd apps && pip install -r trader/requirements-dev.txt && python -m pytest trader/tests -c trader/pytest.ini` | 47 passed, 1 strict xfail | Offline: `.env` loading is disabled and any non-loopback connection or DNS lookup fails the test. Covers no look-ahead as a property, the backtester's one-bar shift, the train/test split, the regime classifier, ChainGuard, the API and the data fallback. The xfail pins a known upstream bug (below). |
+| Web | `cd apps/web && npm test` | 15 (7 added on 2 Oct, 8 on 3 Oct) | Contract reads and the what-if encoder against `cast` fixtures, RPC fallback, reverts, wrong chain. |
 
-**No look-ahead, tested as a property.** For every strategy, `positions(df[:k])` equals `positions(df)[:k]` at every cut `k`, and rewriting future candles never changes a past position. A "same-bar oracle" that peeks at its own candle would earn +845% on the test's synthetic random walk without the backtester's one-bar shift; with the shift it makes +4.8%, the luck of the walk.
+**No look-ahead, tested as a property.** For every strategy, `positions(df[:k])` equals `positions(df)[:k]` at every cut `k`, and rewriting future candles never changes a past position. A test strategy that cheats by trading on its own candle looks like a money machine without the backtester's one-bar shift and loses that edge with it (asserted on a seeded synthetic random walk in `apps/trader/tests/test_backtester.py`).
 
 **CI.** [`.github/workflows/drift-ci.yml`](../.github/workflows/drift-ci.yml) runs all three layers on every change under `drift/`: forge test and coverage, pytest, then `npm ci`, lint, node tests and `next build`.
 
@@ -133,7 +133,7 @@ It ships as three things on one engine:
 - `MacroGuard.sol` targets BNB Smart Chain Testnet (chain 97); mainnet (chain 56) is a config switch. Dex's deployment: [`0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D`](https://testnet.bscscan.com/address/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D).
 - `allowed(signal)` is the veto gate: a drawdown at or past the line trips the halt until the agent calls `resume()`; risk off blocks new Longs.
 - When configured, the bot attempts `recordDecision(symbol, signal, price, drawdown)` on each tick. Successful transactions create a public decision record; failed or skipped writes do not. The recorded signal is the target after the veto.
-- A **regime engine** (`regime.py`) classifies BTC 1h candles into risk-on / neutral / risk-off using realised-vol z-score + EWMA trend, and pushes `setRegime` on-chain when the label changes and a key is configured.
+- A **regime engine** (`regime.py`) classifies BTC 1h candles into risk-on / neutral / risk-off using realised-vol z-score + EWMA trend, and pushes `setRegime` on-chain when the label changes and a key is configured. A regime classified from fallback data is shown, labelled, and never written on-chain.
 
 ### The public panel (`/macroguard`)
 - Reads the contract straight from the browser over two public RPCs (with fallback): chain id, code at the address, regime, halt, threshold, decision count and `allowed()` for each signal. No engine, key or wallet.
@@ -463,7 +463,7 @@ AUTH_SECRET=…
 - **Testnet-first.** Live trading is explicit opt-in; all orders go to Bybit testnet by default.
 - **Risk boundaries are explicit.** The local drawdown stop lives in `LiveRunner`; the bot queries `MacroGuard.allowed()` before orders. The contract cannot stop an exchange order by itself. If the RPC fails, the bot currently fails open under its local stop.
 - **No look-ahead, no fabricated fills.** Backtests are strictly point-in-time (tested as a property); live equity is read from the real account; the LLM is forbidden from inventing numbers.
-- **Labelled data.** A fallback to Binance public data is named in every response and view; live trading never uses it.
+- **Labelled data.** A fallback to Binance public data is named in every response and view; live trading never uses it, and a regime classified from it is never written on-chain.
 - **Secrets stay out of Git.** Keys entered in the web UI are held in memory. Keys supplied through `.env.local` are stored locally in that Git-ignored file; never commit or share it.
 - **The LLM never executes.** The analyst explains; the deterministic strategy + on-chain guard decide.
 - **Threat model:** [`docs/THREAT-MODEL.md`](docs/THREAT-MODEL.md).
@@ -474,7 +474,7 @@ AUTH_SECRET=…
 
 ## License
 
-The upstream README states that DRIFT is released under the MIT License, but the upstream tree ships no `LICENSE` file and does not name the original author. A `LICENSE` file will be added once the original author confirms the terms.
+The upstream README states that DRIFT is released under the MIT License, but the upstream tree ships no `LICENSE` file and names no author (only a contact email on its landing page, see [What came from upstream](#what-came-from-upstream)). A `LICENSE` file will be added once the original author confirms the terms.
 
 <div align="center">
 <sub>Strategies ported from <a href="https://github.com/je-suis-tm/quant-trading">je-suis-tm/quant-trading</a> · Market data from <a href="https://bybit-exchange.github.io/docs/v5/intro">Bybit V5</a> (Binance public data as a labelled fallback) · Risk gate on <a href="https://testnet.bscscan.com/address/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D">BNB Chain</a></sub>
