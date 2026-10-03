@@ -6,6 +6,7 @@ import type { GuardState } from "@/features/trade/types";
 import { readGuardFromChain } from "../chainRead";
 import { Button, Skeleton } from "@/features/dashboard/components/primitives";
 import { DEX_GUARD, addressUrl, short, txUrl } from "../evidence";
+import { AskContract } from "./AskContract";
 import {
   CopyValue,
   DecisionTimeline,
@@ -256,6 +257,9 @@ export function GuardPanel() {
           )}
         </div>
       </Panel>
+
+      {/* --------------------------------- what-if: ask the live contract */}
+      <AskContract live={live} thresholdBps={thresholdBps} />
 
       {/* ----------------------------------------------- decision timeline */}
       <Panel chain className="p-5">

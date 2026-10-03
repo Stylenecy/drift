@@ -3,7 +3,16 @@
 // (Neutral, not halted, 2000 bps, 2 decisions, Long/Short/Flat allowed).
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readGuardFromChain, PUBLIC_RPCS, MACROGUARD_ADDRESS, MACROGUARD_AGENT } from "./chainRead.ts";
+import {
+  readGuardFromChain,
+  askRecordDecision,
+  encodeRecordDecision,
+  expectDecision,
+  castCommand,
+  PUBLIC_RPCS,
+  MACROGUARD_ADDRESS,
+  MACROGUARD_AGENT,
+} from "./chainRead.ts";
 
 const pad = (n) => `0x${n.toString(16).padStart(64, "0")}`;
 
@@ -121,4 +130,133 @@ test("reports both failures when both RPCs are unreachable", async () => {
     assert.match(error.message, new RegExp(new URL(BACKUP).host.replace(/\./g, "\\.")));
     return true;
   });
+});
+
+/* ------------------------------------------- "Ask the contract" (eth_call) -- */
+
+// `cast calldata "recordDecision(string,uint8,uint256,int256)" -- BTCUSDT 1 0 -2500` (cast 1.5.1)
+const CALLDATA_LONG_2500 =
+  "0x210f3f4f" +
+  "0000000000000000000000000000000000000000000000000000000000000080" +
+  "0000000000000000000000000000000000000000000000000000000000000001" +
+  "0000000000000000000000000000000000000000000000000000000000000000" +
+  "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff63c" +
+  "0000000000000000000000000000000000000000000000000000000000000007" +
+  "4254435553445400000000000000000000000000000000000000000000000000";
+// `... -- BTCUSDT 2 0 -1999`
+const CALLDATA_SHORT_1999 =
+  "0x210f3f4f" +
+  "0000000000000000000000000000000000000000000000000000000000000080" +
+  "0000000000000000000000000000000000000000000000000000000000000002" +
+  "0000000000000000000000000000000000000000000000000000000000000000" +
+  "fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff831" +
+  "0000000000000000000000000000000000000000000000000000000000000007" +
+  "4254435553445400000000000000000000000000000000000000000000000000";
+// `... -- BTCUSDT 0 0 0`
+const CALLDATA_FLAT_0 =
+  "0x210f3f4f" +
+  "0000000000000000000000000000000000000000000000000000000000000080" +
+  "0".repeat(64 * 3) +
+  "0000000000000000000000000000000000000000000000000000000000000007" +
+  "4254435553445400000000000000000000000000000000000000000000000000";
+
+// A fake node that answers recordDecision with `answer` and records every method it saw.
+function decisionRpc(answer, methods = []) {
+  return (body) => {
+    methods.push(body.method);
+    if (body.method === "eth_call") return answer(body.params[0]);
+    return rpc()(body);
+  };
+}
+
+test("encodes recordDecision byte for byte like cast calldata", () => {
+  assert.equal(encodeRecordDecision("BTCUSDT", "long", 0n, -2500), CALLDATA_LONG_2500);
+  assert.equal(encodeRecordDecision("BTCUSDT", "flat", 0n, 0), CALLDATA_FLAT_0);
+  assert.equal(encodeRecordDecision("BTCUSDT", "short", 0n, -1999), CALLDATA_SHORT_1999);
+});
+
+test("refuses inputs the encoder cannot represent honestly", () => {
+  assert.throws(() => encodeRecordDecision("btc", "long", 0n, 0), /symbol/);
+  assert.throws(() => encodeRecordDecision("BTCUSDT", "hold", 0n, 0), /unknown signal/);
+  assert.throws(() => encodeRecordDecision("BTCUSDT", "long", 0n, -12.5), /whole number/);
+  assert.throws(() => encodeRecordDecision("BTCUSDT", "long", 0n, -20000), /between/);
+});
+
+test("asks with an eth_call from the agent and never sends a transaction", async () => {
+  const methods = [];
+  let sent;
+  const { fetchImpl } = fakeFetch({
+    [PRIMARY]: decisionRpc((tx) => {
+      sent = tx;
+      return { result: pad(0) };
+    }, methods),
+  });
+  const answer = await askRecordDecision({ signal: "long", drawdownBps: -2500 }, { fetchImpl });
+  assert.equal(answer.allowed, false);
+  assert.equal(answer.block, 0x802a7bd);
+  assert.equal(answer.rpc, new URL(PRIMARY).host);
+  assert.deepEqual(sent, { from: MACROGUARD_AGENT, to: MACROGUARD_ADDRESS, data: CALLDATA_LONG_2500 });
+  assert.deepEqual(answer.call, sent);
+  assert.ok(methods.every((m) => ["eth_chainId", "eth_blockNumber", "eth_call"].includes(m)), methods.join(","));
+});
+
+test("maps an allowed answer and falls back when the primary node fails", async () => {
+  const { fetchImpl, seen } = fakeFetch({
+    [PRIMARY]: decisionRpc(() => ({ error: { message: "header not found" } })),
+    [BACKUP]: decisionRpc(() => ({ result: pad(1) })),
+  });
+  const answer = await askRecordDecision({ signal: "flat", drawdownBps: -2500 }, { fetchImpl });
+  assert.equal(answer.allowed, true);
+  assert.equal(answer.rpc, new URL(BACKUP).host);
+  assert.ok(seen.includes(PRIMARY) && seen.includes(BACKUP));
+});
+
+test("names a NotAgent revert instead of guessing an answer", async () => {
+  const revert = () => ({ error: { code: 3, message: "execution reverted", data: "0x0d9ab13f" } });
+  const { fetchImpl } = fakeFetch({ [PRIMARY]: decisionRpc(revert), [BACKUP]: decisionRpc(revert) });
+  await assert.rejects(askRecordDecision({ signal: "long", drawdownBps: 0 }, { fetchImpl }), (error) => {
+    assert.match(error.message, /public RPC call failed/);
+    assert.match(error.message, /execution reverted: NotAgent\(\)/);
+    return true;
+  });
+});
+
+test("rejects an answer that is not a bool, and a node on the wrong chain", async () => {
+  const notBool = decisionRpc(() => ({ result: pad(2) }));
+  const bad = fakeFetch({ [PRIMARY]: notBool, [BACKUP]: notBool });
+  await assert.rejects(askRecordDecision({ signal: "short", drawdownBps: -100 }, { fetchImpl: bad.fetchImpl }), /recordDecision is not a bool/);
+
+  const wrong = (body) => (body.method === "eth_chainId" ? { result: "0x38" } : { result: pad(1) });
+  const wrongChain = fakeFetch({ [PRIMARY]: wrong, [BACKUP]: wrong });
+  await assert.rejects(askRecordDecision({ signal: "flat", drawdownBps: 0 }, { fetchImpl: wrongChain.fetchImpl }), /wrong chain 56/);
+  assert.equal(wrongChain.seen.length, 2, "no eth_call is sent to a node on the wrong chain");
+});
+
+test("expectDecision applies the contract's rules in the contract's order", () => {
+  const neutral = { regime: 1, halted: false, maxDrawdownBps: 2000 };
+  const riskOff = { regime: 0, halted: false, maxDrawdownBps: 2000 };
+  const halted = { regime: 1, halted: true, maxDrawdownBps: 2000 };
+  const cases = [
+    // [rules, signal, drawdownBps, allowed, haltsNow] — boundary mirrors MacroGuard.t.sol (-1999 vs -2000)
+    [neutral, "long", -1999, true, false],
+    [neutral, "long", -2000, false, true],
+    [neutral, "flat", -2500, true, true],
+    [neutral, "short", -500, true, false],
+    [riskOff, "long", -500, false, false],
+    [riskOff, "short", -500, true, false],
+    [riskOff, "long", -2500, false, true],
+    [halted, "short", 0, false, false],
+    [halted, "flat", -2500, true, false],
+  ];
+  for (const [rules, signal, drawdownBps, allowed, haltsNow] of cases) {
+    assert.deepEqual(expectDecision(rules, { signal, drawdownBps }), { allowed, haltsNow }, `${signal} @ ${drawdownBps}`);
+  }
+});
+
+test("prints the same question as a replayable cast command", () => {
+  assert.equal(
+    castCommand({ signal: "long", drawdownBps: -2500 }),
+    `cast call ${MACROGUARD_ADDRESS} "recordDecision(string,uint8,uint256,int256)(bool)" ` +
+      `--from ${MACROGUARD_AGENT} --rpc-url ${BACKUP} -- BTCUSDT 1 0 -2500`,
+  );
 });

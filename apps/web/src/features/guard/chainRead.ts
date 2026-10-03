@@ -1,6 +1,11 @@
 // Reads Dex's MacroGuard contract straight from BNB Smart Chain Testnet over
 // public JSON-RPC, so the hosted demo needs no engine, key or wallet.
 //
+// It can also ask the contract a what-if question: an `eth_call` of
+// `recordDecision(...)` sent as if from the agent address. An eth_call is a
+// simulation the node runs and throws away: nothing is signed, nothing is
+// written, no transaction exists afterwards and no gas is spent.
+//
 // Integrity: the RPC URLs and the contract address are code constants. Nothing
 // in the URL, hash or browser storage can point this module somewhere else, so
 // a link to the demo cannot make it show another contract's state as "live".
@@ -32,9 +37,15 @@ const SELECTOR = {
   decisionCount: "0x100b63cb",
   agent: "0xf5ff5c76",
   allowed: "0xba795b85",
+  recordDecision: "0x210f3f4f", // recordDecision(string,uint8,uint256,int256)
 } as const;
 
+// Custom errors MacroGuard can revert with (`cast sig "NotAgent()"`).
+const CUSTOM_ERRORS: Record<string, string> = { "0x0d9ab13f": "NotAgent()" };
+
 const SIGNAL = { flat: 0, long: 1, short: 2 } as const;
+
+export type SignalName = keyof typeof SIGNAL;
 
 export type ChainRead = {
   state: GuardState;
@@ -45,7 +56,11 @@ export type ChainRead = {
 
 type FetchLike = (input: string, init: RequestInit) => Promise<Response>;
 
-type RpcResponse = { result?: unknown; error?: { message?: string } };
+type RpcResponse = { result?: unknown; error?: { message?: string; data?: unknown } };
+
+type Call = (method: string, params: unknown[]) => Promise<unknown>;
+
+type RpcOptions = { signal?: AbortSignal; fetchImpl?: FetchLike };
 
 function word(hex: unknown, what: string): bigint {
   if (typeof hex !== "string" || !/^0x[0-9a-fA-F]{64}$/.test(hex)) {
@@ -81,6 +96,13 @@ function quantity(hex: unknown, what: string): number {
   return Number.parseInt(hex.slice(2), 16);
 }
 
+function rpcErrorMessage(error: { message?: string; data?: unknown }): string {
+  const message = error.message ?? "RPC error";
+  const selector = typeof error.data === "string" ? error.data.slice(0, 10).toLowerCase() : "";
+  const known = CUSTOM_ERRORS[selector];
+  return known ? `${message}: ${known}` : message;
+}
+
 // One abortable timeout per RPC, chained to the caller's signal.
 function withTimeout(signal: AbortSignal | undefined): { signal: AbortSignal; done: () => void } {
   const controller = new AbortController();
@@ -97,9 +119,9 @@ function withTimeout(signal: AbortSignal | undefined): { signal: AbortSignal; do
   };
 }
 
-async function readFrom(rpc: string, fetchImpl: FetchLike, signal: AbortSignal): Promise<ChainRead> {
+function rpcCaller(rpc: string, fetchImpl: FetchLike, signal: AbortSignal): Call {
   let id = 0;
-  const call = async (method: string, params: unknown[]): Promise<unknown> => {
+  return async (method, params) => {
     const res = await fetchImpl(rpc, {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -108,14 +130,41 @@ async function readFrom(rpc: string, fetchImpl: FetchLike, signal: AbortSignal):
     });
     if (!res.ok) throw new Error(`RPC HTTP ${res.status}`);
     const body = (await res.json()) as RpcResponse;
-    if (body.error) throw new Error(body.error.message ?? "RPC error");
+    if (body.error) throw new Error(rpcErrorMessage(body.error));
     return body.result;
   };
+}
+
+async function assertChain(call: Call): Promise<void> {
+  const chainId = quantity(await call("eth_chainId", []), "chain id");
+  if (chainId !== CHAIN_ID) throw new Error(`wrong chain ${chainId}, expected ${CHAIN_ID}`);
+}
+
+// Tries each public RPC in order. Throws only when every RPC failed (or the
+// caller aborted); the message lists why each one failed.
+async function eachRpc<T>(what: string, options: RpcOptions, run: (rpc: string, call: Call) => Promise<T>): Promise<T> {
+  const fetchImpl = options.fetchImpl ?? ((input, init) => fetch(input, init));
+  const failures: string[] = [];
+  for (const rpc of PUBLIC_RPCS) {
+    if (options.signal?.aborted) throw options.signal.reason ?? new Error("aborted");
+    const timeout = withTimeout(options.signal);
+    try {
+      return await run(rpc, rpcCaller(rpc, fetchImpl, timeout.signal));
+    } catch (cause) {
+      if (options.signal?.aborted) throw cause;
+      failures.push(`${new URL(rpc).host}: ${cause instanceof Error ? cause.message : String(cause)}`);
+    } finally {
+      timeout.done();
+    }
+  }
+  throw new Error(`public RPC ${what} failed (${failures.join("; ")})`);
+}
+
+async function readFrom(rpc: string, call: Call): Promise<ChainRead> {
   const view = (data: string) => call("eth_call", [{ to: MACROGUARD_ADDRESS, data }, "latest"]);
   const allowedArg = (sig: number) => `${SELECTOR.allowed}${sig.toString(16).padStart(64, "0")}`;
 
-  const chainId = quantity(await call("eth_chainId", []), "chain id");
-  if (chainId !== CHAIN_ID) throw new Error(`wrong chain ${chainId}, expected ${CHAIN_ID}`);
+  await assertChain(call);
 
   const code = await call("eth_getCode", [MACROGUARD_ADDRESS, "latest"]);
   if (typeof code !== "string" || !/^0x[0-9a-fA-F]+$/.test(code) || code.length <= 2) {
@@ -160,24 +209,102 @@ async function readFrom(rpc: string, fetchImpl: FetchLike, signal: AbortSignal):
   };
 }
 
-// Tries each public RPC in order. Throws only when every RPC failed (or the
-// caller aborted); the message lists why each one failed.
-export async function readGuardFromChain(
-  options: { signal?: AbortSignal; fetchImpl?: FetchLike } = {},
-): Promise<ChainRead> {
-  const fetchImpl = options.fetchImpl ?? ((input, init) => fetch(input, init));
-  const failures: string[] = [];
-  for (const rpc of PUBLIC_RPCS) {
-    if (options.signal?.aborted) throw options.signal.reason ?? new Error("aborted");
-    const timeout = withTimeout(options.signal);
-    try {
-      return await readFrom(rpc, fetchImpl, timeout.signal);
-    } catch (cause) {
-      if (options.signal?.aborted) throw cause;
-      failures.push(`${new URL(rpc).host}: ${cause instanceof Error ? cause.message : String(cause)}`);
-    } finally {
-      timeout.done();
-    }
+export function readGuardFromChain(options: RpcOptions = {}): Promise<ChainRead> {
+  return eachRpc("read", options, readFrom);
+}
+
+/* ------------------------------------------------- what-if simulation -- */
+
+// Symbol and price sent with a simulated decision. The gate reads neither:
+// only the signal, the drawdown and the stored regime/halt state decide.
+export const SIMULATED_SYMBOL = "BTCUSDT";
+export const SIMULATED_PRICE = 0;
+
+const TWO_POW_255 = BigInt(2) ** BigInt(255);
+const TWO_POW_256 = BigInt(2) ** BigInt(256);
+
+function uintWord(value: bigint): string {
+  if (value < BigInt(0) || value >= TWO_POW_256) throw new Error("value out of uint256 range");
+  return value.toString(16).padStart(64, "0");
+}
+
+function intWord(value: bigint): string {
+  if (value < -TWO_POW_255 || value >= TWO_POW_255) throw new Error("value out of int256 range");
+  return uintWord(value < BigInt(0) ? TWO_POW_256 + value : value);
+}
+
+// ABI-encodes recordDecision(symbol, signal, price, drawdownBps), byte for byte
+// what `cast calldata "recordDecision(string,uint8,uint256,int256)" ...` prints.
+export function encodeRecordDecision(symbol: string, signal: SignalName, price: bigint, drawdownBps: number): string {
+  if (!/^[A-Z0-9]{1,32}$/.test(symbol)) throw new Error("symbol must be 1 to 32 capital letters or digits");
+  if (!Object.prototype.hasOwnProperty.call(SIGNAL, signal)) throw new Error(`unknown signal ${String(signal)}`);
+  if (!Number.isInteger(drawdownBps) || drawdownBps < -10000 || drawdownBps > 10000) {
+    throw new Error("drawdown must be a whole number of bps between -10000 and 10000");
   }
-  throw new Error(`public RPC read failed (${failures.join("; ")})`);
+  let text = "";
+  for (let i = 0; i < symbol.length; i += 1) text += symbol.charCodeAt(i).toString(16).padStart(2, "0");
+  return (
+    SELECTOR.recordDecision +
+    uintWord(BigInt(128)) + // offset of the string: four head words
+    uintWord(BigInt(SIGNAL[signal])) +
+    uintWord(price) +
+    intWord(BigInt(drawdownBps)) +
+    uintWord(BigInt(symbol.length)) +
+    text.padEnd(64, "0")
+  );
+}
+
+export type DecisionQuestion = { signal: SignalName; drawdownBps: number };
+
+export type DecisionAnswer = {
+  allowed: boolean;
+  block: number;
+  rpc: string;
+  // The exact call that was simulated, so anyone can replay it with `cast call`.
+  call: { from: string; to: string; data: string };
+};
+
+// Asks the live contract what recordDecision would return for this question,
+// via eth_call from the agent address. Read-only: never signs or sends.
+export function askRecordDecision(question: DecisionQuestion, options: RpcOptions = {}): Promise<DecisionAnswer> {
+  let data: string;
+  try {
+    data = encodeRecordDecision(SIMULATED_SYMBOL, question.signal, BigInt(SIMULATED_PRICE), question.drawdownBps);
+  } catch (cause) {
+    return Promise.reject(cause);
+  }
+  const tx = { from: MACROGUARD_AGENT, to: MACROGUARD_ADDRESS, data };
+  return eachRpc("call", options, async (rpc, call) => {
+    await assertChain(call);
+    const [block, result] = await Promise.all([call("eth_blockNumber", []), call("eth_call", [tx, "latest"])]);
+    return {
+      allowed: bool(result, "recordDecision"),
+      block: quantity(block, "block number"),
+      rpc: new URL(rpc).host,
+      call: tx,
+    };
+  });
+}
+
+export type GateRules = { regime: number; halted: boolean; maxDrawdownBps: number };
+
+// The published rules of MacroGuard.sol, applied in the order the contract
+// applies them: a drawdown at or past the limit halts first; a halt allows only
+// Flat; Risk off vetoes new Longs. Used to explain an answer, never to replace it.
+export function expectDecision(rules: GateRules, question: DecisionQuestion): { allowed: boolean; haltsNow: boolean } {
+  const haltsNow = !rules.halted && question.drawdownBps <= -rules.maxDrawdownBps;
+  let allowed = true;
+  if (rules.halted || haltsNow) allowed = question.signal === "flat";
+  else if (rules.regime === 0) allowed = question.signal !== "long";
+  return { allowed, haltsNow };
+}
+
+// The same question as a `cast call` command, for anyone who wants to replay it.
+export function castCommand(question: DecisionQuestion, rpc: string = PUBLIC_RPCS[1]): string {
+  return [
+    `cast call ${MACROGUARD_ADDRESS}`,
+    `"recordDecision(string,uint8,uint256,int256)(bool)"`,
+    `--from ${MACROGUARD_AGENT} --rpc-url ${rpc}`,
+    `-- ${SIMULATED_SYMBOL} ${SIGNAL[question.signal]} ${SIMULATED_PRICE} ${question.drawdownBps}`,
+  ].join(" ");
 }
