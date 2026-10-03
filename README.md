@@ -10,6 +10,7 @@
 
 [![BNB Chain](https://img.shields.io/badge/Chain-BSC%20Testnet%20(97)-F0B90B?logo=binance&logoColor=white)](https://testnet.bscscan.com/address/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)
 [![Sourcify](https://img.shields.io/badge/Sourcify-exact%20match-2ea44f)](https://repo.sourcify.dev/97/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)
+[![drift-ci](https://github.com/Stylenecy/seed-bnb/actions/workflows/drift-ci.yml/badge.svg?branch=dex/drift)](https://github.com/Stylenecy/seed-bnb/actions/workflows/drift-ci.yml?query=branch%3Adex%2Fdrift)
 [![Python](https://img.shields.io/badge/Engine-Python%203-3776ab?logo=python&logoColor=white)](https://www.python.org/)
 [![Next.js 16](https://img.shields.io/badge/Web-Next.js%2016-black?logo=next.js)](https://nextjs.org)
 [![Foundry](https://img.shields.io/badge/Contracts-Foundry-555)](https://book.getfoundry.sh/)
