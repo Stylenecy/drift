@@ -26,7 +26,9 @@ Browse four classical strategies, backtest them on real Bybit market history und
 
 ### This fork's contribution
 
-This fork starts from the DRIFT project in [`bcc-ukdw/seed-bnb`](https://github.com/bcc-ukdw/seed-bnb) at commit `52671ce`. The existing strategy engine, dashboard, `MacroGuard.sol`, and BNB migration are upstream/team work. Dex added the **MacroGuard transparency panel** at `/dashboard/macroguard` and a public, read-only `/guard/state` API. It reads the contract on BSC Testnet (chain ID 97), checks that code exists at the address, and explains the live regime, halt, drawdown threshold, decision count, and allowed signals. Viewing it needs a contract address and RPC URL, not a private key. The panel does not place trades or send transactions.
+DRIFT's core (the quant engine, the cockpit and `MacroGuard.sol`) comes from the upstream DRIFT project, built for a Mantle hackathon track ("AI Trading & Strategy", June 2026) and migrated to BNB Chain in `bcc-ukdw/seed-bnb` (commit `52671ce`, 29 Sep 2026). Dex Bennett's contribution in this fork: the MacroGuard transparency panel (`/dashboard/macroguard` and the public `/macroguard`), the read-only `/guard/state` API, contract reads straight from the browser over a public RPC (no engine needed), honest copy corrections, a self-owned MacroGuard deployment with an on-chain smoke test (30 Sep 2026), source verification on Sourcify, the judge-facing landing page and visual system, the PRD and the pitch deck.
+
+The **MacroGuard transparency panel** reads the contract on BSC Testnet (chain ID 97), checks that code exists at the address, and explains the live regime, halt, drawdown threshold, decision count, and allowed signals. Viewing it needs a contract address and RPC URL, not a private key. The panel does not place trades or send transactions. The same panel is public and login-free at `/macroguard`, with the verified receipts of Dex's own deployment (`0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D`, smoke-tested 2026-09-30; source verified on [Sourcify](https://repo.sourcify.dev/97/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D), exact match). Product spec: [`docs/PRD-DRIFT.md`](docs/PRD-DRIFT.md).
 
 It ships as three things on one engine:
 
@@ -53,7 +55,7 @@ It ships as three things on one engine:
 - The winner becomes a one-click deploy.
 
 ### MacroGuard — on-chain risk enforcer (BSC Testnet)
-- `MacroGuard.sol` targets BNB Smart Chain Testnet (chain 97); mainnet (chain 56) is a config switch. Deployed address (BSC Testnet): [`0x8F2CbB56Cc9A46EfC3997146369257Ff9450Fe5A`](https://testnet.bscscan.com/address/0x8F2CbB56Cc9A46EfC3997146369257Ff9450Fe5A). See the Deployments section.
+- `MacroGuard.sol` targets BNB Smart Chain Testnet (chain 97); mainnet (chain 56) is a config switch. Dex's deployment (BSC Testnet): [`0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D`](https://testnet.bscscan.com/address/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D), source verified on [Sourcify](https://repo.sourcify.dev/97/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D). See the Deployments section.
 - When configured, the bot attempts `recordDecision(symbol, signal, price, drawdown)` on each tick. Successful transactions create a public decision record; failed or skipped writes do not.
 - `allowed(signal)` is the veto gate: a drawdown breach trips the halt until the agent calls `resume()`; risk-off regime blocks new longs.
 - A **regime engine** (`regime.py`) classifies BTC 1h candles into risk-on / neutral / risk-off using realised-vol z-score + EWMA trend, and autonomously pushes `setRegime` on-chain when the label changes — so the veto is driven by real market conditions, not manual config.
@@ -169,7 +171,7 @@ curl "http://localhost:8099/backtest?strategy=macd&symbol=BTCUSDT&timeframe=1h"
 cd apps/web && npm install && npm run dev   # http://localhost:3000
 ```
 
-The cockpit reads the engine at `http://localhost:8099` by default; override with `NEXT_PUBLIC_TRADER_URL`.
+The cockpit reads the engine at `http://localhost:8099` by default; override with `NEXT_PUBLIC_TRADER_URL`. Opened from any other host (such as the hosted demo) without that variable, the cockpit never calls the engine: it shows a notice instead, and `/macroguard` reads the contract straight from BNB Chain over a public RPC.
 
 ### Live bots (Bybit testnet)
 
@@ -370,6 +372,9 @@ Released under the **MIT License**.
 
 | Network | Contract | Address |
 |---|---|---|
-| BSC Testnet (97) | MacroGuard (maxDrawdownBps 2000) | [0x8F2CbB56Cc9A46EfC3997146369257Ff9450Fe5A](https://testnet.bscscan.com/address/0x8F2CbB56Cc9A46EfC3997146369257Ff9450Fe5A) |
+| BSC Testnet (97) | MacroGuard — **Dex's deployment** (maxDrawdownBps 2000) | [0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D](https://testnet.bscscan.com/address/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D) |
+| BSC Testnet (97) | MacroGuard — upstream group deployment, 2026-09-25 | [0x8F2CbB56Cc9A46EfC3997146369257Ff9450Fe5A](https://testnet.bscscan.com/address/0x8F2CbB56Cc9A46EfC3997146369257Ff9450Fe5A) |
 
-Upstream group deployment from 2026-09-25. Its agent is `0xE85f64383Fd58ddC0b7eC64EF1557317B91Ac0B1`; only that agent can send state-changing calls to this address. Dex's deployment, once completed, will be recorded separately. Machine-readable upstream record: `contracts/deployments/bsc-testnet.json`. Source was not verified on BscScan (no API key). Historical smoke-test tx hashes are in `VERIFY-BNB.md`.
+**Dex's deployment** (2026-09-30): deploy tx [`0x2d8cce2d…c044`](https://testnet.bscscan.com/tx/0x2d8cce2de583424a45e8de176c1b79438cdf54f7a016ae0cfc6c4ca86078c044), block 133995398, agent `0x2B07AfB54068042664074781Af36163aC6714b81`, five smoke-test transactions (all status 1), source verified on [Sourcify](https://repo.sourcify.dev/97/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D) (exact match). Record: `docs/deployment-dex.md`. This is the address the demo panel reads.
+
+**Upstream group deployment** (2026-09-25): its agent is `0xE85f64383Fd58ddC0b7eC64EF1557317B91Ac0B1`; only that agent can send state-changing calls to that address. Machine-readable upstream record: `contracts/deployments/bsc-testnet.json`. Historical smoke-test tx hashes are in `VERIFY-BNB.md`.

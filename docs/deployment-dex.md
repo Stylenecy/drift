@@ -1,6 +1,6 @@
 # Dex BSC Testnet Deployment
 
-Status: DEPLOYED (smoke test still pending)
+Status: DEPLOYED and smoke-tested (2026-09-30)
 
 Network: BSC Testnet
 Chain ID: 97

@@ -18,7 +18,7 @@ DRIFT ships as **three things on one engine**:
 - **A web cockpit** (`apps/web`) — a consumer dashboard with candlestick charts, per-bot equity streams, and a one-click Auto-Research optimizer.
 - **A Python FastAPI engine** (`apps/trader`) — the shared brain: strategy library, backtester, live bot runner, MacroGuard wiring, LLM analyst, and Telegram control bot.
 
-Every backtest runs on real Bybit market history under strict point-in-time rules, every live trade decision is recorded on-chain by `MacroGuard.sol` on BSC Testnet, and the LLM analyst explains but never executes.
+Every backtest runs on real Bybit market history under strict point-in-time rules, the live bot is designed to record each trade decision on-chain through `MacroGuard.sol` on BSC Testnet, and the LLM analyst explains but never executes. No live bot tick has been verified in this fork.
 
 ---
 
@@ -139,7 +139,7 @@ _(screenshot here)_
 
 ## On-chain proof (BSC Testnet)
 
-`MacroGuard.sol` targets BNB Smart Chain Testnet (chain 97). Deployed address: [`0x8F2CbB56Cc9A46EfC3997146369257Ff9450Fe5A`](https://testnet.bscscan.com/address/0x8F2CbB56Cc9A46EfC3997146369257Ff9450Fe5A). Every bot tick records a tamper-proof decision; the regime engine autonomously pushes `setRegime` when market conditions flip.
+`MacroGuard.sol` targets BNB Smart Chain Testnet (chain 97). Dex's deployment: [`0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D`](https://testnet.bscscan.com/address/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D) (source verified on [Sourcify](https://repo.sourcify.dev/97/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)); the upstream group deployment is [`0x8F2CbB56Cc9A46EfC3997146369257Ff9450Fe5A`](https://testnet.bscscan.com/address/0x8F2CbB56Cc9A46EfC3997146369257Ff9450Fe5A). The live bot is designed to record each decision on-chain, and with a private key configured the regime engine pushes `setRegime` when market conditions flip. No live bot tick has been verified in this fork.
 
 <!-- ![MacroGuard on BscScan](./docs/img/chain-macroguard.png) -->
 
