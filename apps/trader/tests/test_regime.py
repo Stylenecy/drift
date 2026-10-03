@@ -57,3 +57,35 @@ def test_a_regime_from_fallback_data_is_never_written_on_chain():
     assert should_push_regime(reg, regime.NEUTRAL) is True
     assert should_push_regime(reg, regime.RISK_OFF) is False  # unchanged: nothing to write
     assert should_push_regime(reg, None) is False  # on-chain regime unreadable
+
+
+def test_one_regime_tick_writes_only_bybit_classified_changes(monkeypatch):
+    """A full pass of the engine's regime loop, with a fake chain guard in place of the contract."""
+    import asyncio
+
+    import app.main as main
+
+    class FakeGuard:
+        enabled = True
+
+        def __init__(self):
+            self.writes = []
+
+        def current_regime(self):
+            return regime.NEUTRAL
+
+        def set_regime(self, value):
+            self.writes.append(value)
+            return "0xtx"
+
+    sent = []
+    monkeypatch.setattr(main.tg, "send", lambda text: sent.append(text))
+    for source, expected in (("binance", []), ("bybit", [regime.RISK_OFF])):
+        guard = FakeGuard()
+        monkeypatch.setattr(main, "chain_guard", guard)
+        reg = regime.Regime(regime.RISK_OFF, "risk-off", 2.0, -0.01, 60000.0, source=source)
+        monkeypatch.setattr(main.regime_engine, "current", lambda client, reg=reg: reg)
+        asyncio.run(main.regime_tick())
+        assert guard.writes == expected, source
+        assert main._regime is reg  # shown either way, labelled with its source
+    assert len(sent) == 1 and "data bybit" in sent[0]

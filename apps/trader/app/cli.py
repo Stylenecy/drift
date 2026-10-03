@@ -693,7 +693,10 @@ def cmd_chain() -> None:
     try:
         reg = regime.current(_data)
         tone = UP if reg.label == "risk-on" else DOWN if reg.label == "risk-off" else GREY
-        console.print(f"[dim]regime[/]   [{tone}]{reg.label}[/] [dim]· vol_z {reg.vol_z:+.2f} · trend {reg.trend:+.4f}[/]")
+        console.print(
+            f"[dim]regime[/]   [{tone}]{reg.label}[/] [dim]· vol_z {reg.vol_z:+.2f} · trend {reg.trend:+.4f}"
+            f" · data {reg.source or 'unknown'}[/]"
+        )
     except Exception:
         pass
 
@@ -753,7 +756,10 @@ def _agent_exec(name: str, args: dict) -> str:
             )
         if name == "get_regime":
             g = regime.current(_data)
-            return f"regime {g.label} · vol_z {g.vol_z:+.2f} · trend {g.trend:+.4f} · BTC {g.price:,.2f}"
+            return (
+                f"regime {g.label} · vol_z {g.vol_z:+.2f} · trend {g.trend:+.4f} · BTC {g.price:,.2f}"
+                f" · data source {g.source or 'unknown'}"
+            )
         if name == "run_backtest":
             sid = resolve_strategy(args.get("strategy", ""))
             if not sid:

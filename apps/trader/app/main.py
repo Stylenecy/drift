@@ -84,30 +84,36 @@ def _auto_connect() -> None:
         print(f"[drift] auto-connect from env failed ({env}): {e}")
 
 
+async def regime_tick() -> None:
+    """One pass of the regime loop: classify, cache, and write on-chain when allowed."""
+    global _regime
+    reg = await asyncio.to_thread(regime_engine.current, _public)
+    _regime = reg
+    if not chain_guard.enabled:
+        return
+    onchain = await asyncio.to_thread(chain_guard.current_regime)
+    if not should_push_regime(reg, onchain):
+        if onchain is not None and reg.regime != onchain:
+            print(f"[drift] regime {reg.label} from {reg.source} data: not written on-chain")
+        return
+    tx = await asyncio.to_thread(chain_guard.set_regime, reg.regime)
+    print(f"[drift] regime → {reg.label} (on-chain tx {tx}, data {reg.source})")
+    await asyncio.to_thread(
+        tg.send,
+        f"📊 *Regime → {reg.label}*\nvol\\_z {reg.vol_z:+.2f} · trend {reg.trend:+.4f} · data {reg.source}\n"
+        f"MacroGuard updated on-chain.",
+    )
+
+
 @app.on_event("startup")
 async def _regime_loop() -> None:
     """Re-classify the macro regime on a slow cadence and push it on-chain when
     it changes, so MacroGuard's risk-off veto is driven autonomously."""
 
     async def loop() -> None:
-        global _regime
         while True:
             try:
-                reg = await asyncio.to_thread(regime_engine.current, _public)
-                _regime = reg
-                if chain_guard.enabled:
-                    onchain = await asyncio.to_thread(chain_guard.current_regime)
-                    if not should_push_regime(reg, onchain):
-                        if onchain is not None and reg.regime != onchain:
-                            print(f"[drift] regime {reg.label} from {reg.source} data: not written on-chain")
-                    else:
-                        tx = await asyncio.to_thread(chain_guard.set_regime, reg.regime)
-                        print(f"[drift] regime → {reg.label} (on-chain tx {tx})")
-                        await asyncio.to_thread(
-                            tg.send,
-                            f"📊 *Regime → {reg.label}*\nvol\\_z {reg.vol_z:+.2f} · trend {reg.trend:+.4f}\n"
-                            f"MacroGuard updated on-chain.",
-                        )
+                await regime_tick()
             except Exception as e:
                 print(f"[drift] regime loop: {e}")
             await asyncio.sleep(REGIME_POLL_SECONDS)
@@ -175,7 +181,10 @@ async def _handle_tg(text: str, chat: str) -> None:
     elif cmd == "regime":
         try:
             reg = _regime or await asyncio.to_thread(regime_engine.current, _public)
-            await asyncio.to_thread(reply, f"Regime *{reg.label}* · vol\\_z {reg.vol_z:+.2f} · trend {reg.trend:+.4f}")
+            await asyncio.to_thread(
+                reply,
+                f"Regime *{reg.label}* · vol\\_z {reg.vol_z:+.2f} · trend {reg.trend:+.4f} · data {reg.source or 'unknown'}",
+            )
         except Exception as e:
             await asyncio.to_thread(reply, f"regime error: {e}")
     elif cmd == "markets":
