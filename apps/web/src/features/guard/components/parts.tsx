@@ -23,8 +23,9 @@ export function Panel({
   id?: string;
   reveal?: boolean;
 }) {
-  const body = (
-    <section id={id} className={`hud ${chain ? "hud-chain" : ""} relative scroll-mt-24 bg-slate-1/35 ${className}`}>
+  const cls = `hud ${chain ? "hud-chain" : ""} relative scroll-mt-24 bg-slate-1/35 ${className}`;
+  const inner = (
+    <>
       {(label || aside) && (
         <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
           {label && <div>{label}</div>}
@@ -32,9 +33,18 @@ export function Panel({
         </div>
       )}
       {children}
+    </>
+  );
+  // One element, so grid placement classes (lg:col-span-*) land on the grid item.
+  return reveal ? (
+    <Reveal as="section" kind="clip" id={id} className={cls}>
+      {inner}
+    </Reveal>
+  ) : (
+    <section id={id} className={cls}>
+      {inner}
     </section>
   );
-  return reveal ? <Reveal kind="clip">{body}</Reveal> : body;
 }
 
 export function Eyebrow({ children, chain }: { children: ReactNode; chain?: boolean }) {
