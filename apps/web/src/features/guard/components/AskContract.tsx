@@ -38,6 +38,18 @@ type Phase =
   | { kind: "answered"; question: DecisionQuestion; answer: DecisionAnswer }
   | { kind: "failed"; question: DecisionQuestion; error: string };
 
+// Amber "!" for the failed and mismatch states: a state is always a word plus an icon.
+function WarnIcon() {
+  return (
+    <span
+      aria-hidden
+      className="mt-px grid h-5 w-5 shrink-0 place-items-center rounded-full bg-amber-400/20 text-[12px] font-bold text-amber-300"
+    >
+      !
+    </span>
+  );
+}
+
 // One sentence on why, from the published rules and the state this page read.
 function reasonFor(question: DecisionQuestion, rules: GateRules | null, thresholdBps: number): string {
   const line = `${thresholdBps / 100}% halt line`;
@@ -169,7 +181,7 @@ export function AskContract({ live, thresholdBps }: { live: GuardState | null; t
               className="ask-range mt-2"
               style={{ "--halt": haltPos } as CSSProperties}
             />
-            <div className="relative h-4 font-mono text-[10.5px] text-white/60" aria-hidden>
+            <div className="relative mt-1 h-4 font-mono text-[10.5px] text-white/60" aria-hidden>
               <span className="absolute left-0">0%</span>
               <span className="absolute -translate-x-1/2 whitespace-nowrap text-[#f0b90b]" style={{ left: haltPos }}>
                 −{thresholdBps / 100}% halt line
@@ -201,9 +213,15 @@ export function AskContract({ live, thresholdBps }: { live: GuardState | null; t
           )}
 
           {phase.kind === "failed" && (
-            <div role="alert" className="rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-[13px] leading-relaxed text-amber-100">
-              <strong className="font-semibold">The contract could not be asked.</strong> {phase.error}. No transaction was
-              involved. Try again in a moment.
+            <div
+              role="alert"
+              className="flex items-start gap-2.5 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-[13px] leading-relaxed text-amber-100"
+            >
+              <WarnIcon />
+              <p className="min-w-0 [overflow-wrap:anywhere]">
+                <strong className="font-semibold">The contract could not be asked.</strong> {phase.error}. No transaction
+                was involved. Try again in a moment.
+              </p>
             </div>
           )}
 
@@ -239,10 +257,13 @@ export function AskContract({ live, thresholdBps }: { live: GuardState | null; t
                 {reasonFor(answered.question, rules, thresholdBps)}
               </p>
               {mismatch && (
-                <p className="mt-2 text-[12px] leading-relaxed text-amber-200">
-                  This answer differs from the published rules applied to the state this page read, so the state may have
-                  changed since. Refresh the panel; the contract&apos;s answer is the one that counts.
-                </p>
+                <div className="mt-2 flex items-start gap-2 text-[12px] leading-relaxed text-amber-200">
+                  <WarnIcon />
+                  <p>
+                    This answer differs from the published rules applied to the state this page read, so the state may
+                    have changed since. Refresh the panel; the contract&apos;s answer is the one that counts.
+                  </p>
+                </div>
               )}
 
               <dl className="mt-3 space-y-1 border-t border-white/10 pt-3 font-mono text-[11px] leading-relaxed text-white/60 [overflow-wrap:anywhere]">

@@ -14,8 +14,6 @@ import socket
 import sys
 from pathlib import Path
 
-import pytest
-
 for _key in (
     "ETH_PRIVATE_KEY",
     "MACROGUARD_ADDRESS",
@@ -43,17 +41,24 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))  # apps/trader -> `
 
 
 LOOPBACK = {"127.0.0.1", "::1", "localhost"}
+_real_connect = socket.socket.connect
+_real_getaddrinfo = socket.getaddrinfo
 
 
-@pytest.fixture(autouse=True)
-def no_network(monkeypatch):
-    real_connect = socket.socket.connect
+def _connect(self, address):
+    # Loopback stays open: asyncio on Windows builds its self-pipe from a local socket pair.
+    if isinstance(address, tuple) and address[0] in LOOPBACK:
+        return _real_connect(self, address)
+    raise RuntimeError(f"network access attempted in an offline test: {address!r}")
 
-    def refuse(self, address):
-        # Loopback stays open: asyncio on Windows builds its self-pipe from a local socket pair.
-        if isinstance(address, tuple) and address[0] in LOOPBACK:
-            return real_connect(self, address)
-        raise RuntimeError(f"network access attempted in an offline test: {address!r}")
 
-    monkeypatch.setattr(socket.socket, "connect", refuse)
+def _getaddrinfo(host, *args, **kwargs):
+    if host is None or host in LOOPBACK:
+        return _real_getaddrinfo(host, *args, **kwargs)
+    raise RuntimeError(f"DNS lookup attempted in an offline test: {host!r}")
 
+
+# Patched at import time, so the guard also covers collection and module-level code,
+# for the whole session.
+socket.socket.connect = _connect
+socket.getaddrinfo = _getaddrinfo

@@ -38,7 +38,7 @@ export function ogCard(): ImageResponse {
         }}
       >
         <div style={{ display: "flex", alignItems: "center", fontSize: 24, letterSpacing: "0.14em", color: MUTED }}>
-          <span style={{ color: GOLD }}>DRIFT</span>
+          <span style={{ color: "#FFFFFF" }}>DRIFT</span>
           <span style={{ margin: "0 14px" }}>·</span>
           <span>MACROGUARD ON BNB CHAIN</span>
         </div>

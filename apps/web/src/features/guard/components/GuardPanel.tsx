@@ -124,15 +124,26 @@ export function GuardPanel() {
 
       {/* --------------------------------------------------- status banners */}
       {status === "offline" && (
-        <p role="alert" className="rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100">
-          <strong className="font-semibold">Live read unavailable.</strong> The live read failed (
-          {error ?? "no response"}), so no live risk claim is shown. In this state the trading runner fails open to
-          its local stop. The contract is still public:{" "}
-          <a className="underline underline-offset-2" href={addressUrl(DEX_GUARD.address)} target="_blank" rel="noopener noreferrer">
-            check it on BscScan ↗
-          </a>
-          . Verified receipts are below.
-        </p>
+        <div
+          role="alert"
+          className="flex items-start gap-2.5 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-sm text-amber-100"
+        >
+          <span
+            aria-hidden
+            className="mt-px grid h-5 w-5 shrink-0 place-items-center rounded-full bg-amber-400/20 text-[12px] font-bold text-amber-300"
+          >
+            !
+          </span>
+          <p className="min-w-0 [overflow-wrap:anywhere]">
+            <strong className="font-semibold">Live read unavailable.</strong> The live read failed (
+            {error ?? "no response"}), so no live risk claim is shown. In this state the trading runner fails open to
+            its local stop. The contract is still public:{" "}
+            <a className="underline underline-offset-2" href={addressUrl(DEX_GUARD.address)} target="_blank" rel="noopener noreferrer">
+              check it on BscScan ↗
+            </a>
+            . Verified receipts are below.
+          </p>
+        </div>
       )}
       {state && !isDexContract && (
         <p role="status" className="rounded-xl border border-white/15 bg-white/[0.04] px-4 py-3 text-sm text-white/75">

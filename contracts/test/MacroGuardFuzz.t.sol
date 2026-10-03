@@ -153,10 +153,16 @@ contract MacroGuardFuzzTest is Test {
 
     function testFuzz_OutOfRangeSignalIsRejected(uint8 raw) public {
         raw = uint8(bound(raw, 3, type(uint8).max));
+        // Control: the same raw encoding with an in-range value (Long = 1) is accepted,
+        // so the failure below comes from the enum check, not from the encoding.
+        (bool control,) = address(guard).call(
+            abi.encodeWithSelector(MacroGuard.recordDecision.selector, "BTCUSDT", uint8(1), uint256(1), int256(0))
+        );
+        assertTrue(control);
         (bool success,) = address(guard).call(
             abi.encodeWithSelector(MacroGuard.recordDecision.selector, "BTCUSDT", raw, uint256(1), int256(0))
         );
         assertFalse(success);
-        assertEq(guard.decisionCount(), 0);
+        assertEq(guard.decisionCount(), 1);
     }
 }
