@@ -14,7 +14,7 @@ const proof = [
   { k: "contract", v: short(DEX_GUARD.address, 6, 4), href: addressUrl(DEX_GUARD.address) },
   { k: "halt line", v: `${DEX_GUARD.maxDrawdownBps / 100}% · ${DEX_GUARD.maxDrawdownBps} bps` },
   { k: "receipts", v: `${SMOKE_TEST.length} · status 1` },
-  { k: "contract tests", v: "7/7 passing" },
+  { k: "contract tests", v: "30/30 passing" },
 ];
 
 function Content() {

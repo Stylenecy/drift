@@ -11,7 +11,7 @@ export default function BacktestPage() {
         </p>
         <p className="mt-3 inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[12px] text-white/65">
           <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-[#9aa8f0]" />
-          Historical simulation on public Bybit data · research, not a profit claim
+          Historical simulation on public market data (Bybit, or Binance when labelled) · research, not a profit claim
         </p>
       </div>
       <Research />
