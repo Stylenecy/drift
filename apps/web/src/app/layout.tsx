@@ -14,10 +14,29 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const TITLE = "DRIFT — a trading bot whose risk rules you can verify on BNB Chain";
+const DESCRIPTION =
+  "DRIFT's quant engine runs off-chain; its risk gate, MacroGuard, is a public contract on BNB Smart Chain Testnet. See what the bot may do right now, ask the live contract a what-if, and open every receipt on BscScan. No login, no wallet.";
+
 export const metadata: Metadata = {
-  title: "DRIFT — AI quant strategies with honest backtests",
-  description:
-    "DRIFT runs transparent quant strategies on Bybit with point-in-time backtests and bounded, on-the-record risk. No look-ahead, no black box.",
+  // Production domain, so Open Graph and Twitter image URLs are absolute.
+  metadataBase: new URL("https://drift-macroguard.vercel.app"),
+  title: TITLE,
+  description: DESCRIPTION,
+  applicationName: "DRIFT",
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: "DRIFT",
+    locale: "en_US",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
   // Public commit id of this build, so anyone can check which commit a deployment serves.
   other: { "build-sha": process.env.NEXT_PUBLIC_BUILD_SHA ?? "local" },
 };
