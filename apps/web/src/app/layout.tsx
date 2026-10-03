@@ -1,6 +1,7 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
 import { AuthProvider } from "@/components/AuthProvider";
+import { MotionBoot } from "@/features/motion/Motion";
 import { AUTH_ENABLED } from "@/lib/auth";
 import "@/styles/globals.css";
 
@@ -11,6 +12,14 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+// One serif-italic phrase per screen (DEX-MOTION-LANGUAGE.md §2).
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  weight: "400",
+  style: "italic",
   subsets: ["latin"],
 });
 
@@ -41,15 +50,31 @@ export const metadata: Metadata = {
   other: { "build-sha": process.env.NEXT_PUBLIC_BUILD_SHA ?? "local" },
 };
 
+export const viewport: Viewport = {
+  themeColor: "#0c0d0d",
+  colorScheme: "dark",
+};
+
+// Runs before first paint. html.has-js says JavaScript runs (live reads can work).
+// With no reduced-motion preference it also sets html.js, which arms the reveal
+// start states in globals.css; if the motion code has not booted 4 s later, it
+// takes html.js away again so nothing stays hidden.
+const BOOT = `(function(){try{var d=document.documentElement;d.classList.add('has-js');if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('js');setTimeout(function(){if(!window.__rv)d.classList.remove('js')},4000)}catch(e){}})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: BOOT }} />
+      </head>
       <body className="min-h-full">
+        <MotionBoot />
         <AuthProvider enabled={AUTH_ENABLED}>{children}</AuthProvider>
       </body>
     </html>
