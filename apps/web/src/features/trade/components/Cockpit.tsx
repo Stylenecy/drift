@@ -72,15 +72,15 @@ export function Cockpit() {
   if (engineError) {
     return (
       <Card title="Engine offline">
-        <div className="space-y-3 py-4 text-sm text-white/60">
+        <div className="space-y-3 py-4 text-sm text-bone/70">
           <p>
             Could not reach the DRIFT engine. Start it with{" "}
-            <span className="font-mono text-white/80">
+            <span className="font-mono text-bone/85">
               uvicorn app.main:app --port 8099
             </span>{" "}
-            in <span className="font-mono text-white/80">apps/trader</span>.
+            in <span className="font-mono text-bone/85">apps/trader</span>.
           </p>
-          <p className="font-mono text-[11px] text-rose-300">{engineError}</p>
+          <p className="font-mono text-[11px] text-veto-soft">{engineError}</p>
         </div>
       </Card>
     );
@@ -98,7 +98,7 @@ export function Cockpit() {
               onSelect={selectStrategy}
             />
           ) : (
-            <p className="py-6 text-center text-sm text-white/40">Loading…</p>
+            <p className="py-6 text-center text-sm text-mute">Loading…</p>
           )}
         </Card>
 
@@ -125,7 +125,7 @@ export function Cockpit() {
       <div>
         {runError && (
           <Card title="Backtest failed" className="mb-4">
-            <p className="py-2 font-mono text-[12px] text-rose-300">{runError}</p>
+            <p className="py-2 font-mono text-[12px] text-veto-soft">{runError}</p>
           </Card>
         )}
         {result ? (
@@ -136,7 +136,7 @@ export function Cockpit() {
               <Badge tone="lime" dot>
                 Testnet · point-in-time
               </Badge>
-              <p className="max-w-sm text-sm text-white/50">
+              <p className="max-w-sm text-sm text-mute">
                 Configure a strategy on the left and run a backtest against real
                 Bybit market history. No look-ahead, honest equity curve.
               </p>

@@ -5,11 +5,9 @@ export function ArchiveBanner() {
     <aside
       role="note"
       aria-label="About these posts"
-      className="mb-12 flex flex-col gap-1.5 rounded-xl border border-white/15 bg-white/[0.04] px-4 py-3.5 text-sm leading-relaxed text-white/75 sm:flex-row sm:gap-3"
+      className="hud relative mb-12 bg-slate-1/40 px-5 pb-4 pt-9 text-[14px] leading-relaxed text-bone/85"
     >
-      <span className="shrink-0 font-mono text-[11px] uppercase leading-6 tracking-[0.14em] text-white/60">
-        Archive
-      </span>
+      <span className="meta absolute left-4 top-3 text-mute">(archive · provenance)</span>
       <p>
         Archived posts from the upstream DRIFT project, written for a Mantle hackathon track in June 2026. During the
         September 2026 BNB Chain migration, mentions of Mantle were changed to BNB Chain and the Mantle ecosystem post

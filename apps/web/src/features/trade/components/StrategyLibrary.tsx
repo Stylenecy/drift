@@ -17,19 +17,19 @@ export function StrategyLibrary({
           <li key={s.id}>
             <button
               onClick={() => onSelect(s)}
-              className={`w-full rounded-lg border px-3 py-2.5 text-left transition ${
+              className={`w-full border px-3 py-2.5 text-left transition ${
                 active
-                  ? "border-[#9aa8f0]/40 bg-white/[0.07]"
-                  : "border-white/10 bg-white/[0.03] hover:bg-white/[0.06]"
+                  ? "border-engine/40 bg-bone/[0.07]"
+                  : "border-[var(--line)] bg-bone/[0.03] hover:bg-bone/[0.06]"
               }`}
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-[13px] font-semibold text-white">{s.name}</span>
-                <span className="font-mono text-[10px] uppercase tracking-wide text-white/40">
+                <span className="text-[13px] font-semibold text-bone">{s.name}</span>
+                <span className="font-mono text-[10px] uppercase tracking-wide text-mute">
                   {s.type}
                 </span>
               </div>
-              <p className="mt-1 text-xs leading-relaxed text-white/55">{s.blurb}</p>
+              <p className="mt-1 text-xs leading-relaxed text-mute">{s.blurb}</p>
             </button>
           </li>
         );

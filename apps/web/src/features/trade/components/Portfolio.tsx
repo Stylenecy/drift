@@ -54,7 +54,7 @@ export function Portfolio() {
         <Card title="Connect to start">
           <div className="flex flex-col items-start gap-3 py-2">
             <Badge tone="amber" dot>Bybit keys required</Badge>
-            <p className="text-sm text-white/55">
+            <p className="text-sm text-mute">
               Add Bybit testnet keys to fund your account and deploy bots.
             </p>
             <Link href="/dashboard/connection">
@@ -67,7 +67,7 @@ export function Portfolio() {
       <Card title="Your bots" subtitle="Live positions and P&L">
         {bots.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-12 text-center">
-            <p className="text-sm text-white/45">No bots yet.</p>
+            <p className="text-sm text-mute">No bots yet.</p>
             <Link href="/dashboard">
               <Button variant="primary">Browse markets</Button>
             </Link>
@@ -76,7 +76,7 @@ export function Portfolio() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/10 text-left font-mono text-[10px] uppercase tracking-wide text-white/40">
+                <tr className="border-b border-[var(--line)] text-left font-mono text-[10px] uppercase tracking-wide text-mute">
                   <th className="py-2 pr-3 font-medium">Market</th>
                   <th className="py-2 pr-3 font-medium">Strategy</th>
                   <th className="py-2 pr-3 font-medium">Position</th>
@@ -91,20 +91,20 @@ export function Portfolio() {
                   const pnl = b.peak_equity > 0 ? b.equity / b.peak_equity - 1 : 0;
                   const pos = b.position > 0 ? "Long" : b.position < 0 ? "Short" : "Flat";
                   return (
-                    <tr key={b.id} className="border-b border-white/5">
-                      <td className="py-2.5 pr-3 font-mono text-white">{b.config.symbol}</td>
-                      <td className="py-2.5 pr-3 text-white/70">{b.config.strategy}</td>
+                    <tr key={b.id} className="border-b border-[var(--line)]">
+                      <td className="py-2.5 pr-3 font-mono text-bone">{b.config.symbol}</td>
+                      <td className="py-2.5 pr-3 text-bone/70">{b.config.strategy}</td>
                       <td className="py-2.5 pr-3">
-                        <span className={b.position > 0 ? "text-emerald-400" : b.position < 0 ? "text-rose-400" : "text-white/45"}>
+                        <span className={b.position > 0 ? "text-ok" : b.position < 0 ? "text-veto-soft" : "text-mute"}>
                           {pos}
                         </span>
                       </td>
-                      <td className="py-2.5 pr-3 text-white/60">{b.last_signal ?? "—"}</td>
-                      <td className="py-2.5 pr-3 text-right font-mono tabular-nums text-white">{b.equity.toFixed(2)}</td>
-                      <td className={`py-2.5 pr-3 text-right font-mono tabular-nums ${pnl >= 0 ? "text-emerald-400" : "text-rose-400"}`}>
+                      <td className="py-2.5 pr-3 text-bone/70">{b.last_signal ?? "—"}</td>
+                      <td className="py-2.5 pr-3 text-right font-mono tabular-nums text-bone">{b.equity.toFixed(2)}</td>
+                      <td className={`py-2.5 pr-3 text-right font-mono tabular-nums ${pnl >= 0 ? "text-ok" : "text-veto-soft"}`}>
                         {pct(pnl)}
                       </td>
-                      <td className="py-2.5 text-right font-mono tabular-nums text-white/60">{pct(b.drawdown)}</td>
+                      <td className="py-2.5 text-right font-mono tabular-nums text-bone/70">{pct(b.drawdown)}</td>
                     </tr>
                   );
                 })}

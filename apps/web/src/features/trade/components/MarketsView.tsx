@@ -58,9 +58,9 @@ export function MarketsView() {
   if (error && markets.length === 0) {
     return (
       <Card title="Engine offline">
-        <p className="py-4 text-sm text-white/55">
+        <p className="py-4 text-sm text-mute">
           Could not reach the DRIFT engine. Start it on{" "}
-          <span className="font-mono text-white/80">:8099</span> and reload.
+          <span className="font-mono text-bone/85">:8099</span> and reload.
         </p>
       </Card>
     );
@@ -76,7 +76,7 @@ export function MarketsView() {
       >
         <ul className="space-y-0.5">
           {markets.length === 0 && (
-            <li className="px-2 py-6 text-center text-sm text-white/30">Loading…</li>
+            <li className="px-2 py-6 text-center text-sm text-mute">Loading…</li>
           )}
           {markets.map((m) => {
             const up = m.change24h >= 0;
@@ -84,17 +84,17 @@ export function MarketsView() {
               <li key={m.symbol}>
                 <button
                   onClick={() => setSymbol(m.symbol)}
-                  className={`flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left transition ${
-                    m.symbol === symbol ? "bg-white/[0.07]" : "hover:bg-white/[0.04]"
+                  className={`flex w-full items-center justify-between px-2.5 py-2 text-left transition ${
+                    m.symbol === symbol ? "bg-bone/[0.07]" : "hover:bg-bone/[0.04]"
                   }`}
                 >
-                  <span className="font-mono text-[13px] text-white">
+                  <span className="font-mono text-[13px] text-bone">
                     {m.symbol.replace("USDT", "")}
-                    <span className="text-white/30">/USDT</span>
+                    <span className="text-mute">/USDT</span>
                   </span>
                   <span className="text-right">
-                    <span className="block font-mono text-[12px] tabular-nums text-white/80">{fmt(m.last)}</span>
-                    <span className={`block font-mono text-[10px] tabular-nums ${up ? "text-emerald-400" : "text-rose-400"}`}>
+                    <span className="block font-mono text-[12px] tabular-nums text-bone/85">{fmt(m.last)}</span>
+                    <span className={`block font-mono text-[10px] tabular-nums ${up ? "text-ok" : "text-veto-soft"}`}>
                       {up ? "+" : ""}{(m.change24h * 100).toFixed(2)}%
                     </span>
                   </span>
@@ -125,8 +125,8 @@ export function MarketsView() {
                 <button
                   key={tf}
                   onClick={() => setTimeframe(tf)}
-                  className={`rounded-md px-2 py-1 font-mono text-[11px] transition ${
-                    tf === timeframe ? "bg-[#9aa8f0] text-[#14152b]" : "text-white/45 hover:bg-white/[0.06] hover:text-white"
+                  className={` px-2 py-1 font-mono text-[11px] transition ${
+                    tf === timeframe ? "bg-engine text-ink" : "text-mute hover:bg-bone/[0.06] hover:text-bone"
                   }`}
                 >
                   {tf}
@@ -183,7 +183,7 @@ function DeployPanel({ symbol, timeframe }: { symbol: string; timeframe: string 
   return (
     <Card title="Deploy a bot here" subtitle={`${symbol} · ${timeframe} · Bybit testnet`}>
       {connected === false && (
-        <div className="mb-3 rounded-lg border border-amber-400/25 bg-amber-400/10 px-3 py-2 text-[12px] text-amber-300">
+        <div className="mb-3 border border-warn/25 bg-warn/10 px-3 py-2 text-[12px] text-warn">
           Not connected — add Bybit keys on the{" "}
           <Link href="/dashboard/connection" className="underline">Connection</Link> tab to deploy.
         </div>
@@ -193,20 +193,20 @@ function DeployPanel({ symbol, timeframe }: { symbol: string; timeframe: string 
           <select
             value={strategy}
             onChange={(e) => setStrategy(e.target.value)}
-            className="w-full rounded-md border border-white/15 bg-white/[0.04] px-2 py-1.5 text-[13px] text-white outline-none focus:border-[#9aa8f0]"
+            className="w-full border border-[var(--line-strong)] bg-bone/[0.04] px-2 py-1.5 text-[13px] text-bone outline-none focus:border-engine"
           >
             {strategies.map((s) => (
-              <option key={s.id} value={s.id} className="bg-[#0c0d10]">{s.name}</option>
+              <option key={s.id} value={s.id} className="bg-ink">{s.name}</option>
             ))}
           </select>
         </Field>
         <Field label="Quantity">
           <input type="number" value={qty} step={0.001} min={0.001} onChange={(e) => setQty(Number(e.target.value))}
-            className="w-full rounded-md border border-white/15 bg-white/[0.04] px-2 py-1.5 font-mono text-[13px] text-white outline-none focus:border-[#9aa8f0]" />
+            className="w-full border border-[var(--line-strong)] bg-bone/[0.04] px-2 py-1.5 font-mono text-[13px] text-bone outline-none focus:border-engine" />
         </Field>
         <Field label="Max drawdown">
           <input type="number" value={maxDd} step={0.05} min={0.05} max={1} onChange={(e) => setMaxDd(Number(e.target.value))}
-            className="w-full rounded-md border border-white/15 bg-white/[0.04] px-2 py-1.5 font-mono text-[13px] text-white outline-none focus:border-[#9aa8f0]" />
+            className="w-full border border-[var(--line-strong)] bg-bone/[0.04] px-2 py-1.5 font-mono text-[13px] text-bone outline-none focus:border-engine" />
         </Field>
         <div className="flex items-end">
           <Button variant="primary" className="w-full" onClick={deploy} disabled={!strategy || connected === false}>
@@ -215,12 +215,12 @@ function DeployPanel({ symbol, timeframe }: { symbol: string; timeframe: string 
         </div>
       </div>
       {deployed && (
-        <p className="mt-3 text-[12px] text-emerald-400">
+        <p className="mt-3 text-[12px] text-ok">
           Bot <span className="font-mono">{deployed}</span> deployed.{" "}
           <Link href="/dashboard/bots" className="underline">Open the bot console →</Link>
         </p>
       )}
-      {error && <p className="mt-3 font-mono text-[11px] text-rose-300">{error}</p>}
+      {error && <p className="mt-3 font-mono text-[11px] text-veto-soft">{error}</p>}
     </Card>
   );
 }
@@ -228,7 +228,7 @@ function DeployPanel({ symbol, timeframe }: { symbol: string; timeframe: string 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1 block font-mono text-[10px] uppercase tracking-wide text-white/45">{label}</span>
+      <span className="mb-1 block font-mono text-[10px] uppercase tracking-wide text-mute">{label}</span>
       {children}
     </label>
   );

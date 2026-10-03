@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
@@ -15,43 +16,56 @@ function GoogleIcon() {
   );
 }
 
+// Only shown when Google OAuth is configured (local or private deployments).
+// The hosted demo has no sign-in: /login redirects straight to the cockpit.
 export function LoginForm() {
   return (
-    <div
-      className="relative flex min-h-screen bg-black bg-cover bg-center text-white"
-      style={{ backgroundImage: "linear-gradient(to right, rgba(8,9,12,0.88) 0%, rgba(8,9,12,0.55) 45%, rgba(8,9,12,0.2) 100%), url('/hero-stars.jpg')" }}
-    >
-      <div className="hidden flex-1 flex-col justify-between p-12 lg:flex">
-        <Link href="/">
-          <Image src="/drift-logo.png" alt="DRIFT" width={36} height={36} className="object-contain" />
+    <div className="hero-x relative flex min-h-screen bg-ink text-bone">
+      <div aria-hidden className="ld-clip pointer-events-none absolute inset-y-0 left-[var(--gx)] right-[var(--gx)] grid-12" style={{ "--d": "0s" } as CSSProperties} />
+
+      <div className="relative hidden flex-1 flex-col justify-between p-12 lg:flex">
+        <Link href="/" className="flex items-center gap-2.5" aria-label="DRIFT home">
+          <Image src="/drift-logo.png" alt="" width={28} height={28} className="object-contain" />
+          <span className="text-[15px] font-semibold tracking-[-0.02em]">DRIFT</span>
         </Link>
         <div>
-          <h1 className="text-4xl font-semibold leading-tight">
-            Run MACD, RSI, Bollinger and Dual Thrust on Bybit — with risk you can see, and a stop you can&apos;t override.
+          <span className="bracket">(cockpit)</span>
+          <h1 className="display-2 ld-lines mt-5 max-w-[16ch]" aria-label="Run classical strategies with a stop you can read.">
+            <span className="ln">
+              <span className="ln-i" style={{ "--i": 0 } as CSSProperties}>
+                Run classical strategies
+              </span>
+            </span>
+            <span className="ln">
+              <span className="ln-i" style={{ "--i": 1 } as CSSProperties}>
+                with a stop <span className="serif-i text-chain">you can read.</span>
+              </span>
+            </span>
           </h1>
-          <p className="mt-4 max-w-sm text-sm text-white/50">
-            Sign in to deploy and monitor your bots on Bybit.
+          <p className="ld-up mt-6 max-w-sm text-[15px] text-mute" style={{ "--d": "0.5s" } as CSSProperties}>
+            Sign in to deploy and monitor your bots on Bybit testnet.
           </p>
         </div>
-        <div className="text-xs text-white/30">Honest · bounded · on the record</div>
+        <div className="meta text-mute">Honest · bounded · on the record</div>
       </div>
 
-      <div className="flex w-full items-center justify-center p-6 lg:w-[480px]">
-        <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#101218]/80 p-8 shadow-2xl backdrop-blur-xl">
-          <h2 className="text-xl font-semibold">Sign in</h2>
-          <p className="mt-1 text-sm text-white/45">Access your trading cockpit.</p>
+      <div className="relative flex w-full items-center justify-center p-6 lg:w-[480px]">
+        <div className="ld-clip hud w-full max-w-sm bg-slate-1/60 p-8 pt-12" style={{ "--d": "0.2s" } as CSSProperties}>
+          <span className="meta absolute left-4 top-3 text-mute">(sign in)</span>
+          <h2 className="text-[24px] font-semibold tracking-[-0.02em]">Sign in</h2>
+          <p className="mt-1 text-sm text-mute">Access your trading cockpit.</p>
 
           <button
             onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            className="mt-6 flex w-full items-center justify-center gap-2.5 rounded-lg border border-white/15 bg-white py-2.5 text-sm font-medium text-[#14152b] transition hover:bg-white/90"
+            className="mt-7 flex w-full items-center justify-center gap-2.5 bg-bone py-3 text-sm font-medium text-ink transition-colors hover:bg-paper"
           >
             <GoogleIcon />
             Sign in with Google
           </button>
 
-          <p className="mt-6 text-center text-[11px] leading-relaxed text-white/30">
-            We use your Google account only to identify your session. Bybit keys
-            stay in the engine&apos;s memory and are never linked to your account.
+          <p className="mt-6 text-center text-[12px] leading-relaxed text-mute">
+            We use your Google account only to identify your session. Bybit keys stay in the engine&apos;s memory and are never
+            linked to your account.
           </p>
         </div>
       </div>

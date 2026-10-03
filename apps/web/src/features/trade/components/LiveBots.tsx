@@ -69,13 +69,13 @@ export function LiveBots() {
   if (conn && !conn.connected) {
     return (
       <Card title="Not connected">
-        <div className="space-y-3 py-4 text-sm text-white/55">
+        <div className="space-y-3 py-4 text-sm text-mute">
           <Badge tone="amber" dot>
             Bybit keys required
           </Badge>
           <p>
             Live bots place real orders on Bybit testnet. Add your keys on the{" "}
-            <span className="font-mono text-white/70">Connection</span> tab first.
+            <span className="font-mono text-bone/70">Connection</span> tab first.
           </p>
         </div>
       </Card>
@@ -88,12 +88,12 @@ export function LiveBots() {
       <LaunchForm strategies={strategies} onLaunch={launch} />
       {error && (
         <Card title="Launch failed">
-          <p className="py-1 font-mono text-[12px] text-rose-300">{error}</p>
+          <p className="py-1 font-mono text-[12px] text-veto-soft">{error}</p>
         </Card>
       )}
       {bots.length === 0 ? (
         <Card>
-          <p className="py-12 text-center text-sm text-white/45">
+          <p className="py-12 text-center text-sm text-mute">
             No bots running. Configure one above to start trading on testnet.
           </p>
         </Card>
@@ -115,18 +115,18 @@ function GuardBanner({ chain, regime }: { chain: ChainInfo; regime: RegimeInfo |
   const regimeTone =
     regime?.label === "risk-on" ? "green" : regime?.label === "risk-off" ? "rose" : "zinc";
   return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-lg border border-[#9aa8f0]/25 bg-[#9aa8f0]/[0.06] px-3.5 py-2.5 text-[12px]">
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border border-engine/25 bg-engine/[0.06] px-3.5 py-2.5 text-[12px]">
       <Badge tone="green" dot>
         configured
       </Badge>
-      <span className="text-white/70">
+      <span className="text-bone/70">
         MacroGuard signal check on{" "}
-        <span className="text-white/90">BNB Chain</span> · writes are best effort
+        <span className="text-bone/85">BNB Chain</span> · writes are best effort
       </span>
       {regime && (
         <span className="flex items-center gap-1.5">
-          <span className="text-white/35">·</span>
-          <span className="text-white/45">regime</span>
+          <span className="text-mute">·</span>
+          <span className="text-mute">regime</span>
           <Badge tone={regimeTone as "green" | "rose" | "zinc"} dot>
             {regime.label}
           </Badge>
@@ -137,7 +137,7 @@ function GuardBanner({ chain, regime }: { chain: ChainInfo; regime: RegimeInfo |
           href={chain.explorer}
           target="_blank"
           rel="noreferrer"
-          className="ml-auto font-mono text-[#9aa8f0] underline-offset-2 hover:underline"
+          className="ml-auto font-mono text-engine underline-offset-2 hover:underline"
         >
           {short} ↗
         </a>
@@ -248,8 +248,8 @@ function BotCard({
       title={
         <span className="flex items-center gap-2">
           <span className="font-mono">{bot.config.symbol}</span>
-          <span className="text-white/35">·</span>
-          <span className="text-white/60">{bot.config.strategy}</span>
+          <span className="text-mute">·</span>
+          <span className="text-bone/70">{bot.config.strategy}</span>
           {bot.running ? (
             <Badge tone="green" dot>live</Badge>
           ) : (
@@ -266,7 +266,7 @@ function BotCard({
     >
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_220px]">
         {/* chart */}
-        <div className="rounded-lg border border-white/10 bg-black/20 p-2">
+        <div className=" border border-[var(--line)] bg-black/20 p-2">
           <CandleChart candles={candles} markers={markers} height={240} />
         </div>
 
@@ -286,7 +286,7 @@ function BotCard({
               {bot.last_signal ?? "—"}
             </Badge>
             {bot.last_price != null && (
-              <span className="font-mono text-[12px] text-white/55">
+              <span className="font-mono text-[12px] text-mute">
                 @ {bot.last_price.toLocaleString()}
               </span>
             )}
@@ -297,14 +297,14 @@ function BotCard({
             )}
           </div>
           {chain?.enabled && (
-            <div className="flex items-center gap-1.5 text-[11px] text-white/45">
-              <span className="text-[#9aa8f0]">⛓</span>
+            <div className="flex items-center gap-1.5 text-[11px] text-mute">
+              <span className="text-engine">⛓</span>
               {bot.last_chain_tx ? (
                 <a
                   href={`${chain.explorer_base}/tx/${bot.last_chain_tx}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="font-mono text-[#9aa8f0] underline-offset-2 hover:underline"
+                  className="font-mono text-engine underline-offset-2 hover:underline"
                 >
                   decision logged {bot.last_chain_tx.slice(0, 10)}… ↗
                 </a>
@@ -315,22 +315,22 @@ function BotCard({
           )}
           {bot.error &&
             (/10005|permission denied/i.test(bot.error) ? (
-              <p className="rounded-md border border-amber-400/25 bg-amber-400/10 px-2.5 py-1.5 text-[11px] leading-relaxed text-amber-300">
+              <p className=" border border-warn/25 bg-warn/10 px-2.5 py-1.5 text-[11px] leading-relaxed text-warn">
                 Your Bybit keys are <b>read-only</b>. Live orders need a key with{" "}
                 <b>trade</b> permission (and a funded testnet balance).
               </p>
             ) : (
-              <p className="font-mono text-[11px] text-rose-300">{bot.error}</p>
+              <p className="font-mono text-[11px] text-veto-soft">{bot.error}</p>
             ))}
           <div>
-            <div className="mb-1 font-mono text-[10px] uppercase tracking-wide text-white/40">Fills</div>
+            <div className="mb-1 font-mono text-[10px] uppercase tracking-wide text-mute">Fills</div>
             {bot.fills.length ? (
               <div className="max-h-28 space-y-0.5 overflow-y-auto">
                 {[...bot.fills].reverse().map((f, i) => (
                   <Row
                     key={i}
                     label={
-                      <span className={f.side === "Buy" ? "text-emerald-400" : "text-rose-300"}>
+                      <span className={f.side === "Buy" ? "text-ok" : "text-veto-soft"}>
                         {f.side} {f.qty}
                         {f.flatten ? " (flat)" : ""}
                       </span>
@@ -340,7 +340,7 @@ function BotCard({
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-white/40">No fills yet — waiting for a signal.</p>
+              <p className="text-xs text-mute">No fills yet — waiting for a signal.</p>
             )}
           </div>
         </div>
@@ -362,16 +362,16 @@ function Select({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block font-mono text-[10px] uppercase tracking-wide text-white/45">
+      <span className="mb-1 block font-mono text-[10px] uppercase tracking-wide text-mute">
         {label}
       </span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-md border border-white/15 bg-white/[0.04] px-2 py-1.5 text-[13px] text-white outline-none focus:border-[#9aa8f0]"
+        className="w-full border border-[var(--line-strong)] bg-bone/[0.04] px-2 py-1.5 text-[13px] text-bone outline-none focus:border-engine"
       >
         {options.map((o) => (
-          <option key={o.value} value={o.value} className="bg-[#0c0d10]">
+          <option key={o.value} value={o.value} className="bg-ink">
             {o.label}
           </option>
         ))}
@@ -397,7 +397,7 @@ function NumberField({
 }) {
   return (
     <label className="block">
-      <span className="mb-1 block font-mono text-[10px] uppercase tracking-wide text-white/45">
+      <span className="mb-1 block font-mono text-[10px] uppercase tracking-wide text-mute">
         {label}
       </span>
       <input
@@ -407,7 +407,7 @@ function NumberField({
         min={min}
         max={max}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="w-full rounded-md border border-white/15 bg-white/[0.04] px-2 py-1.5 font-mono text-[13px] text-white outline-none focus:border-[#9aa8f0]"
+        className="w-full border border-[var(--line-strong)] bg-bone/[0.04] px-2 py-1.5 font-mono text-[13px] text-bone outline-none focus:border-engine"
       />
     </label>
   );

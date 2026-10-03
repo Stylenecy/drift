@@ -1,112 +1,70 @@
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import Nav from "@/features/landing/components/Nav";
 import Footer from "@/features/landing/components/Footer";
 import { posts } from "@/features/landing/blogs";
 import { ArchiveBanner } from "@/features/landing/components/ArchiveBanner";
+import { Reveal } from "@/features/motion/Motion";
 
 export const metadata = {
   title: "Blog — DRIFT",
   description: "Archived build log from the upstream DRIFT project: inspiration, architecture, strategies, and ecosystem.",
 };
 
+// An editorial index: one row per post, index · tag · title · date. The posts
+// are the upstream archive, kept as published; the banner says so.
 export default function BlogIndex() {
   return (
-    <div className="min-h-screen bg-black text-white">
-      <Nav />
+    <div className="min-h-screen bg-ink text-bone">
+      <Nav solid />
 
-      <main className="mx-auto max-w-5xl px-6 pb-32 pt-36">
-        <div className="mb-14">
-          <span className="mb-4 inline-block font-mono text-[11px] uppercase tracking-[0.18em] text-white/60">
-            Upstream archive
+      <main className="mx-auto w-full max-w-[1440px] px-4 pb-28 pt-[110px] sm:px-6 sm:pt-[132px]">
+        <div className="ld-fade flex items-center gap-4" style={{ "--d": "0.05s" } as CSSProperties}>
+          <span className="meta text-mute">Archive</span>
+          <span className="bracket">(upstream build log)</span>
+        </div>
+        <h1 className="display-2 ld-lines mt-6 text-bone" aria-label="From the lab.">
+          <span className="ln">
+            <span className="ln-i" style={{ "--i": 0 } as CSSProperties}>
+              From the <span className="serif-i">lab.</span>
+            </span>
           </span>
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
-            From the lab.
-          </h1>
-          <p className="mt-4 max-w-lg text-white/60">
-            How the upstream DRIFT team designed the engine — from the first honest
-            backtest to the on-chain risk guard.
-          </p>
+        </h1>
+        <p className="ld-up mt-6 max-w-[52ch] text-[16px] leading-relaxed text-mute" style={{ "--d": "0.4s" } as CSSProperties}>
+          How the upstream DRIFT team designed the engine — from the first honest backtest to the on-chain risk guard.
+        </p>
+
+        <div className="mt-12 max-w-4xl">
+          <ArchiveBanner />
         </div>
 
-        <ArchiveBanner />
-
-        <div className="grid gap-6 sm:grid-cols-2">
+        <Reveal as="ol" kind="stagger" className="border-t border-[var(--line-strong)]">
           {posts.map((post, i) => (
-            <Link
-              key={post.slug}
-              href={`/blog/${post.slug}`}
-              className="group block overflow-hidden rounded-2xl border border-white/[0.08] transition duration-300 hover:border-white/20 hover:shadow-xl hover:shadow-black/40"
-              style={{ background: "linear-gradient(160deg, #0d0e15 0%, #0a0b0f 100%)" }}
-            >
-              {/* styled header zone */}
-              <div className="relative h-44 overflow-hidden border-b border-white/[0.06]">
-                {/* accent radial glow */}
-                <div
-                  className="absolute inset-0 opacity-50 transition duration-500 group-hover:opacity-100"
-                  style={{
-                    background: `radial-gradient(ellipse at 20% 70%, ${post.accent}28 0%, transparent 60%)`,
-                  }}
-                />
-                {/* dot grid */}
-                <div
-                  className="absolute inset-0 opacity-[0.055]"
-                  style={{
-                    backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.9) 1px, transparent 1px)",
-                    backgroundSize: "18px 18px",
-                  }}
-                />
-                {/* giant watermark */}
-                <span
-                  className="pointer-events-none absolute -bottom-5 -right-2 select-none font-mono font-black uppercase leading-none tracking-tighter opacity-[0.09] transition duration-500 group-hover:opacity-[0.16]"
-                  style={{ fontSize: "108px", color: post.accent }}
-                >
+            <li key={post.slug}>
+              <Link
+                href={`/blog/${post.slug}`}
+                className="group grid grid-cols-[2.5rem_1fr] items-baseline gap-x-4 gap-y-2 border-b border-[var(--line)] py-7 transition-colors hover:bg-bone/[0.025] sm:grid-cols-[3rem_9rem_1fr_auto] sm:gap-x-6 sm:px-2"
+              >
+                <span className="font-mono text-[12px] text-mute tnum">{String(i + 1).padStart(2, "0")}</span>
+                <span className="meta col-start-2 text-mute sm:col-start-auto">
+                  <span aria-hidden className="mr-2 inline-block h-1.5 w-1.5 rotate-45 align-middle" style={{ backgroundColor: post.accent }} />
                   {post.tag}
                 </span>
-                {/* post index */}
-                <span className="absolute right-5 top-5 font-mono text-[11px] text-white/60">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                {/* tag pill */}
-                <span
-                  className="absolute bottom-5 left-5 rounded-full px-2.5 py-1 font-mono text-[10px] uppercase tracking-wide"
-                  style={{
-                    color: post.accent,
-                    backgroundColor: `${post.accent}18`,
-                    border: `1px solid ${post.accent}38`,
-                  }}
-                >
-                  {post.tag}
-                </span>
-                {/* accent gradient line at top */}
-                <div
-                  className="absolute inset-x-0 top-0 h-[1.5px] opacity-70 transition duration-300 group-hover:opacity-100"
-                  style={{
-                    background: `linear-gradient(90deg, ${post.accent} 0%, ${post.accent}20 100%)`,
-                  }}
-                />
-              </div>
-
-              {/* body */}
-              <div className="p-6">
-                <h2 className="mb-2 text-[15px] font-semibold leading-snug text-white transition group-hover:text-white/90">
-                  {post.title}
-                </h2>
-                <p className="mb-5 line-clamp-2 text-sm leading-relaxed text-white/60">
-                  {post.excerpt}
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-[11px] text-white/60">
-                    {post.date} · {post.readTime} read
-                    {post.note && <span className="mt-1 block text-amber-200/80">{post.note}</span>}
+                <span className="col-start-2 sm:col-start-auto">
+                  <span className="block text-[22px] font-semibold leading-tight tracking-[-0.025em] text-bone sm:text-[28px]">
+                    <span className="u-draw pb-1">{post.title}</span>
                   </span>
-                  <span className="font-mono text-[11px] text-white/60 opacity-0 transition group-hover:opacity-100">
-                    Read →
-                  </span>
-                </div>
-              </div>
-            </Link>
+                  <span className="mt-2 block max-w-[70ch] text-[14px] leading-relaxed text-mute">{post.excerpt}</span>
+                  {post.note && <span className="meta mt-2 block text-warn">{post.note}</span>}
+                </span>
+                <span className="meta col-start-2 text-mute sm:col-start-auto sm:text-right">
+                  {post.date} · {post.readTime}
+                  <span aria-hidden className="ml-2 inline-block transition-transform duration-500 group-hover:translate-x-1">→</span>
+                </span>
+              </Link>
+            </li>
           ))}
-        </div>
+        </Reveal>
       </main>
 
       <Footer />

@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Nav from "@/features/landing/components/Nav";
@@ -19,39 +20,25 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 function Block({ block }: { block: ContentBlock }) {
   switch (block.type) {
     case "h2":
-      return (
-        <h2 className="mb-4 mt-12 text-2xl font-bold tracking-tight text-white">
-          {block.text}
-        </h2>
-      );
+      return <h2 className="mb-4 mt-14 text-[28px] font-semibold leading-tight tracking-[-0.03em] text-bone">{block.text}</h2>;
     case "h3":
-      return (
-        <h3 className="mb-3 mt-8 text-lg font-semibold text-white/90">
-          {block.text}
-        </h3>
-      );
+      return <h3 className="mb-3 mt-9 text-[19px] font-semibold tracking-[-0.01em] text-bone">{block.text}</h3>;
     case "p":
-      return (
-        <p className="mb-5 leading-[1.85] text-white/60">{block.text}</p>
-      );
+      return <p className="mb-5 text-[16.5px] leading-[1.8] text-bone/80">{block.text}</p>;
     case "blockquote":
       return (
-        <blockquote className="my-8 border-l-2 border-white/20 pl-5 text-base italic leading-relaxed text-white/60">
-          {block.text}
-        </blockquote>
+        <blockquote className="serif-i my-10 border-l border-chain/60 pl-6 text-[24px] leading-[1.3] text-bone">{block.text}</blockquote>
       );
     case "code":
       return (
-        <pre className="my-6 overflow-x-auto rounded-xl border border-white/10 bg-white/[0.04] p-5 font-mono text-[13px] leading-relaxed text-[#9aa8f0]">
-          {block.text}
-        </pre>
+        <pre className="hud my-7 overflow-x-auto bg-slate-1/50 p-5 font-mono text-[13px] leading-relaxed text-engine">{block.text}</pre>
       );
     case "ul":
       return (
-        <ul className="mb-6 space-y-2.5 pl-1">
+        <ul className="mb-6 space-y-3 pl-1">
           {block.items.map((item, i) => (
-            <li key={i} className="flex items-start gap-3 text-sm leading-relaxed text-white/60">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-white/30" />
+            <li key={i} className="flex items-start gap-3 text-[15.5px] leading-relaxed text-bone/80">
+              <span aria-hidden className="mt-2.5 h-1.5 w-1.5 shrink-0 rotate-45 bg-mute" />
               {item}
             </li>
           ))}
@@ -64,60 +51,55 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const post = getPost(slug);
   if (!post) notFound();
+  const index = posts.findIndex((p) => p.slug === post.slug);
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      <Nav />
+    <div className="min-h-screen bg-ink text-bone">
+      <Nav solid />
 
-      <main className="mx-auto max-w-2xl px-6 pb-32 pt-36">
-        <Link
-          href="/blog"
-          className="mb-10 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wide text-white/60 transition hover:text-white"
-        >
-          ← Upstream archive
-        </Link>
+      <main className="mx-auto w-full max-w-[1440px] px-4 pb-28 pt-[110px] sm:px-6 sm:pt-[132px]">
+        <div className="mx-auto max-w-[44rem]">
+          <Link href="/blog" className="meta inline-flex items-center gap-2 text-mute transition-colors hover:text-bone">
+            <span aria-hidden>←</span>
+            <span className="u-draw pb-0.5">Upstream archive</span>
+          </Link>
 
-        <ArchiveBanner />
-
-        <div className="mb-10">
-          <div className="mb-5 flex items-center gap-3">
-            <span
-              className="rounded-full px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-wide"
-              style={{ color: post.accent, backgroundColor: `${post.accent}18` }}
-            >
+          <div className="ld-fade mt-10 flex flex-wrap items-center gap-x-4 gap-y-1" style={{ "--d": "0.05s" } as CSSProperties}>
+            <span className="meta text-mute tnum">{String(index + 1).padStart(2, "0")} / {String(posts.length).padStart(2, "0")}</span>
+            <span className="meta inline-flex items-center gap-2 text-mute">
+              <span aria-hidden className="inline-block h-1.5 w-1.5 rotate-45" style={{ backgroundColor: post.accent }} />
               {post.tag}
             </span>
-            <span className="font-mono text-[11px] text-white/60">
+            <span className="meta text-mute">
               {post.date} · {post.readTime} read
             </span>
           </div>
-          {post.note && (
-            <p className="mb-4 font-mono text-[11.5px] text-amber-200/85">Note: {post.note}.</p>
-          )}
 
-          <h1 className="text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl">
-            {post.title}
+          <h1 className="ld-lines mt-6 text-[40px] font-semibold leading-[1.02] tracking-[-0.04em] text-bone sm:text-[60px]" aria-label={post.title}>
+            <span className="ln">
+              <span className="ln-i" style={{ "--i": 0 } as CSSProperties}>
+                {post.title}
+              </span>
+            </span>
           </h1>
+          {post.note && <p className="meta mt-5 text-warn">Note: {post.note}.</p>}
 
-          <div
-            className="mt-6 h-0.5 w-12 rounded-full"
-            style={{ backgroundColor: post.accent }}
-          />
-        </div>
+          <div className="mt-10">
+            <ArchiveBanner />
+          </div>
 
-        <article>
-          {post.content.map((block, i) => (
-            <Block key={i} block={block} />
-          ))}
-        </article>
+          <article className="ld-up" style={{ "--d": "0.3s" } as CSSProperties}>
+            {post.content.map((block, i) => (
+              <Block key={i} block={block} />
+            ))}
+          </article>
 
-        <div className="mt-16 border-t border-white/10 pt-10">
-          <Link
-            href="/blog"
-            className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-wide text-white/60 transition hover:text-white"
-          >
-            ← All posts
-          </Link>
+          <div className="mt-16 border-t border-[var(--line)] pt-8">
+            <Link href="/blog" className="meta inline-flex items-center gap-2 text-mute transition-colors hover:text-bone">
+              <span aria-hidden>←</span>
+              <span className="u-draw pb-0.5">All posts</span>
+            </Link>
+          </div>
         </div>
       </main>
 

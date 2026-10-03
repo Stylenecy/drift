@@ -24,7 +24,7 @@ export function CandleChart({
 }) {
   if (candles.length < 2) {
     return (
-      <div className="flex items-center justify-center py-16 text-sm text-white/30">
+      <div className="flex items-center justify-center py-16 text-sm text-mute">
         No price data.
       </div>
     );

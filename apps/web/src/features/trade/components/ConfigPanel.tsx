@@ -75,7 +75,7 @@ export function ConfigPanel({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <div className="mb-1.5 font-mono text-[10px] uppercase tracking-wide text-white/45">
+      <div className="mb-1.5 font-mono text-[10px] uppercase tracking-wide text-mute">
         {label}
       </div>
       {children}
@@ -98,10 +98,10 @@ function Segmented({
         <button
           key={o}
           onClick={() => onChange(o)}
-          className={`rounded-md border px-2.5 py-1 font-mono text-[11px] transition ${
+          className={` border px-2.5 py-1 font-mono text-[11px] transition ${
             o === value
-              ? "border-[#9aa8f0] bg-[#9aa8f0] text-[#14152b]"
-              : "border-white/15 bg-white/[0.04] text-white/60 hover:bg-white/[0.06]"
+              ? "border-engine bg-engine text-ink"
+              : "border-[var(--line-strong)] bg-bone/[0.04] text-bone/70 hover:bg-bone/[0.06]"
           }`}
         >
           {o}

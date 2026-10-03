@@ -57,24 +57,24 @@ export function AutoResearch() {
             {running ? "Researching…" : "Run Auto-Research"}
           </Button>
         </div>
-        <p className="mt-3 text-xs leading-relaxed text-white/40">
+        <p className="mt-3 text-xs leading-relaxed text-mute">
           DRIFT sweeps every strategy across its parameter space, optimises on the
           first 70% of history, then scores the winner on the held-out last 30% it
           never saw. A config that shines in-sample but fails out-of-sample is
-          flagged <span className="text-amber-300">overfit</span> — only ones that
-          hold up in both are <span className="text-emerald-400">robust</span>.
+          flagged <span className="text-warn">overfit</span> — only ones that
+          hold up in both are <span className="text-ok">robust</span>.
         </p>
       </Card>
 
       {error && (
         <Card title="Research failed">
-          <p className="py-1 font-mono text-[12px] text-rose-300">{error}</p>
+          <p className="py-1 font-mono text-[12px] text-veto-soft">{error}</p>
         </Card>
       )}
 
       {running && !res && (
         <Card>
-          <p className="py-12 text-center text-sm text-white/40">
+          <p className="py-12 text-center text-sm text-mute">
             Sweeping parameter space for {symbol} · {timeframe}…
           </p>
         </Card>
@@ -86,7 +86,7 @@ export function AutoResearch() {
           subtitle={`${res.symbol} · ${res.timeframe} · optimised on 70% / scored on held-out 30%`}
         >
           {connected === false && (
-            <div className="mb-3 rounded-lg border border-amber-400/25 bg-amber-400/10 px-3 py-2 text-[12px] text-amber-300">
+            <div className="mb-3 border border-warn/25 bg-warn/10 px-3 py-2 text-[12px] text-warn">
               Not connected — add Bybit keys on Connection to deploy a result.
             </div>
           )}
@@ -153,12 +153,12 @@ function ResultRow({
   };
 
   return (
-    <div className="overflow-hidden rounded-lg border border-white/10">
-      <button onClick={onToggle} className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition hover:bg-white/[0.03]">
-        <span className="w-5 shrink-0 font-mono text-[12px] text-white/35">{rank}</span>
+    <div className="overflow-hidden border border-[var(--line)]">
+      <button onClick={onToggle} className="flex w-full items-center gap-3 px-3 py-2.5 text-left transition hover:bg-bone/[0.03]">
+        <span className="w-5 shrink-0 font-mono text-[12px] text-mute">{rank}</span>
         <span className="w-36 shrink-0">
-          <span className="block text-[13px] font-semibold text-white">{r.name}</span>
-          <span className="block truncate font-mono text-[10px] text-white/40">{params}</span>
+          <span className="block text-[13px] font-semibold text-bone">{r.name}</span>
+          <span className="block truncate font-mono text-[10px] text-mute">{params}</span>
         </span>
         <span className="hidden flex-1 items-center gap-4 sm:flex">
           <Metric label="IS Sharpe" value={r.in_sample.sharpe.toFixed(2)} dim />
@@ -166,13 +166,13 @@ function ResultRow({
           <Metric label="OOS return" value={pct(oos.total_return)} good={oos.total_return >= 0} />
         </span>
         <Badge tone={verdictTone[r.verdict]}>{verdictLabel[r.verdict]}</Badge>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`h-4 w-4 shrink-0 text-white/30 transition-transform ${open ? "rotate-180" : ""}`}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className={`h-4 w-4 shrink-0 text-mute transition-transform ${open ? "rotate-180" : ""}`}>
           <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
 
       {open && (
-        <div className="border-t border-white/10 bg-black/20 p-3">
+        <div className="border-t border-[var(--line)] bg-black/20 p-3">
           <div className="mb-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
             <StatTile label="OOS return" value={pct(oos.total_return)} accent={oos.total_return >= 0} />
             <StatTile label="OOS Sharpe" value={oos.sharpe.toFixed(2)} accent={oos.sharpe >= 0} />
@@ -185,12 +185,12 @@ function ResultRow({
               {deployed ? "Deployed" : "Deploy this config"}
             </Button>
             {deployed && (
-              <span className="text-[12px] text-emerald-400">
+              <span className="text-[12px] text-ok">
                 Bot <span className="font-mono">{deployed}</span> live ·{" "}
                 <Link href="/dashboard/bots" className="underline">open console →</Link>
               </span>
             )}
-            {err && <span className="font-mono text-[11px] text-rose-300">{err}</span>}
+            {err && <span className="font-mono text-[11px] text-veto-soft">{err}</span>}
           </div>
         </div>
       )}
@@ -231,8 +231,8 @@ function SplitEquity({ points, split }: { points: EquityPoint[]; split: number }
 function Metric({ label, value, good, dim }: { label: string; value: string; good?: boolean; dim?: boolean }) {
   return (
     <span className="leading-tight">
-      <span className="block font-mono text-[9px] uppercase tracking-wide text-white/35">{label}</span>
-      <span className={`block font-mono text-[13px] tabular-nums ${dim ? "text-white/45" : good ? "text-emerald-400" : "text-rose-400"}`}>
+      <span className="block font-mono text-[9px] uppercase tracking-wide text-mute">{label}</span>
+      <span className={`block font-mono text-[13px] tabular-nums ${dim ? "text-mute" : good ? "text-ok" : "text-veto-soft"}`}>
         {value}
       </span>
     </span>
@@ -242,14 +242,14 @@ function Metric({ label, value, good, dim }: { label: string; value: string; goo
 function Picker({ label, options, value, onChange }: { label: string; options: string[]; value: string; onChange: (v: string) => void }) {
   return (
     <div>
-      <div className="mb-1.5 font-mono text-[10px] uppercase tracking-wide text-white/45">{label}</div>
+      <div className="mb-1.5 font-mono text-[10px] uppercase tracking-wide text-mute">{label}</div>
       <div className="flex gap-1.5">
         {options.map((o) => (
           <button
             key={o}
             onClick={() => onChange(o)}
-            className={`rounded-md border px-2.5 py-1 font-mono text-[11px] transition ${
-              o === value ? "border-[#9aa8f0] bg-[#9aa8f0] text-[#14152b]" : "border-white/15 bg-white/[0.03] text-white/60 hover:bg-white/[0.07]"
+            className={` border px-2.5 py-1 font-mono text-[11px] transition ${
+              o === value ? "border-engine bg-engine text-ink" : "border-[var(--line-strong)] bg-bone/[0.03] text-bone/70 hover:bg-bone/[0.07]"
             }`}
           >
             {o.replace("USDT", "")}

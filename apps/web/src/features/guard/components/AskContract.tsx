@@ -43,7 +43,7 @@ function WarnIcon() {
   return (
     <span
       aria-hidden
-      className="mt-px grid h-5 w-5 shrink-0 place-items-center rounded-full bg-amber-400/20 text-[12px] font-bold text-amber-300"
+      className="mt-px grid h-5 w-5 shrink-0 place-items-center border border-warn/60 text-[12px] font-bold text-warn"
     >
       !
     </span>
@@ -109,38 +109,43 @@ export function AskContract({ live, thresholdBps }: { live: GuardState | null; t
   const mismatch = answered !== null && expected !== null && expected.allowed !== answered.answer.allowed;
 
   return (
-    <Panel className="p-5">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <Eyebrow>Ask the contract · simulation</Eyebrow>
-        <span className="text-[11px] text-white/60">
-          <span className="font-mono">eth_call</span> · nothing signed, nothing written
+    <Panel
+      id="ask"
+      className="p-5 pt-6 sm:p-7"
+      label={<Eyebrow>(ask the contract · simulation)</Eyebrow>}
+      aside={
+        <span className="meta text-mute">
+          <span className="text-bone">eth_call</span> · nothing signed, nothing written
         </span>
-      </div>
-      <h2 className="mt-2 text-lg font-semibold tracking-tight text-white sm:text-xl">
-        What would MacroGuard decide if the bot reported this?
+      }
+    >
+      <h2 className="display-3 mt-5 max-w-[22ch] text-bone">
+        What would MacroGuard decide <span className="serif-i">if the bot reported this?</span>
       </h2>
-      <p className="mt-1.5 max-w-3xl text-[13px] leading-relaxed text-white/70">
-        Pick a signal and the drawdown the bot would report. Your browser sends one <span className="font-mono">eth_call</span> of{" "}
-        <span className="font-mono">recordDecision</span> to the live contract, as if from the agent address. It is a simulation:
+      <p className="mt-4 max-w-3xl text-[14px] leading-relaxed text-mute">
+        Pick a signal and the drawdown the bot would report. Your browser sends one <span className="font-mono text-bone">eth_call</span> of{" "}
+        <span className="font-mono text-bone">recordDecision</span> to the live contract, as if from the agent address. It is a simulation:
         nothing is signed or written, no transaction is created and no gas is spent. The answer comes from the contract on BSC
         Testnet, not from this page.
       </p>
 
-      <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
+      <div className="mt-7 grid grid-cols-1 gap-6 lg:grid-cols-2 lg:gap-8">
         <form
-          className="space-y-5"
+          className="space-y-6"
           onSubmit={(event) => {
             event.preventDefault();
             ask();
           }}
         >
           <fieldset>
-            <legend className="text-[12px] font-medium text-white/85">Signal the bot wants</legend>
-            <div className="mt-2 grid grid-cols-3 gap-1.5">
-              {SIGNALS.map((s) => (
+            <legend className="meta text-bone">Signal the bot wants</legend>
+            <div className="mt-3 grid grid-cols-3">
+              {SIGNALS.map((s, i) => (
                 <label
                   key={s.id}
-                  className="cursor-pointer rounded-lg border border-white/10 px-3 py-2 text-white/70 transition hover:border-white/25 has-[:checked]:border-white/40 has-[:checked]:bg-white/[0.10] has-[:checked]:text-white has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[#f0b90b]"
+                  className={`cursor-pointer border border-[var(--line-strong)] px-3 py-2.5 text-mute transition-colors hover:border-bone/40 has-[:checked]:relative has-[:checked]:z-10 has-[:checked]:border-bone/70 has-[:checked]:bg-bone/[0.08] has-[:checked]:text-bone has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-chain ${
+                    i > 0 ? "-ml-px" : ""
+                  }`}
                 >
                   <input
                     type="radio"
@@ -150,11 +155,11 @@ export function AskContract({ live, thresholdBps }: { live: GuardState | null; t
                     onChange={() => setSignal(s.id)}
                     className="sr-only"
                   />
-                  <span className="block text-[13px] font-semibold">
+                  <span className="block text-[14px] font-semibold">
                     {signal === s.id && <span aria-hidden>● </span>}
                     {s.label}
                   </span>
-                  <span className="block text-[11px] text-white/60">{s.hint}</span>
+                  <span className="meta block text-mute">{s.hint}</span>
                 </label>
               ))}
             </div>
@@ -162,11 +167,11 @@ export function AskContract({ live, thresholdBps }: { live: GuardState | null; t
 
           <div>
             <div className="flex flex-wrap items-baseline justify-between gap-x-3">
-              <label htmlFor={sliderId} className="text-[12px] font-medium text-white/85">
+              <label htmlFor={sliderId} className="meta text-bone">
                 Drawdown it reports
               </label>
-              <output htmlFor={sliderId} className="font-mono text-[13px] tabular-nums text-white">
-                {pct(-lossBps)} <span className="text-white/60">({bpsText(-lossBps)})</span>
+              <output htmlFor={sliderId} className="font-mono text-[15px] text-bone tnum">
+                {pct(-lossBps)} <span className="text-mute">({bpsText(-lossBps)})</span>
               </output>
             </div>
             <input
@@ -181,9 +186,9 @@ export function AskContract({ live, thresholdBps }: { live: GuardState | null; t
               className="ask-range mt-2"
               style={{ "--halt": haltPos } as CSSProperties}
             />
-            <div className="relative mt-1 h-4 font-mono text-[10.5px] text-white/60" aria-hidden>
+            <div className="meta relative mt-1 h-4 text-mute" aria-hidden>
               <span className="absolute left-0">0%</span>
-              <span className="absolute -translate-x-1/2 whitespace-nowrap text-[#f0b90b]" style={{ left: haltPos }}>
+              <span className="absolute -translate-x-1/2 whitespace-nowrap text-chain" style={{ left: haltPos }}>
                 −{thresholdBps / 100}% halt line
               </span>
               <span className="absolute right-0">−{MAX_LOSS_BPS / 100}%</span>
@@ -193,30 +198,29 @@ export function AskContract({ live, thresholdBps }: { live: GuardState | null; t
           <button
             type="submit"
             disabled={phase.kind === "asking"}
-            className="inline-flex items-center gap-2 rounded-lg bg-[#f0b90b] px-4 py-2 text-[13px] font-semibold text-[#1a1405] transition hover:bg-[#f8d36a] disabled:cursor-wait disabled:opacity-70"
+            className="inline-flex items-center gap-3 bg-chain px-5 py-3 text-[14px] font-semibold text-ink transition-colors hover:bg-chain-soft disabled:cursor-wait disabled:opacity-70"
           >
             {phase.kind === "asking" ? "Asking BSC Testnet…" : stale ? "Ask again" : "Ask the live contract"}
+            <span aria-hidden>→</span>
           </button>
         </form>
 
         <div aria-live="polite" className="min-w-0">
           {phase.kind === "idle" && (
-            <div className="flex h-full min-h-[148px] items-center rounded-xl border border-dashed border-white/15 px-4 py-4 text-[13px] leading-relaxed text-white/65">
+            <div className="flex h-full min-h-[168px] items-center border border-dashed border-[var(--line-strong)] px-5 py-5 text-[14px] leading-relaxed text-mute">
               No question asked yet. The contract&apos;s answer appears here, with the block it was read at.
             </div>
           )}
 
           {phase.kind === "asking" && (
-            <div className="flex h-full min-h-[148px] items-center rounded-xl border border-white/10 px-4 py-4 text-[13px] text-white/70">
+            <div className="flex h-full min-h-[168px] items-center gap-3 border border-[var(--line-strong)] px-5 py-5 text-[14px] text-bone/85">
+              <span aria-hidden className="live-dot h-2 w-2 shrink-0 rounded-full bg-chain" />
               Asking the contract: {label(phase.question.signal)} at {pct(phase.question.drawdownBps)}…
             </div>
           )}
 
           {phase.kind === "failed" && (
-            <div
-              role="alert"
-              className="flex items-start gap-2.5 rounded-xl border border-amber-400/30 bg-amber-400/10 px-4 py-3 text-[13px] leading-relaxed text-amber-100"
-            >
+            <div role="alert" className="flex items-start gap-3 border border-warn/40 bg-warn/[0.08] px-5 py-4 text-[14px] leading-relaxed text-bone">
               <WarnIcon />
               <p className="min-w-0 [overflow-wrap:anywhere]">
                 <strong className="font-semibold">The contract could not be asked.</strong> Reason: {phase.error}. No
@@ -227,37 +231,34 @@ export function AskContract({ live, thresholdBps }: { live: GuardState | null; t
 
           {answered && (
             <div
-              className={`rounded-xl border p-4 ${
-                answered.answer.allowed ? "border-emerald-400/25 bg-emerald-500/[0.06]" : "border-rose-400/35 bg-rose-500/[0.08]"
-              }`}
+              key={`${answered.answer.block}-${answered.question.signal}-${answered.question.drawdownBps}`}
+              className={`ld-clip hud border p-5 ${answered.answer.allowed ? "border-[var(--line-strong)]" : "hud-veto border-veto/50 bg-veto/[0.07]"}`}
+              style={{ "--d": "0s" } as CSSProperties}
             >
               {stale && (
-                <p className="mb-2 text-[11.5px] text-white/65">
-                  Answer for {label(answered.question.signal)} at {pct(answered.question.drawdownBps)}. Ask again for your new
-                  choice.
+                <p className="meta mb-3 text-mute">
+                  Answer for {label(answered.question.signal)} at {pct(answered.question.drawdownBps)}. Ask again for your new choice.
                 </p>
               )}
-              <div className="flex items-center gap-2.5">
+              <div className="flex flex-wrap items-center gap-3">
                 <span
                   aria-hidden
-                  className={`grid h-7 w-7 place-items-center rounded-full text-[14px] font-bold ${
-                    answered.answer.allowed ? "bg-emerald-400/20 text-emerald-300" : "bg-rose-400/20 text-rose-300"
+                  className={`grid h-9 w-9 place-items-center border text-[16px] font-bold ${
+                    answered.answer.allowed ? "border-ok/60 text-ok" : "border-veto/70 text-veto-soft"
                   }`}
                 >
                   {answered.answer.allowed ? "✓" : "✕"}
                 </span>
-                <span className={`text-xl font-semibold ${answered.answer.allowed ? "text-emerald-100" : "text-rose-100"}`}>
+                <span className={`text-[34px] font-semibold leading-none tracking-[-0.03em] ${answered.answer.allowed ? "text-bone" : "text-veto-soft"}`}>
                   {answered.answer.allowed ? "Allowed" : "Blocked"}
                 </span>
-                <span className="text-[12px] text-white/60">
+                <span className="meta text-mute">
                   {label(answered.question.signal)} at {pct(answered.question.drawdownBps)}
                 </span>
               </div>
-              <p className="mt-2 text-[13px] leading-relaxed text-white/80">
-                {reasonFor(answered.question, rules, thresholdBps)}
-              </p>
+              <p className="mt-3 text-[14px] leading-relaxed text-bone/85">{reasonFor(answered.question, rules, thresholdBps)}</p>
               {mismatch && (
-                <div className="mt-2 flex items-start gap-2 text-[12px] leading-relaxed text-amber-200">
+                <div className="mt-2 flex items-start gap-2 text-[13px] leading-relaxed text-warn">
                   <WarnIcon />
                   <p>
                     This answer differs from the published rules applied to the state this page read, so the state may
@@ -266,10 +267,10 @@ export function AskContract({ live, thresholdBps }: { live: GuardState | null; t
                 </div>
               )}
 
-              <dl className="mt-3 space-y-1 border-t border-white/10 pt-3 font-mono text-[11px] leading-relaxed text-white/60 [overflow-wrap:anywhere]">
+              <dl className="mt-4 space-y-1 border-t border-[var(--line)] pt-3 font-mono text-[11.5px] leading-relaxed text-mute [overflow-wrap:anywhere]">
                 <div>
                   <dt className="inline">call </dt>
-                  <dd className="inline text-white/85">
+                  <dd className="inline text-bone/90">
                     recordDecision(&quot;{SIMULATED_SYMBOL}&quot;, {label(answered.question.signal)}, {SIMULATED_PRICE},{" "}
                     {answered.question.drawdownBps})
                   </dd>
@@ -285,7 +286,7 @@ export function AskContract({ live, thresholdBps }: { live: GuardState | null; t
                       href={addressUrl(DEX_GUARD.address)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[#f8d36a] underline-offset-2 hover:underline"
+                      className="text-chain-soft underline-offset-2 hover:underline"
                     >
                       MacroGuard {short(DEX_GUARD.address, 6, 4)} ↗
                     </a>
@@ -298,13 +299,13 @@ export function AskContract({ live, thresholdBps }: { live: GuardState | null; t
                   </dd>
                 </div>
               </dl>
-              <p className="mt-2 text-[11.5px] leading-relaxed text-white/60">
+              <p className="mt-3 text-[12.5px] leading-relaxed text-mute">
                 Simulation only: the node ran the call and discarded the result. The on-chain decision count is unchanged.
               </p>
-              <details className="mt-2 text-[11.5px] text-white/65">
-                <summary className="cursor-pointer select-none">Replay it with Foundry&apos;s cast</summary>
+              <details className="mt-3 text-[12.5px] text-mute">
+                <summary className="cursor-pointer select-none text-bone/85">Replay it with Foundry&apos;s cast</summary>
                 <div className="mt-2 flex items-start gap-2">
-                  <code className="min-w-0 flex-1 whitespace-pre-wrap rounded-md bg-black/40 px-2 py-1.5 font-mono text-[10.5px] text-white/80 [overflow-wrap:anywhere]">
+                  <code className="min-w-0 flex-1 whitespace-pre-wrap bg-ink/70 px-2 py-1.5 font-mono text-[11px] text-bone/85 [overflow-wrap:anywhere]">
                     {castCommand(answered.question)}
                   </code>
                   <CopyValue value={castCommand(answered.question)} label="cast command" />

@@ -38,18 +38,18 @@ export function ConnectionPanel() {
       <Card title="Bybit connection" subtitle="Keys are held in memory only, never written to disk">
         <div className="space-y-3">
           <label className="block">
-            <span className="mb-1 block font-mono text-[10px] uppercase tracking-wide text-white/45">
+            <span className="mb-1 block font-mono text-[10px] uppercase tracking-wide text-mute">
               API key
             </span>
             <input
               value={apiKey}
               onChange={(e) => setApiKey(e.target.value)}
               placeholder="API key"
-              className="w-full rounded-md border border-white/15 bg-white/[0.04] px-3 py-1.5 font-mono text-[13px] text-white outline-none focus:border-[#9aa8f0]"
+              className="w-full border border-[var(--line-strong)] bg-bone/[0.04] px-3 py-1.5 font-mono text-[13px] text-bone outline-none focus:border-engine"
             />
           </label>
           <label className="block">
-            <span className="mb-1 block font-mono text-[10px] uppercase tracking-wide text-white/45">
+            <span className="mb-1 block font-mono text-[10px] uppercase tracking-wide text-mute">
               API secret
             </span>
             <input
@@ -57,10 +57,10 @@ export function ConnectionPanel() {
               value={apiSecret}
               onChange={(e) => setApiSecret(e.target.value)}
               placeholder="API secret"
-              className="w-full rounded-md border border-white/15 bg-white/[0.04] px-3 py-1.5 font-mono text-[13px] text-white outline-none focus:border-[#9aa8f0]"
+              className="w-full border border-[var(--line-strong)] bg-bone/[0.04] px-3 py-1.5 font-mono text-[13px] text-bone outline-none focus:border-engine"
             />
           </label>
-          <label className="flex items-center gap-2 text-[13px] text-white/70">
+          <label className="flex items-center gap-2 text-[13px] text-bone/70">
             <input
               type="checkbox"
               checked={testnet}
@@ -69,7 +69,7 @@ export function ConnectionPanel() {
             />
             Testnet
           </label>
-          {error && <p className="font-mono text-[11px] text-rose-300">{error}</p>}
+          {error && <p className="font-mono text-[11px] text-veto-soft">{error}</p>}
           <Button
             variant="primary"
             className="w-full"
@@ -78,7 +78,7 @@ export function ConnectionPanel() {
           >
             {busy ? "Connecting…" : "Connect"}
           </Button>
-          <p className="text-xs leading-relaxed text-white/45">
+          <p className="text-xs leading-relaxed text-mute">
             Read-scope keys unlock markets and portfolio. Trade-scope keys are
             required to deploy bots. Keys are held in memory only.
           </p>
@@ -100,7 +100,7 @@ export function ConnectionPanel() {
             <Badge tone="amber" dot>
               Not connected
             </Badge>
-            <p className="text-sm text-white/50">
+            <p className="text-sm text-mute">
               Connect Bybit API keys to deploy bots. Backtesting and markets work without keys.
             </p>
           </div>

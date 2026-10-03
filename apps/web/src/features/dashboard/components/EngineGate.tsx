@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useSyncExternalStore } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -28,24 +28,23 @@ export function EngineGate({ children }: { children: ReactNode }) {
   if (engine) return <>{children}</>;
 
   return (
-    <section
-      role="status"
-      className="max-w-2xl rounded-2xl border border-[#9aa8f0]/25 bg-[#9aa8f0]/[0.06] p-5 text-sm leading-relaxed text-white/80 sm:p-6"
-    >
-      <div className="font-mono text-[10.5px] font-medium uppercase tracking-[0.16em] text-[#9aa8f0]">
-        Hosted demo · read-only
-      </div>
-      <p className="mt-3 text-[15px] text-white">
-        The quant engine runs on your own machine. This hosted demo is read-only: the live risk gate is at{" "}
-        <Link href="/macroguard" className="text-[#f8d36a] underline underline-offset-2 hover:text-[#f0b90b]">
+    <section role="status" className="ld-clip hud relative max-w-3xl bg-engine/[0.05] px-5 pb-6 pt-10 sm:px-8" style={{ "--d": "0s" } as CSSProperties}>
+      <span className="meta absolute left-4 top-3 text-engine">(hosted demo · read-only)</span>
+      <span className="meta absolute right-4 top-3 hidden text-mute sm:inline">engine: not on this host</span>
+      <p className="display-3 text-bone">
+        The engine runs on <span className="serif-i">your own machine.</span>
+      </p>
+      <p className="mt-4 max-w-[60ch] text-[15px] leading-relaxed text-mute">
+        This hosted demo is read-only: the live risk gate is at{" "}
+        <Link href="/macroguard" className="text-chain-soft underline underline-offset-2 hover:text-chain">
           /macroguard
         </Link>
         , and the README shows how to run the cockpit locally.
       </p>
-      <div className="mt-5 flex flex-wrap gap-2">
+      <div className="mt-7 flex flex-wrap gap-3">
         <Link
           href="/macroguard"
-          className="inline-flex items-center rounded-lg bg-[#f0b90b] px-3 py-1.5 text-[12.5px] font-semibold text-[#1a1405] transition hover:bg-[#f8d36a]"
+          className="inline-flex items-center gap-2 bg-chain px-4 py-2.5 text-[13px] font-semibold text-ink transition-colors hover:bg-chain-soft"
         >
           Open the live risk gate →
         </Link>
@@ -53,7 +52,7 @@ export function EngineGate({ children }: { children: ReactNode }) {
           href={QUICK_START}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center rounded-lg border border-white/20 px-3 py-1.5 text-[12.5px] text-white/85 transition hover:border-white/40"
+          className="inline-flex items-center border border-[var(--line-strong)] px-4 py-2.5 text-[13px] text-bone transition-colors hover:border-bone/50"
         >
           Run the cockpit locally ↗
         </a>

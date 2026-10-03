@@ -1,46 +1,44 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
+import { Reveal } from "@/features/motion/Motion";
 import { SMOKE_TEST, DEX_GUARD, txUrl, short, type TimelineStep } from "../evidence";
 
 /* --------------------------------------------------------------- Shell -- */
+// A HUD-framed surface. Gold corners mark content a judge can verify on BscScan.
 export function Panel({
   children,
   className = "",
   chain,
+  label,
+  aside,
+  id,
+  reveal = true,
 }: {
   children: ReactNode;
   className?: string;
-  // Gold hairline marks content a judge can verify on BscScan.
   chain?: boolean;
+  label?: ReactNode;
+  aside?: ReactNode;
+  id?: string;
+  reveal?: boolean;
 }) {
-  return (
-    <section
-      className={`relative overflow-hidden rounded-2xl border bg-white/[0.03] ${
-        chain ? "border-[#f0b90b]/30" : "border-white/10"
-      } ${className}`}
-    >
-      {chain && (
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#f0b90b]/80 to-transparent"
-        />
+  const body = (
+    <section id={id} className={`hud ${chain ? "hud-chain" : ""} relative scroll-mt-24 bg-slate-1/35 ${className}`}>
+      {(label || aside) && (
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+          {label && <div>{label}</div>}
+          {aside && <div className="min-w-0">{aside}</div>}
+        </div>
       )}
       {children}
     </section>
   );
+  return reveal ? <Reveal kind="clip">{body}</Reveal> : body;
 }
 
 export function Eyebrow({ children, chain }: { children: ReactNode; chain?: boolean }) {
-  return (
-    <div
-      className={`font-mono text-[10.5px] font-medium uppercase tracking-[0.16em] ${
-        chain ? "text-[#f0b90b]" : "text-white/50"
-      }`}
-    >
-      {children}
-    </div>
-  );
+  return <div className={`meta ${chain ? "text-chain" : "text-mute"}`}>{children}</div>;
 }
 
 /* ---------------------------------------------------------------- Copy -- */
@@ -55,7 +53,7 @@ export function CopyValue({ value, label }: { value: string; label: string }) {
           setTimeout(() => setCopied(false), 1400);
         });
       }}
-      className="rounded-md border border-white/10 px-2 py-0.5 font-mono text-[10.5px] text-white/60 transition hover:border-white/25 hover:text-white"
+      className="meta border border-[var(--line-strong)] px-2 py-0.5 text-mute transition-colors hover:border-bone/40 hover:text-bone"
       aria-label={`Copy ${label}`}
     >
       {copied ? "copied" : "copy"}
@@ -65,29 +63,29 @@ export function CopyValue({ value, label }: { value: string; label: string }) {
 
 /* ------------------------------------------------------- Regime stepper -- */
 const REGIMES = [
-  { label: "Risk off", hint: "Long vetoed", on: "bg-amber-400/20 text-amber-200 border-amber-300/50" },
-  { label: "Neutral", hint: "All signals open", on: "bg-white/[0.12] text-white border-white/40" },
-  { label: "Risk on", hint: "All signals open", on: "bg-emerald-400/15 text-emerald-200 border-emerald-300/50" },
+  { label: "Risk off", hint: "Long vetoed", on: "border-warn/60 bg-warn/10 text-warn" },
+  { label: "Neutral", hint: "All signals open", on: "border-bone/50 bg-bone/[0.08] text-bone" },
+  { label: "Risk on", hint: "All signals open", on: "border-ok/50 bg-ok/10 text-ok" },
 ];
 
 export function RegimeStepper({ regime }: { regime: number | null }) {
   return (
-    <div role="group" aria-label="Market regime stored on-chain" className="grid grid-cols-3 gap-1.5">
+    <div role="group" aria-label="Market regime stored on-chain" className="grid grid-cols-3">
       {REGIMES.map((r, i) => {
         const active = regime === i;
         return (
           <div
             key={r.label}
             aria-current={active ? "true" : undefined}
-            className={`rounded-lg border px-3 py-2 transition ${
-              active ? r.on : "border-white/[0.07] text-white/45"
+            className={`border px-3 py-2.5 transition-colors duration-500 ${i > 0 ? "-ml-px" : ""} ${
+              active ? `relative z-10 ${r.on}` : "border-[var(--line-strong)] text-mute"
             }`}
           >
             <div className="text-[13px] font-semibold">
               {active && <span aria-hidden>● </span>}
               {r.label}
             </div>
-            <div className={`text-[11px] ${active ? "opacity-80" : "text-white/40"}`}>{r.hint}</div>
+            <div className={`meta mt-0.5 ${active ? "" : "text-mute"}`}>{r.hint}</div>
           </div>
         );
       })}
@@ -101,15 +99,15 @@ export const regimeLabel = (regime: number | null) =>
 /* ------------------------------------------------------------ Halt chip -- */
 export function HaltChip({ halted }: { halted: boolean | null }) {
   if (halted === null) {
-    return <span className="text-sm text-white/50">Halt state unknown</span>;
+    return <span className="meta text-mute">Halt state unknown</span>;
   }
   return halted ? (
-    <span className="inline-flex items-center gap-2 rounded-full border border-rose-400/40 bg-rose-500/15 px-3 py-1 text-[12.5px] font-semibold text-rose-200">
+    <span className="meta inline-flex items-center gap-2 border border-veto/60 bg-veto/15 px-3 py-1 text-veto-soft">
       <span aria-hidden>■</span> Halted — only Flat allowed
     </span>
   ) : (
-    <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/35 bg-emerald-500/10 px-3 py-1 text-[12.5px] font-semibold text-emerald-200">
-      <span aria-hidden className="live-dot h-2 w-2 rounded-full bg-emerald-400" /> Running — no drawdown halt
+    <span className="meta inline-flex items-center gap-2 border border-ok/40 bg-ok/10 px-3 py-1 text-ok">
+      <span aria-hidden className="live-dot h-2 w-2 rounded-full bg-ok" /> Running — no drawdown halt
     </span>
   );
 }
@@ -135,31 +133,32 @@ export function SignalVerdicts({
   halted: boolean | null;
 }) {
   return (
-    <ul className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-      {(["long", "short", "flat"] as const).map((sig) => {
+    <ul className="grid grid-cols-1 sm:grid-cols-3">
+      {(["long", "short", "flat"] as const).map((sig, i) => {
         const ok = allowed[sig];
         return (
           <li
             key={sig}
-            className={`rounded-xl border p-4 ${
-              ok ? "border-emerald-400/25 bg-emerald-500/[0.06]" : "border-rose-400/35 bg-rose-500/[0.08]"
+            className={`step-in border p-5 ${i > 0 ? "sm:-ml-px" : ""} ${i > 0 ? "-mt-px sm:mt-0" : ""} ${
+              ok ? "border-[var(--line-strong)]" : "relative z-10 border-veto/70 bg-veto/[0.08]"
             }`}
+            style={{ animationDelay: `${i * 90}ms` } as CSSProperties}
           >
             <div className="flex items-center justify-between">
-              <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/60">{sig}</span>
+              <span className="meta text-mute">{sig}</span>
               <span
-                className={`grid h-6 w-6 place-items-center rounded-full text-[13px] font-bold ${
-                  ok ? "bg-emerald-400/20 text-emerald-300" : "bg-rose-400/20 text-rose-300"
+                className={`grid h-7 w-7 place-items-center border text-[13px] font-bold ${
+                  ok ? "border-ok/50 text-ok" : "border-veto/70 text-veto-soft"
                 }`}
                 aria-hidden
               >
                 {ok ? "✓" : "✕"}
               </span>
             </div>
-            <div className={`mt-2 text-lg font-semibold ${ok ? "text-emerald-100" : "text-rose-100"}`}>
+            <div className={`mt-4 text-[28px] font-semibold leading-none tracking-[-0.03em] ${ok ? "text-bone" : "text-veto-soft"}`}>
               {ok ? "Allowed" : "Blocked"}
             </div>
-            <p className="mt-0.5 text-[12.5px] leading-snug text-white/65">{reasonFor(sig, ok, regime, halted)}</p>
+            <p className="mt-2 text-[13px] leading-snug text-mute">{reasonFor(sig, ok, regime, halted)}</p>
           </li>
         );
       })}
@@ -171,100 +170,105 @@ export function SignalVerdicts({
 export function HaltGauge({ maxDrawdownBps }: { maxDrawdownBps: number }) {
   const limit = maxDrawdownBps / 100;
   const scale = Math.max(30, limit * 1.5);
-  const at = (pct: number) => `${Math.min(100, (pct / scale) * 100)}%`;
+  const pos = (pct: number) => Math.min(100, (pct / scale) * 100);
   const dots = SMOKE_TEST.filter((s) => s.drawdownPct !== undefined);
 
   return (
-    <div>
-      <div className="relative mt-9 h-3 rounded-full bg-white/[0.06]">
-        <div className="absolute inset-y-0 left-0 rounded-l-full bg-emerald-400/25" style={{ width: at(limit) }} />
-        <div className="absolute inset-y-0 right-0 rounded-r-full bg-rose-500/25" style={{ left: at(limit) }} />
+    <Reveal kind="gauge" className="mt-10">
+      <div className="relative h-8">
+        <div aria-hidden className="absolute inset-x-0 top-1/2 h-px bg-[var(--line-strong)]" />
+        <div aria-hidden className="absolute left-0 top-[calc(50%-1px)] h-[3px] bg-ok/45" style={{ width: `${pos(limit)}%` }} />
+        <div aria-hidden className="absolute right-0 top-[calc(50%-1px)] h-[3px] bg-veto/55" style={{ left: `${pos(limit)}%` }} />
         {/* on-chain halt line */}
-        <div className="absolute -top-7 bottom-[-6px] w-px bg-[#f0b90b]" style={{ left: at(limit) }}>
-          <span className="absolute -top-0.5 right-1.5 whitespace-nowrap font-mono text-[10.5px] text-[#f0b90b]">
-            halt line · {maxDrawdownBps} bps
-          </span>
+        <div className="absolute -top-6 bottom-[-6px] w-px bg-chain" style={{ left: `${pos(limit)}%` }}>
+          <span className="meta absolute -top-0.5 right-1.5 whitespace-nowrap text-chain">halt line · {maxDrawdownBps} bps</span>
         </div>
-        {dots.map((d) => (
-          <span
+        {dots.map((d, i) => (
+          <div
             key={d.tx}
-            className={`absolute top-1/2 h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[#0b0c0f] ${
-              (d.drawdownPct ?? 0) > limit ? "bg-rose-400" : "bg-emerald-400"
-            }`}
-            style={{ left: at(d.drawdownPct ?? 0) }}
-            title={`${d.action}: −${d.drawdownPct}%`}
-          />
+            className="gauge-mark absolute inset-y-0 left-0 w-full"
+            style={{ "--to": `${pos(d.drawdownPct ?? 0)}%`, "--d": `${0.2 + i * 0.15}s` } as CSSProperties}
+          >
+            <span
+              className={`absolute top-1/2 block h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border-2 border-ink ${
+                (d.drawdownPct ?? 0) >= limit ? "bg-veto" : "bg-ok"
+              }`}
+              title={`${d.action}: −${d.drawdownPct}%`}
+            />
+          </div>
         ))}
       </div>
       {/* axis labels sit at their own positions, so −limit% lines up with the halt line */}
-      <div className="relative mt-2 h-4 font-mono text-[10.5px] text-white/60">
+      <div className="meta relative mt-2 h-4 text-mute">
         <span className="absolute left-0">0%</span>
-        <span className="absolute -translate-x-1/2 text-[#f0b90b]" style={{ left: at(limit) }}>
+        <span className="absolute -translate-x-1/2 text-chain" style={{ left: `${pos(limit)}%` }}>
           −{limit}%
         </span>
         <span className="absolute right-0">−{scale}%</span>
       </div>
-      <ul className="mt-4 space-y-1.5 text-[12.5px] text-white/70">
+      <ul className="mt-5 space-y-1.5 text-[13px] text-mute">
         {dots.map((d) => (
           <li key={d.tx} className="flex items-center gap-2">
-            <span
-              aria-hidden
-              className={`h-2 w-2 rounded-full ${(d.drawdownPct ?? 0) > limit ? "bg-rose-400" : "bg-emerald-400"}`}
-            />
+            <span aria-hidden className={`h-2 w-2 rotate-45 ${(d.drawdownPct ?? 0) >= limit ? "bg-veto" : "bg-ok"}`} />
             <span>
-              −{d.drawdownPct}% recorded → {(d.drawdownPct ?? 0) > limit ? "contract halted itself" : "inside the limit, kept running"}
+              −{d.drawdownPct}% recorded → {(d.drawdownPct ?? 0) >= limit ? "contract halted itself" : "inside the limit, kept running"}
             </span>
           </li>
         ))}
       </ul>
-    </div>
+    </Reveal>
   );
 }
 
 /* ------------------------------------------------------------- Timeline -- */
 const toneDot: Record<TimelineStep["tone"], string> = {
-  neutral: "bg-white/60",
-  amber: "bg-amber-400",
-  rose: "bg-rose-400",
-  green: "bg-emerald-400",
+  neutral: "bg-bone/70",
+  amber: "bg-warn",
+  rose: "bg-veto",
+  green: "bg-ok",
 };
 
 export function DecisionTimeline() {
   return (
-    <ol className="relative space-y-1">
-      <span aria-hidden className="absolute bottom-3 left-[7px] top-3 w-px bg-white/10" />
-      {SMOKE_TEST.map((s, i) => (
-        <li key={s.tx} className="step-in relative pl-7" style={{ animationDelay: `${i * 90}ms` }}>
-          <span
-            aria-hidden
-            className={`absolute left-[3px] top-[18px] h-[9px] w-[9px] rounded-full ring-4 ring-[#0b0c0f] ${toneDot[s.tone]}`}
-          />
-          <div className="flex flex-col gap-1 rounded-xl px-3 py-2.5 transition hover:bg-white/[0.03] lg:flex-row lg:items-center lg:gap-4">
-            <div className="min-w-0 lg:w-[38%]">
-              <div className="text-[14px] font-semibold text-white">
-                <span className="mr-2 font-mono text-[11px] text-white/40">{String(i + 1).padStart(2, "0")}</span>
-                {s.action}
-              </div>
-              <div className="truncate font-mono text-[11.5px] text-white/55">{s.call}</div>
-            </div>
-            <div className="text-[13px] text-white/75 lg:flex-1">{s.outcome}</div>
-            <a
-              href={txUrl(s.tx)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex shrink-0 items-center gap-1.5 font-mono text-[11.5px] text-[#f0b90b] underline-offset-2 hover:underline"
-              aria-label={`${s.action} transaction on BscScan, block ${s.block}`}
+    <div className="relative">
+      <span aria-hidden className="absolute bottom-16 left-[7px] top-6 w-px bg-[var(--line-strong)]" />
+      <Reveal as="ol" kind="stagger">
+        {SMOKE_TEST.map((s, i) => (
+          <li key={s.tx} className="relative pl-7">
+            <span aria-hidden className={`absolute left-[3px] top-[20px] h-[9px] w-[9px] rotate-45 ${toneDot[s.tone]}`} />
+            <div
+              className={`flex flex-col gap-1 border-b border-[var(--line)] px-3 py-3 transition-colors hover:bg-bone/[0.03] lg:flex-row lg:items-center lg:gap-4 ${
+                s.tone === "rose" ? "bg-veto/[0.06]" : ""
+              }`}
             >
-              <span className="rounded bg-emerald-500/15 px-1 text-[10px] text-emerald-300">status 1</span>
-              <span className="whitespace-nowrap">#{s.block.toLocaleString("en-US")} · {short(s.tx, 8, 4)} ↗</span>
-            </a>
-          </div>
-        </li>
-      ))}
-      <li className="pl-7 pt-2 text-[11.5px] text-white/45">
-        Executed {DEX_GUARD.testedOn} from the agent wallet. Static record of verified receipts — not a live
-        feed. Plus one simulated call from a random address: reverted with <span className="font-mono">NotAgent()</span>.
-      </li>
-    </ol>
+              <div className="min-w-0 lg:w-[38%]">
+                <div className="text-[14px] font-semibold text-bone">
+                  <span className="mr-2 font-mono text-[11px] text-mute tnum">{String(i + 1).padStart(2, "0")}</span>
+                  {s.action}
+                </div>
+                <div className="truncate font-mono text-[11.5px] text-mute">{s.call}</div>
+              </div>
+              <div className={`text-[13px] lg:flex-1 ${s.tone === "rose" ? "text-veto-soft" : "text-bone/85"}`}>{s.outcome}</div>
+              <a
+                href={txUrl(s.tx)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex shrink-0 items-center gap-2 font-mono text-[11.5px] text-chain underline-offset-2 hover:underline"
+                aria-label={`${s.action} transaction on BscScan, block ${s.block}`}
+              >
+                <span className="meta border border-ok/40 px-1 text-[10px] text-ok">status 1</span>
+                <span className="whitespace-nowrap tnum">
+                  #{s.block.toLocaleString("en-US")} · {short(s.tx, 8, 4)} ↗
+                </span>
+              </a>
+            </div>
+          </li>
+        ))}
+      </Reveal>
+      <p className="pl-7 pt-4 text-[12px] leading-relaxed text-mute">
+        Executed {DEX_GUARD.testedOn} from the agent wallet. Static record of verified receipts — not a live feed. Plus one
+        simulated call from a random address: reverted with <span className="font-mono">NotAgent()</span>.
+      </p>
+    </div>
   );
 }

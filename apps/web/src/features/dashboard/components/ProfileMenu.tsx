@@ -39,19 +39,19 @@ function TelegramSection() {
   if (!tg) return null;
 
   return (
-    <div className="border-t border-white/10 px-3.5 py-3">
-      <div className="mb-2 font-mono text-[10px] uppercase tracking-wide text-white/30">Telegram</div>
+    <div className="border-t border-[var(--line)] px-3.5 py-3">
+      <div className="mb-2 font-mono text-[10px] uppercase tracking-wide text-mute">Telegram</div>
       {tg.enabled ? (
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-            <span className="text-[12px] text-white/70">
+            <span className="h-1.5 w-1.5 rounded-full bg-ok" />
+            <span className="text-[12px] text-bone/70">
               Connected{tg.username ? ` · @${tg.username}` : ""}
             </span>
           </div>
           <button
             onClick={sendTest}
-            className="w-full rounded-md border border-white/10 py-1.5 text-[12px] text-white/60 transition hover:border-white/20 hover:text-white/80"
+            className="w-full border border-[var(--line)] py-1.5 text-[12px] text-bone/70 transition hover:border-[var(--line-strong)] hover:text-bone/85"
           >
             {testNote ?? "Send test alert"}
           </button>
@@ -59,24 +59,24 @@ function TelegramSection() {
       ) : tg.configured && tg.username ? (
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
-            <span className="text-[12px] text-white/55">Not connected yet</span>
+            <span className="h-1.5 w-1.5 rounded-full bg-warn" />
+            <span className="text-[12px] text-mute">Not connected yet</span>
           </div>
           <a
             href={`https://t.me/${tg.username}`}
             target="_blank"
             rel="noreferrer"
-            className="flex w-full items-center justify-center gap-2 rounded-md bg-[#229ED9]/20 py-2 text-[12px] font-medium text-[#229ED9] transition hover:bg-[#229ED9]/30"
+            className="flex w-full items-center justify-center gap-2 bg-[#229ED9]/20 py-2 text-[12px] font-medium text-[#229ED9] transition hover:bg-[#229ED9]/30"
           >
             <TelegramIcon />
             Connect via Telegram
           </a>
-          <p className="text-[10px] leading-relaxed text-white/35">
+          <p className="text-[10px] leading-relaxed text-mute">
             Opens @{tg.username} — send <span className="font-mono">/start</span> to bind your chat and receive alerts.
           </p>
         </div>
       ) : (
-        <p className="text-[11px] text-white/35">Bot not configured on server.</p>
+        <p className="text-[11px] text-mute">Bot not configured on server.</p>
       )}
     </div>
   );
@@ -107,7 +107,8 @@ export function ProfileMenu() {
 
   if (!authEnabled) {
     return (
-      <div className="border-t border-white/10 px-5 py-3 text-[12px] leading-relaxed text-white/60">
+      <div className="border-t border-[var(--line)] px-5 py-4 text-[12px] leading-relaxed text-mute">
+        <div className="bracket mb-1">(account)</div>
         Sign-in is off: Google OAuth is not configured on this server.
       </div>
     );
@@ -115,12 +116,12 @@ export function ProfileMenu() {
 
   if (status !== "loading" && !session) {
     return (
-      <div className="border-t border-white/10 p-3">
+      <div className="border-t border-[var(--line)] p-3">
         <button
           onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-          className="flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 text-[13px] text-white/60 transition hover:bg-white/[0.05] hover:text-white"
+          className="flex w-full items-center gap-2.5 px-2 py-1.5 text-[13px] text-bone/70 transition hover:bg-bone/[0.05] hover:text-bone"
         >
-          <span className="grid h-8 w-8 place-items-center rounded-full border border-white/15 text-white/40">
+          <span className="grid h-8 w-8 place-items-center rounded-full border border-[var(--line-strong)] text-mute">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-4 w-4">
               <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
@@ -142,16 +143,16 @@ export function ProfileMenu() {
   };
 
   return (
-    <div ref={ref} className="relative border-t border-white/10 p-3">
+    <div ref={ref} className="relative border-t border-[var(--line)] p-3">
       {open && (
-        <div className="absolute bottom-[calc(100%+6px)] left-3 right-3 z-30 overflow-hidden rounded-xl border border-white/10 bg-[#121319] shadow-2xl shadow-black/50">
+        <div className="absolute bottom-[calc(100%+6px)] left-3 right-3 z-30 overflow-hidden border border-[var(--line)] bg-slate-1 shadow-2xl shadow-black/50">
           {/* user info */}
-          <div className="border-b border-white/10 px-3.5 py-3">
+          <div className="border-b border-[var(--line)] px-3.5 py-3">
             <div className="flex items-center gap-2.5">
               <Avatar name={name} image={image} size={34} />
               <div className="min-w-0">
-                <div className="truncate text-sm font-medium text-white">{name}</div>
-                {email && <div className="truncate text-[11px] text-white/45">{email}</div>}
+                <div className="truncate text-sm font-medium text-bone">{name}</div>
+                {email && <div className="truncate text-[11px] text-mute">{email}</div>}
               </div>
             </div>
           </div>
@@ -160,10 +161,10 @@ export function ProfileMenu() {
           <TelegramSection />
 
           {/* actions */}
-          <div className="border-t border-white/10 py-1">
+          <div className="border-t border-[var(--line)] py-1">
             <button
               onClick={handleSignOut}
-              className="block w-full px-3.5 py-2 text-left text-[13px] text-red-400 transition hover:bg-white/[0.05]"
+              className="block w-full px-3.5 py-2 text-left text-[13px] text-veto-soft transition hover:bg-bone/[0.05]"
             >
               Sign out
             </button>
@@ -173,14 +174,14 @@ export function ProfileMenu() {
 
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-2.5 rounded-lg px-2 py-1.5 transition hover:bg-white/[0.05]"
+        className="flex w-full items-center gap-2.5 px-2 py-1.5 transition hover:bg-bone/[0.05]"
       >
         <Avatar name={name} image={image} />
         <div className="min-w-0 flex-1 text-left">
-          <div className="truncate text-[13px] font-medium text-white">{name}</div>
-          {email && <div className="truncate text-[11px] text-white/40">{email}</div>}
+          <div className="truncate text-[13px] font-medium text-bone">{name}</div>
+          {email && <div className="truncate text-[11px] text-mute">{email}</div>}
         </div>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-white/40">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-mute">
           <path d="M8 9l4-4 4 4M16 15l-4 4-4-4" />
         </svg>
       </button>

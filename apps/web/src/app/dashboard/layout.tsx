@@ -14,12 +14,12 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#0b0c0f] text-white">
+    <div className="flex h-screen overflow-hidden bg-ink text-bone">
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar />
-        <main className="flex-1 overflow-y-auto px-4 py-5 sm:px-6 sm:py-6">
-          <div className="mx-auto max-w-[1100px]">
+        <main className="flex-1 overflow-y-auto px-4 py-6 sm:px-8 sm:py-8">
+          <div className="mx-auto max-w-[1180px]">
             <EngineGate>{children}</EngineGate>
           </div>
         </main>
