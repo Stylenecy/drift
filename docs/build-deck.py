@@ -207,10 +207,10 @@ s = slide(
 )
 title(s, "The panel, and asking the contract")
 # Trim the site navigation and the page margins so only the panel shows.
-shot(s, "public-guard-desktop.png", 0.5, 1.4, 6.1, crop=(0.097, 0.094, 0.097, 0.0))
+shot(s, "public-guard-desktop.png", 0.5, 1.4, 6.1, crop=(0.097, 0.094, 0.097, 0.12))
 shot(s, "ask-contract-desktop.png", 6.8, 1.4, 6.0)
-box(s, 0.5, 5.85, 6.1, 1.2, "Live regime, halt, 20% line and decisions,\nread from BSC Testnet at a named block", 16, MUTED)
-box(s, 6.8, 5.85, 6.0, 1.2, "Long at −25%: Blocked, answered by the live contract\nvia `eth_call` from the agent address (simulation)", 16, MUTED)
+box(s, 0.5, 5.25, 6.1, 1.2, "Live regime, halt, 20% line and decisions,\nread from BSC Testnet at a named block", 16, MUTED)
+box(s, 6.8, 5.25, 6.0, 1.2, "Long at −25%: Blocked, answered by the live contract\nvia `eth_call` from the agent address (simulation)", 16, MUTED)
 
 # 6. The halt story
 s = slide(
@@ -306,7 +306,7 @@ box(
 box(s, 0.7, 6.4, 11.9, 0.5, f"Code: `{REPO_URL.removeprefix('https://')}`", 16, MUTED)
 
 # 10. Roadmap and links
-s = slide("Roadmap items are not built yet. The links are live today and clickable in the deck.")
+s = slide("Roadmap items are not built yet. The links are live today; the BscScan and Sourcify links are clickable.")
 title(s, "Roadmap")
 box(s, 0.7, 1.3, 11.9, 0.5, "Not built yet; listed in order of trust gained per step", 15, AMBER, True)
 box(
