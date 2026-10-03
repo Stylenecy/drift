@@ -93,7 +93,7 @@ export function LiveReadout() {
           BscScan ↗
         </a>
       </p>
-      <p className="meta needs-js mt-3 border-t border-[var(--line)] pt-3 text-mute [overflow-wrap:anywhere]">
+      <p className="meta needs-js mt-3 min-h-[4.25em] border-t border-[var(--line)] pt-3 text-mute [overflow-wrap:anywhere]">
         {live.status === "live" && `public RPC · ${live.read.rpc} · read ${live.at}`}
         {live.status === "loading" && "reading BSC Testnet from your browser…"}
         {live.status === "offline" && (

@@ -91,8 +91,8 @@ export async function ogCard(): Promise<ImageResponse> {
             Don&apos;t take the bot&apos;s word for it.
           </div>
           <div style={{ ...meta, marginTop: 22, lineHeight: 1.6, display: "flex", flexDirection: "column" }}>
-            <span>QUANT RESEARCH OFF-CHAIN.</span>
-            <span>RISK GATE: A PUBLIC CONTRACT.</span>
+            <span>ENGINE · OFF-CHAIN</span>
+            <span>RISK GATE · ON-CHAIN</span>
           </div>
         </div>
 
@@ -116,7 +116,7 @@ export async function ogCard(): Promise<ImageResponse> {
             />
           ))}
           <div style={{ ...meta, position: "absolute", left: PAD + 4, top: 40, display: "flex" }}>0%</div>
-          <div style={{ ...meta, position: "absolute", left: xAt(limit) + 10, top: 40, color: GOLD, display: "flex" }}>
+          <div style={{ ...meta, position: "absolute", right: W - xAt(limit) + 12, top: 40, color: GOLD, display: "flex" }}>
             {`HALT LINE −${limit}% · ${DEX_GUARD.maxDrawdownBps} BPS`}
           </div>
           <div style={{ ...meta, position: "absolute", right: PAD + 4, top: 40, display: "flex" }}>−30%</div>

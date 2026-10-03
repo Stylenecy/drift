@@ -32,14 +32,14 @@ const steps: Step[] = [
     where: "off",
     node: "Runner",
     title: "The runner trades on testnet.",
-    body: "Orders go to Bybit testnet only when the gate allows them. If the chain is unreachable the runner falls back to its local stop: it fails open, and says so.",
+    body: "The runner moves the Bybit testnet position to the target the gate allows: a vetoed signal becomes Flat. If the chain is unreachable it falls back to its local stop, which means it fails open.",
     code: "client.place_market_order(symbol, side, qty)",
   },
   {
     where: "on",
     node: "MacroGuard · recordDecision()",
     title: "The decision goes on the record.",
-    body: "Each decision becomes a public receipt. A reported drawdown at or past 20% makes the contract halt itself.",
+    body: "Each recorded decision becomes a public receipt on BscScan. A reported drawdown at or past 20% makes the contract halt itself.",
     code: "recordDecision(symbol, signal, price, drawdownBps) → tx",
   },
 ];
@@ -147,12 +147,12 @@ export function HowItWorks() {
         </div>
 
         <div className="mt-16 grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-8">
-          {/* Narrow screens: the whole pipeline once, static */}
-          <div className="lg:hidden">
+          {/* Narrow screens, and reduced motion: the whole pipeline once, static */}
+          <div className="lg:col-span-5 lg:hidden motion-reduce:lg:block">
             <Instrument active={0} pinned={false} />
           </div>
-          {/* Wide screens: pinned instrument */}
-          <div className="hidden lg:col-span-5 lg:block">
+          {/* Wide screens: the pinned instrument */}
+          <div className="hidden lg:col-span-5 motion-safe:lg:block">
             <div className="how-pin h-[72vh]">
               <Instrument active={active} pinned />
             </div>
@@ -163,7 +163,7 @@ export function HowItWorks() {
               <li
                 key={s.title}
                 data-step={i}
-                className={`flex flex-col justify-center border-t border-[var(--line)] py-10 transition-opacity duration-700 lg:min-h-[72vh] lg:py-0 ${
+                className={`flex flex-col justify-center border-t border-[var(--line)] py-10 transition-opacity duration-700 lg:min-h-[72vh] lg:py-0 motion-reduce:transition-none motion-reduce:lg:min-h-0 motion-reduce:lg:py-12 motion-reduce:lg:opacity-100 ${
                   i === active ? "lg:opacity-100" : "lg:opacity-35"
                 }`}
               >

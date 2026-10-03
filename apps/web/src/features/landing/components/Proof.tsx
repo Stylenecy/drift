@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Count, Reveal, SplitWords } from "@/features/motion/Motion";
+import { Count, Reveal } from "@/features/motion/Motion";
+import { ScrubWords } from "@/features/motion/Scrub";
 import { Chapter } from "@/features/ui/hud";
 import { DEX_GUARD, SMOKE_TEST, txUrl } from "@/features/guard/evidence";
 import { site } from "../site";
@@ -53,11 +54,15 @@ export function Proof() {
     <section id="proof" className="relative scroll-mt-20 px-4 py-24 sm:px-6 sm:py-32">
       <div className="mx-auto max-w-[1440px]">
         <Chapter index="02" label="proof" />
-        <SplitWords
-          className="display-2 mt-10 max-w-[15ch] text-bone"
+        <ScrubWords
+          as="h2"
+          className="mt-10 max-w-[30ch] text-[clamp(30px,4.2vw,64px)] font-medium leading-[1.08] tracking-[-0.03em] text-bone"
           segments={[
-            { text: "Heavy maths off-chain. The rules that matter," },
-            { text: "on-chain.", className: "serif-i text-chain" },
+            { text: "Most trading bots" },
+            { text: "ask for your trust.", className: "serif-i" },
+            { text: "DRIFT puts its risk gate" },
+            { text: "on BNB Chain,", className: "text-chain" },
+            { text: "where anyone can read it, ask it a what-if and open every receipt." },
           ]}
         />
 

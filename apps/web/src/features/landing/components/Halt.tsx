@@ -30,7 +30,7 @@ function Gauge() {
         <div aria-hidden className="absolute right-0 top-[calc(50%-1px)] h-[3px] bg-veto/60" style={{ left: `${pos(LIMIT)}%` }} />
         {/* the on-chain halt line */}
         <div aria-hidden className="absolute -top-3 bottom-[-12px] w-px bg-chain" style={{ left: `${pos(LIMIT)}%` }}>
-          <span className="meta absolute -top-5 left-2 whitespace-nowrap text-chain">halt line · {DEX_GUARD.maxDrawdownBps} bps</span>
+          <span className="meta absolute -top-5 right-2 whitespace-nowrap text-chain">halt line · {DEX_GUARD.maxDrawdownBps} bps</span>
         </div>
         {recorded.map((s, i) => {
           const breach = (s.drawdownPct ?? 0) >= LIMIT;
