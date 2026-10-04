@@ -21,6 +21,8 @@ serif-italic phrase, bracket labels, a thin measuring grid, and motion that expl
 - **Charts (cockpit only):** up = emerald, down / short side = `#F87171` (7.03:1 on ink), markers =
   amber, the off-chain test region = periwinkle. The chart red is a price direction, never a veto.
   Category marks in the blog archive are neutral (mute); categories are told by their mono label.
+- **Third-party marks:** a service keeps its own colour only on its logo mark (Google on `/login`,
+  Telegram blue `#229ED9` on its icon in the cockpit), never on text.
 
 **Type:** Geist for prose and display (display: weight 600, tracking −0.045em, `clamp(56px, 9vw, 168px)`).
 Geist Mono for anything a machine wrote: addresses, hashes, bps, block numbers, chain IDs, and the

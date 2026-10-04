@@ -78,9 +78,12 @@ function TelegramSection() {
             href={`https://t.me/${tg.username}`}
             target="_blank"
             rel="noreferrer"
-            className="flex w-full items-center justify-center gap-2 bg-[#229ED9]/20 py-2 text-[12px] font-medium text-[#229ED9] transition hover:bg-[#229ED9]/30"
+            className="flex w-full items-center justify-center gap-2 border border-[var(--line-strong)] py-2 text-[12px] font-medium text-bone transition-colors hover:border-bone/40 hover:bg-bone/[0.05]"
           >
-            <TelegramIcon />
+            {/* Telegram's own blue only on its mark (5.57:1 on slate-1), like the Google mark on /login. */}
+            <span className="text-[#229ED9]">
+              <TelegramIcon />
+            </span>
             Connect via Telegram
           </a>
           <p className="text-[10px] leading-relaxed text-mute">

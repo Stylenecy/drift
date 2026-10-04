@@ -7,5 +7,6 @@ export const CHART = {
   exit: "var(--warn)",
   engine: "var(--engine)",
   ink: "var(--ink)",
+  label: "var(--mute)", // axis and legend text: 5.79:1 on ink, 5.01:1 on slate-1
   mono: "var(--font-geist-mono), ui-monospace, monospace",
 } as const;

@@ -223,7 +223,7 @@ function SplitEquity({ points, split }: { points: EquityPoint[]; split: number }
       <line x1={splitX} y1={0} x2={splitX} y2={H} stroke={CHART.engine} strokeOpacity="0.4" strokeDasharray="3 3" />
       <line x1={pad} y1={y(1)} x2={W - pad} y2={y(1)} stroke="white" strokeOpacity="0.12" strokeDasharray="2 3" />
       <path d={line} fill="none" stroke={stroke} strokeWidth="1.6" strokeLinejoin="round" />
-      <text x={pad + 4} y={14} fontSize="9" fill="rgba(225,229,229,0.45)" fontFamily={CHART.mono}>train (optimised)</text>
+      <text x={pad + 4} y={14} fontSize="9" fill={CHART.label} fontFamily={CHART.mono}>train (optimised)</text>
       <text x={splitX + 5} y={14} fontSize="9" fill={CHART.engine} fontFamily={CHART.mono}>test (held out)</text>
     </svg>
   );

@@ -39,7 +39,7 @@ export function Topbar() {
       <nav
         ref={tabsRef}
         aria-label="Cockpit"
-        className="relative flex gap-1 overflow-x-auto px-3 pb-2 [mask-image:linear-gradient(to_right,black_82%,transparent)] md:hidden"
+        className="relative flex gap-1 overflow-x-auto px-3 pb-2 [mask-image:linear-gradient(to_right,black_82%,transparent)] after:w-16 after:shrink-0 after:content-[''] md:hidden"
       >
         {items.map((item) => {
           const active = item.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.href);

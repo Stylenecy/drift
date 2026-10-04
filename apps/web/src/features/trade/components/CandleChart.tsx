@@ -78,7 +78,7 @@ export function CandleChart({
       {ticks.map((p, i) => (
         <g key={i}>
           <line x1={8} y1={y(p)} x2={W - gutter} y2={y(p)} stroke="white" strokeOpacity="0.05" />
-          <text x={W - gutter + 6} y={y(p) + 3} fontSize="9" fill="rgba(225,229,229,0.45)" fontFamily={CHART.mono}>
+          <text x={W - gutter + 6} y={y(p) + 3} fontSize="9" fill={CHART.label} fontFamily={CHART.mono}>
             {fmtPrice(p)}
           </text>
         </g>
