@@ -99,14 +99,17 @@ export default function Hero() {
             <p className="meta ld-up text-mute" style={{ "--d": "0.15s" } as CSSProperties}>
               <span className="text-bone">(drift)</span> — a trading bot whose
             </p>
-            <Lines
-              as="h1"
-              mode="load"
-              delay={0.25}
-              label="A trading bot whose risk rules you can verify."
-              className="display mt-5 text-bone"
-              lines={["Risk rules", "you can", <span key="v" className="text-chain">verify.</span>]}
-            />
+            <div className="relative mt-5">
+              <Lines
+                as="h1"
+                mode="settle"
+                delay={0.05}
+                label="A trading bot whose risk rules you can verify."
+                className="display text-bone"
+                lines={["Risk rules", "you can", <span key="v" className="text-chain">verify.</span>]}
+              />
+              <span aria-hidden className="read-head" />
+            </div>
             <p className="serif-i ld-up mt-8 text-[28px] leading-[1.1] text-bone sm:text-[34px]" style={{ "--d": "0.8s" } as CSSProperties}>
               Don&apos;t take the bot&apos;s word for it.
             </p>

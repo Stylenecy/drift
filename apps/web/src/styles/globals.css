@@ -268,6 +268,60 @@ html.has-js .no-js-note {
     animation: ld-rise 1.1s var(--ease-out) both;
     animation-delay: calc(var(--d, 0.2s) + var(--i, 0) * 90ms);
   }
+  /* Hero headline: painted on the very first frame (it is the LCP element), then each
+     line settles 0.24em into place while a gold read head sweeps down it once. */
+  @keyframes ld-settle {
+    from {
+      transform: translate3d(0, 0.24em, 0);
+    }
+    to {
+      transform: none;
+    }
+  }
+  .ld-settle .ln {
+    overflow: visible;
+  }
+  .ld-settle .ln-i {
+    animation: ld-settle 1.1s var(--ease-out) both;
+    animation-delay: calc(var(--d, 0.05s) + var(--i, 0) * 90ms);
+  }
+  @keyframes read-head {
+    0% {
+      transform: translate3d(0, 0, 0);
+      opacity: 0;
+    }
+    12% {
+      opacity: 1;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      transform: translate3d(0, 100%, 0);
+      opacity: 0;
+    }
+  }
+  .read-head {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    animation: read-head 1.5s var(--ease-move) 0.15s both;
+  }
+  .read-head::before {
+    content: "";
+    position: absolute;
+    inset: -28px 0 auto 0;
+    height: 28px;
+    background: linear-gradient(to bottom, transparent, rgba(240, 185, 11, 0.12));
+  }
+  .read-head::after {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: var(--chain);
+  }
+
   .ld-up {
     animation: ld-fade-up 0.9s var(--ease-out) both;
     animation-delay: var(--d, 0.6s);
@@ -553,6 +607,8 @@ html.has-js .no-js-note {
       scroll-behavior: auto;
     }
     .ld-lines .ln-i,
+    .ld-settle .ln-i,
+    .read-head,
     .ld-up,
     .ld-clip,
     .ld-clip-x,
@@ -564,6 +620,9 @@ html.has-js .no-js-note {
     }
     .how-pin {
       position: static;
+    }
+    .read-head {
+      display: none;
     }
     .rv-up,
     .rv-clip,

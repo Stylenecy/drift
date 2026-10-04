@@ -2,9 +2,10 @@ import type { CSSProperties, ElementType, ReactNode } from "react";
 import { Reveal } from "./Motion";
 
 /**
- * Authored lines in masks. mode "load" rises on first paint with CSS only and
- * stays a server component (no hydration for the hero headline); mode "scroll"
- * hands the element to the shared reveal.
+ * Authored lines. mode "load" rises out of masks on first paint (CSS only);
+ * "settle" is painted on the first frame and settles into place (for an LCP
+ * headline); "scroll" hands the element to the shared reveal. Load modes stay
+ * server-rendered with no client JS.
  */
 export function Lines({
   as: Tag = "h2",
@@ -17,7 +18,7 @@ export function Lines({
   as?: ElementType;
   lines: ReactNode[];
   className?: string;
-  mode?: "load" | "scroll";
+  mode?: "load" | "settle" | "scroll";
   delay?: number;
   label?: string;
 }) {
@@ -28,10 +29,10 @@ export function Lines({
       </span>
     </span>
   ));
-  if (mode === "load") {
+  if (mode === "load" || mode === "settle") {
     return (
       <Tag
-        className={`ld-lines ${className}`}
+        className={`${mode === "load" ? "ld-lines" : "ld-settle"} ${className}`}
         style={delay !== undefined ? ({ "--d": `${delay}s` } as CSSProperties) : undefined}
         aria-label={label}
       >
