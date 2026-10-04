@@ -285,6 +285,19 @@ html.has-js .no-js-note {
     animation: ld-settle 1.1s var(--ease-out) both;
     animation-delay: calc(var(--d, 0.05s) + var(--i, 0) * 90ms);
   }
+  /* Hero body copy: also painted on the first frame, it only settles upward. */
+  @keyframes ld-settle-up {
+    from {
+      transform: translate3d(0, 14px, 0);
+    }
+    to {
+      transform: none;
+    }
+  }
+  .ld-settle-up {
+    animation: ld-settle-up 1s var(--ease-out) both;
+    animation-delay: var(--d, 0.3s);
+  }
   @keyframes read-head {
     0% {
       transform: translate3d(0, 0, 0);
@@ -528,7 +541,8 @@ html.has-js .no-js-note {
   @supports (animation-timeline: view()) {
     @media (prefers-reduced-motion: no-preference) {
       .scrub-w {
-        opacity: 0.16;
+        /* dim, not gone: bone at 0.5 is 4.4:1 and gold 3.5:1 on ink (large text, AA) */
+        opacity: 0.5;
         animation: scrub-lit linear both;
         animation-timeline: --scrub;
         animation-range: cover calc(8% + var(--i) * var(--step)) cover calc(14% + var(--i) * var(--step));
@@ -608,6 +622,7 @@ html.has-js .no-js-note {
     }
     .ld-lines .ln-i,
     .ld-settle .ln-i,
+    .ld-settle-up,
     .read-head,
     .ld-up,
     .ld-clip,

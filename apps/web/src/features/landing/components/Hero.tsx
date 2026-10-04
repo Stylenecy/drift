@@ -113,7 +113,7 @@ export default function Hero() {
             <p className="serif-i ld-up mt-8 text-[28px] leading-[1.1] text-bone sm:text-[34px]" style={{ "--d": "0.8s" } as CSSProperties}>
               Don&apos;t take the bot&apos;s word for it.
             </p>
-            <p className="ld-up mt-4 max-w-[34rem] text-[16px] leading-relaxed text-mute sm:text-[17px]" style={{ "--d": "0.9s" } as CSSProperties}>
+            <p className="ld-settle-up mt-4 max-w-[34rem] text-[16px] leading-relaxed text-mute sm:text-[17px]" style={{ "--d": "0.35s" } as CSSProperties}>
               Quant research runs off-chain. The risk gate, MacroGuard, is a public contract on BNB Smart Chain
               Testnet: read it from your browser, ask it a what-if, open every receipt on BscScan.
             </p>
