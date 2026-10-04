@@ -91,6 +91,10 @@ html.has-js .no-js-note {
   content-visibility: auto;
   contain-intrinsic-size: auto 1100px;
 }
+/* In-page links and deep links need real positions: render everything first. */
+.cv-off .cv-auto {
+  content-visibility: visible;
+}
 
 /* Components live in a layer so Tailwind utilities can still override them. */
 @layer components {

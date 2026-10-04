@@ -26,10 +26,27 @@ const KIND_CLASS: Record<Kind, string> = {
   gauge: "gauge",
 };
 
-/** Marks motion as booted; without it the inline boot script drops html.js after 4 s. */
+/**
+ * Marks motion as booted (without it the inline boot script drops html.js after 4 s),
+ * and, before any in-page link scrolls, renders the sections that content-visibility
+ * is still skipping, so the jump lands exactly on its target.
+ */
 export function MotionBoot() {
   useEffect(() => {
     (window as unknown as { __rv?: boolean }).__rv = true;
+    const root = document.documentElement;
+    const renderAll = () => root.classList.add("cv-off");
+    // Any link with a fragment, on this page or another (the html element, and so
+    // this class, survives client-side navigation).
+    const onClick = (e: MouseEvent) => {
+      if ((e.target as Element | null)?.closest?.("a[href*='#']")) renderAll();
+    };
+    document.addEventListener("click", onClick, true);
+    window.addEventListener("hashchange", renderAll);
+    return () => {
+      document.removeEventListener("click", onClick, true);
+      window.removeEventListener("hashchange", renderAll);
+    };
   }, []);
   return null;
 }

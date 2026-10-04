@@ -61,8 +61,9 @@ export const viewport: Viewport = {
 // Runs before first paint. html.has-js says JavaScript runs (live reads can work).
 // With no reduced-motion preference it also sets html.js, which arms the reveal
 // start states in globals.css; if the motion code has not booted 4 s later, it
-// takes html.js away again so nothing stays hidden.
-const BOOT = `(function(){try{var d=document.documentElement;d.classList.add('has-js');if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('js');setTimeout(function(){if(!window.__rv)d.classList.remove('js')},4000)}catch(e){}})();`;
+// takes html.js away again so nothing stays hidden. A deep link (#section) turns
+// off content-visibility skipping so the browser lands exactly on the section.
+const BOOT = `(function(){try{var d=document.documentElement;d.classList.add('has-js');if(location.hash)d.classList.add('cv-off');if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('js');setTimeout(function(){if(!window.__rv)d.classList.remove('js')},4000)}catch(e){}})();`;
 
 export default function RootLayout({
   children,
