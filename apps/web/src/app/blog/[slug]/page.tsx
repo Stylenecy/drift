@@ -67,7 +67,7 @@ export default async function BlogPost({ params }: { params: Promise<{ slug: str
           <div className="ld-fade mt-10 flex flex-wrap items-center gap-x-4 gap-y-1" style={{ "--d": "0.05s" } as CSSProperties}>
             <span className="meta text-mute tnum">{String(index + 1).padStart(2, "0")} / {String(posts.length).padStart(2, "0")}</span>
             <span className="meta inline-flex items-center gap-2 text-mute">
-              <span aria-hidden className="inline-block h-1.5 w-1.5 rotate-45" style={{ backgroundColor: post.accent }} />
+              <span aria-hidden className="inline-block h-1.5 w-1.5 rotate-45 bg-mute" />
               {post.tag}
             </span>
             <span className="meta text-mute">

@@ -201,7 +201,7 @@ export function HaltGauge({ maxDrawdownBps }: { maxDrawdownBps: number }) {
         <div aria-hidden className="absolute right-0 top-[calc(50%-1px)] h-[3px] bg-veto/55" style={{ left: `${pos(limit)}%` }} />
         {/* on-chain halt line */}
         <div className="absolute -top-6 bottom-[-6px] w-px bg-chain" style={{ left: `${pos(limit)}%` }}>
-          <span className="meta absolute -top-0.5 right-1.5 whitespace-nowrap text-chain">halt line · {maxDrawdownBps} bps</span>
+          <span className="meta absolute -top-0.5 right-1.5 whitespace-nowrap text-chain">halt line · {maxDrawdownBps.toLocaleString("en-US")} bps</span>
         </div>
         {dots.map((d, i) => (
           <div

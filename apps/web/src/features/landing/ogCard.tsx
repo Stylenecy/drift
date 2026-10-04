@@ -117,7 +117,7 @@ export async function ogCard(): Promise<ImageResponse> {
           ))}
           <div style={{ ...meta, position: "absolute", left: PAD + 4, top: 40, display: "flex" }}>0%</div>
           <div style={{ ...meta, position: "absolute", right: W - xAt(limit) + 12, top: 40, color: GOLD, display: "flex" }}>
-            {`HALT LINE −${limit}% · ${DEX_GUARD.maxDrawdownBps} BPS`}
+            {`HALT LINE −${limit}% · ${DEX_GUARD.maxDrawdownBps.toLocaleString("en-US")} BPS`}
           </div>
           <div style={{ ...meta, position: "absolute", right: PAD + 4, top: 40, display: "flex" }}>−30%</div>
         </div>

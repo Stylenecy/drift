@@ -47,7 +47,7 @@ export function ConfigPanel({
           step={50}
           value={bars}
           onChange={(e) => onBars(Number(e.target.value))}
-          className="w-full accent-[#9aa8f0]"
+          className="w-full accent-engine"
         />
       </Field>
 
@@ -60,7 +60,7 @@ export function ConfigPanel({
             step={p.step}
             value={params[p.key] ?? p.default}
             onChange={(e) => onParam(p.key, Number(e.target.value))}
-            className="w-full accent-[#9aa8f0]"
+            className="w-full accent-engine"
           />
         </Field>
       ))}

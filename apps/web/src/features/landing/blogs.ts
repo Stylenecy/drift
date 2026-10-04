@@ -9,7 +9,6 @@ export type ContentBlock =
 export interface BlogPost {
   slug: string
   tag: string
-  accent: string
   title: string
   date: string
   readTime: string
@@ -23,7 +22,6 @@ export const posts: BlogPost[] = [
   {
     slug: "why-we-built-drift",
     tag: "Origin",
-    accent: "#9aa8f0",
 
     title: "Why We Built DRIFT",
     date: "June 2, 2026",
@@ -62,7 +60,6 @@ export const posts: BlogPost[] = [
   {
     slug: "the-engine-room",
     tag: "Engineering",
-    accent: "#34d399",
 
     title: "The Engine Room: How DRIFT Works",
     date: "June 8, 2026",
@@ -118,7 +115,6 @@ export const posts: BlogPost[] = [
   {
     slug: "four-ways-to-read-the-market",
     tag: "Research",
-    accent: "#f59e0b",
 
     title: "Four Ways to Read the Market",
     date: "June 10, 2026",
@@ -197,7 +193,6 @@ export const posts: BlogPost[] = [
   {
     slug: "building-on-bnb-chain",
     tag: "Ecosystem",
-    accent: "#c084fc",
 
     title: "Building on BNB Chain: AI Meets On-Chain Risk",
     date: "June 12, 2026",

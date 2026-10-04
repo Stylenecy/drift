@@ -8,7 +8,8 @@ serif-italic phrase, bracket labels, a thin measuring grid, and motion that expl
 **Colour has meaning — never mixed:**
 - **Gold `#F0B90B` = on-chain / verifiable.** Contract address, receipts, BscScan links, the
   on-chain halt line, "live read" proof. If it is gold, a judge can check it on BscScan. Sparingly
-  (≤10% of a screen).
+  (≤10% of a screen). Its light tint `#F8D36A` (13.45:1 on ink) is for gold text links on dark
+  surfaces and gold hover states.
 - **Vermilion `#E34C22` = halt / veto.** Blocked verdicts, the `Halted` event, the breach zone.
   Text only on ink (4.93:1); on raised surfaces use `#F2795A`; ink on vermilion is 4.93:1.
 - **Periwinkle `#9AA8F0` = off-chain engine.** A marker in diagrams and the cockpit, not an accent.
@@ -17,6 +18,9 @@ serif-italic phrase, bracket labels, a thin measuring grid, and motion that expl
   paper `#F1F3F3` (the one light block; secondary text on it `#5B6363`, 5.52:1), hairlines bone at 8%/16%.
 - **State:** emerald `#34D399` allowed/running · amber `#FBBF24` risk-off/attention · vermilion
   halted/blocked. Every state also carries a word and an icon — never colour alone.
+- **Charts (cockpit only):** up = emerald, down / short side = `#F87171` (7.03:1 on ink), markers =
+  amber, the off-chain test region = periwinkle. The chart red is a price direction, never a veto.
+  Category marks in the blog archive are neutral (mute); categories are told by their mono label.
 
 **Type:** Geist for prose and display (display: weight 600, tracking −0.045em, `clamp(56px, 9vw, 168px)`).
 Geist Mono for anything a machine wrote: addresses, hashes, bps, block numbers, chain IDs, and the

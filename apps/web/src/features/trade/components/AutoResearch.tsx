@@ -7,6 +7,7 @@ import type { EquityPoint, OptimizeResult, OptimizeResponse } from "../types";
 import { pct } from "@/lib/format";
 import { Card, Button, Badge, StatTile } from "@/features/dashboard/components/primitives";
 import { DataSourceNote } from "./DataSourceNote";
+import { CHART } from "../chartColors";
 
 const SYMBOLS = ["BTCUSDT", "ETHUSDT", "SOLUSDT", "BNBUSDT"];
 const TIMEFRAMES = ["1h", "4h", "1d"];
@@ -212,18 +213,18 @@ function SplitEquity({ points, split }: { points: EquityPoint[]; split: number }
   const y = (v: number) => pad + (1 - (v - min) / span) * (H - 2 * pad);
   const line = points.map((p, i) => `${i === 0 ? "M" : "L"}${x(i)},${y(p.equity)}`).join(" ");
   const up = points[points.length - 1].equity >= 1;
-  const stroke = up ? "#34d399" : "#f87171";
+  const stroke = up ? CHART.up : CHART.down;
   const splitX = x(split);
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Train/test equity">
       {/* test region shading */}
-      <rect x={splitX} y={0} width={W - splitX} height={H} fill="#9aa8f0" fillOpacity="0.06" />
-      <line x1={splitX} y1={0} x2={splitX} y2={H} stroke="#9aa8f0" strokeOpacity="0.4" strokeDasharray="3 3" />
+      <rect x={splitX} y={0} width={W - splitX} height={H} fill={CHART.engine} fillOpacity="0.06" />
+      <line x1={splitX} y1={0} x2={splitX} y2={H} stroke={CHART.engine} strokeOpacity="0.4" strokeDasharray="3 3" />
       <line x1={pad} y1={y(1)} x2={W - pad} y2={y(1)} stroke="white" strokeOpacity="0.12" strokeDasharray="2 3" />
       <path d={line} fill="none" stroke={stroke} strokeWidth="1.6" strokeLinejoin="round" />
-      <text x={pad + 4} y={14} fontSize="9" fill="rgba(255,255,255,0.35)" fontFamily="monospace">train (optimised)</text>
-      <text x={splitX + 5} y={14} fontSize="9" fill="#9aa8f0" fontFamily="monospace">test (held out)</text>
+      <text x={pad + 4} y={14} fontSize="9" fill="rgba(225,229,229,0.45)" fontFamily={CHART.mono}>train (optimised)</text>
+      <text x={splitX + 5} y={14} fontSize="9" fill={CHART.engine} fontFamily={CHART.mono}>test (held out)</text>
     </svg>
   );
 }

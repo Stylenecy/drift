@@ -25,7 +25,10 @@ export function Topbar() {
       </div>
 
       {/* Mobile navigation — the sidebar is hidden below md */}
-      <nav aria-label="Cockpit" className="flex gap-1 overflow-x-auto px-3 pb-2 md:hidden">
+      <nav
+        aria-label="Cockpit"
+        className="flex gap-1 overflow-x-auto px-3 pb-2 [mask-image:linear-gradient(to_right,black_82%,transparent)] md:hidden"
+      >
         {items.map((item) => {
           const active = item.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.href);
           return (

@@ -47,7 +47,7 @@ export default function BlogIndex() {
               >
                 <span className="font-mono text-[12px] text-mute tnum">{String(i + 1).padStart(2, "0")}</span>
                 <span className="meta col-start-2 text-mute sm:col-start-auto">
-                  <span aria-hidden className="mr-2 inline-block h-1.5 w-1.5 rotate-45 align-middle" style={{ backgroundColor: post.accent }} />
+                  <span aria-hidden className="mr-2 inline-block h-1.5 w-1.5 rotate-45 align-middle bg-mute" />
                   {post.tag}
                 </span>
                 <span className="col-start-2 sm:col-start-auto">

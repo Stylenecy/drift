@@ -254,7 +254,7 @@ export function GuardPanel({ variant = "cockpit" }: { variant?: "public" | "cock
                 <dd className="mt-1 font-mono text-[28px] leading-none tracking-[-0.03em] text-bone tnum">
                   {(thresholdBps / 100).toFixed(0)}%
                 </dd>
-                <dd className="meta mt-1 text-mute">{thresholdBps} bps</dd>
+                <dd className="meta mt-1 text-mute">{thresholdBps.toLocaleString("en-US")} bps</dd>
               </div>
               <div>
                 <dt className="meta text-mute">Decisions logged</dt>

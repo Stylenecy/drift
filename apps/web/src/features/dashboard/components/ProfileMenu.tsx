@@ -3,19 +3,31 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
-import BoringAvatar from "boring-avatars";
 import { getTelegram, testTelegram } from "@/features/trade/api";
 import { useAuthEnabled } from "@/components/AuthProvider";
 import type { TelegramStatus } from "@/features/trade/types";
 
-const AVATAR_COLORS = ["#9aa8f0", "#a855f7", "#6366f1", "#22d3ee", "#f472b6"];
-
+// Initials on a token surface; a profile photo when Google provides one.
 function Avatar({ name, image, size = 32 }: { name: string; image?: string | null; size?: number }) {
   if (image) {
     // eslint-disable-next-line @next/next/no-img-element
     return <img src={image} alt={name} width={size} height={size} className="shrink-0 rounded-full" style={{ width: size, height: size }} />;
   }
-  return <BoringAvatar size={size} name={name} variant="beam" colors={AVATAR_COLORS} />;
+  const initials = name
+    .split(/[\s@._-]+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? "")
+    .join("");
+  return (
+    <span
+      aria-hidden
+      className="grid shrink-0 place-items-center rounded-full border border-[var(--line-strong)] bg-slate-1 font-mono text-[11px] text-bone"
+      style={{ width: size, height: size }}
+    >
+      {initials || "·"}
+    </span>
+  );
 }
 
 function TelegramSection() {
@@ -108,7 +120,7 @@ export function ProfileMenu() {
   if (!authEnabled) {
     return (
       <div className="border-t border-[var(--line)] px-5 py-4 text-[12px] leading-relaxed text-mute">
-        <div className="bracket mb-1">(account)</div>
+        <div className="bracket mb-1">(sign-in)</div>
         Sign-in is off: Google OAuth is not configured on this server.
       </div>
     );

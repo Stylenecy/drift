@@ -163,16 +163,21 @@ export function HowItWorks() {
               <li
                 key={s.title}
                 data-step={i}
-                className={`flex flex-col justify-center border-t border-[var(--line)] py-10 transition-opacity duration-700 lg:min-h-[72vh] lg:py-0 motion-reduce:transition-none motion-reduce:lg:min-h-0 motion-reduce:lg:py-12 motion-reduce:lg:opacity-100 ${
-                  i === active ? "lg:opacity-100" : "lg:opacity-35"
-                }`}
+                className="flex flex-col justify-center border-t border-[var(--line)] py-10 lg:min-h-[72vh] lg:py-0 motion-reduce:lg:min-h-0 motion-reduce:lg:py-12"
               >
                 <Reveal>
                   <div className="flex items-center gap-4">
                     <span className="font-mono text-[13px] text-mute tnum">{String(i + 1).padStart(2, "0")}</span>
                     <span className={`meta ${WHERE[s.where].text}`}>{WHERE[s.where].label}</span>
                   </div>
-                  <h3 className="display-3 mt-5 max-w-[16ch] text-bone">{s.title}</h3>
+                  {/* Steps not in focus dim their heading only, to 0.5 (bone 4.44:1, large text). */}
+                  <h3
+                    className={`display-3 mt-5 max-w-[16ch] text-bone transition-opacity duration-700 motion-reduce:transition-none motion-reduce:lg:opacity-100 ${
+                      i === active ? "lg:opacity-100" : "lg:opacity-50"
+                    }`}
+                  >
+                    {s.title}
+                  </h3>
                   <p className="mt-5 max-w-[44ch] text-[16px] leading-relaxed text-mute">{s.body}</p>
                   <code className="mt-6 block font-mono text-[12.5px] text-bone/80 lg:hidden [overflow-wrap:anywhere]">› {s.code}</code>
                 </Reveal>

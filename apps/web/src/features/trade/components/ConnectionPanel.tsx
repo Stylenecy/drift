@@ -65,7 +65,7 @@ export function ConnectionPanel() {
               type="checkbox"
               checked={testnet}
               onChange={(e) => setTestnet(e.target.checked)}
-              className="accent-[#9aa8f0]"
+              className="accent-engine"
             />
             Testnet
           </label>

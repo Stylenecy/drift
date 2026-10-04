@@ -50,7 +50,7 @@ export function Engine() {
 
           <div className="lg:col-span-6 lg:col-start-7">
             <Reveal kind="clip">
-              <figure className="hud relative bg-[#0f1111] p-2 sm:p-3">
+              <figure className="hud relative bg-slate-1 p-2 sm:p-3">
                 <Image
                   src="/screens/cli-research-btc-1h.png"
                   alt="DRIFT terminal, research btc 1h: four strategies optimised on 70% of history and scored on the held-out 30%, run on Binance public-data fallback, 1000 candles from 22 Aug to 3 Oct 2026"

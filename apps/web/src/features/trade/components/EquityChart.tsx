@@ -1,4 +1,5 @@
 import type { EquityPoint } from "../types";
+import { CHART } from "../chartColors";
 
 // Equity curve (line) with the drawdown envelope shaded below the baseline.
 export function EquityChart({ data }: { data: EquityPoint[] }) {
@@ -22,7 +23,7 @@ export function EquityChart({ data }: { data: EquityPoint[] }) {
   const baseY = y(1);
   const end = data[data.length - 1].equity;
   const up = end >= 1;
-  const stroke = up ? "#34d399" : "#f87171";
+  const stroke = up ? CHART.up : CHART.down;
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="none" role="img" aria-label="Equity curve">
@@ -58,8 +59,8 @@ export function DrawdownChart({ data }: { data: EquityPoint[] }) {
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" preserveAspectRatio="none" role="img" aria-label="Drawdown">
-      <path d={area} fill="#f87171" fillOpacity="0.12" />
-      <path d={line} fill="none" stroke="#f87171" strokeWidth="1.25" strokeOpacity="0.75" />
+      <path d={area} fill={CHART.down} fillOpacity="0.12" />
+      <path d={line} fill="none" stroke={CHART.down} strokeWidth="1.25" strokeOpacity="0.75" />
     </svg>
   );
 }

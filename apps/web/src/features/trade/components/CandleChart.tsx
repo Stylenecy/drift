@@ -1,9 +1,10 @@
 import type { Candle } from "../types";
+import { CHART } from "../chartColors";
 
 export type ChartMarker = { time: number; side: "long" | "short" | "exit"; price: number };
 
-const UP = "#34d399";
-const DOWN = "#f87171";
+const UP = CHART.up;
+const DOWN = CHART.down;
 
 function fmtPrice(v: number): string {
   if (v >= 1000) return v.toLocaleString("en-US", { maximumFractionDigits: 0 });
@@ -69,7 +70,7 @@ export function CandleChart({
   const ticks = Array.from({ length: gridLines + 1 }, (_, i) => pMin + ((pMax - pMin) * i) / gridLines);
 
   const markerColor = (s: ChartMarker["side"]) =>
-    s === "long" ? UP : s === "short" ? DOWN : "#fbbf24";
+    s === "long" ? UP : s === "short" ? DOWN : CHART.exit;
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Candlestick chart">
@@ -77,7 +78,7 @@ export function CandleChart({
       {ticks.map((p, i) => (
         <g key={i}>
           <line x1={8} y1={y(p)} x2={W - gutter} y2={y(p)} stroke="white" strokeOpacity="0.05" />
-          <text x={W - gutter + 6} y={y(p) + 3} fontSize="9" fill="rgba(255,255,255,0.4)" fontFamily="monospace">
+          <text x={W - gutter + 6} y={y(p) + 3} fontSize="9" fill="rgba(225,229,229,0.45)" fontFamily={CHART.mono}>
             {fmtPrice(p)}
           </text>
         </g>
@@ -102,7 +103,7 @@ export function CandleChart({
       {/* last price line */}
       <line x1={8} y1={lastY} x2={W - gutter} y2={lastY} stroke={lastUp ? UP : DOWN} strokeOpacity="0.5" strokeDasharray="3 3" />
       <rect x={W - gutter} y={lastY - 7} width={gutter} height={14} fill={lastUp ? UP : DOWN} fillOpacity="0.9" rx="2" />
-      <text x={W - gutter + 5} y={lastY + 3} fontSize="9" fill="#0b0c0f" fontFamily="monospace" fontWeight="bold">
+      <text x={W - gutter + 5} y={lastY + 3} fontSize="9" fill={CHART.ink} fontFamily={CHART.mono} fontWeight="bold">
         {fmtPrice(last)}
       </text>
 

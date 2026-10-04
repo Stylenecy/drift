@@ -1,4 +1,5 @@
 import type { Candle, TradeMarker } from "../types";
+import { CHART } from "../chartColors";
 
 // Close-price line with long/short/exit trade markers overlaid.
 export function PriceChart({
@@ -29,7 +30,7 @@ export function PriceChart({
   const line = candles.map((c, i) => `${i === 0 ? "M" : "L"}${x(c.time)},${y(c.close)}`).join(" ");
 
   const colorFor = (side: TradeMarker["side"]) =>
-    side === "long" ? "#34d399" : side === "short" ? "#f87171" : "#fbbf24";
+    side === "long" ? CHART.up : side === "short" ? CHART.down : CHART.exit;
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Price with trades">
