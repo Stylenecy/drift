@@ -20,10 +20,9 @@ function Gauge() {
     <Reveal kind="gauge" className="relative mt-16 select-none sm:mt-20" aria-label={`Drawdown gauge: halt line at ${LIMIT}%, recorded decisions at −1% and −25%`} role="img">
       <div className="meta flex justify-between text-mute">
         <span>0%</span>
-        <span className="hidden sm:inline">drawdown reported with each decision</span>
         <span>−{SCALE}%</span>
       </div>
-      <div className="relative mt-4 h-16">
+      <div className="gauge-track relative mt-4 h-16">
         <div aria-hidden className="absolute inset-x-0 top-1/2 h-px bg-[var(--line-strong)]" />
         <div aria-hidden className="absolute inset-x-0 top-[calc(50%-6px)] h-3 grid-12" />
         <div aria-hidden className="absolute left-0 top-[calc(50%-1px)] h-[3px] bg-ok/50" style={{ width: `${pos(LIMIT)}%` }} />
@@ -38,8 +37,8 @@ function Gauge() {
             <div
               key={s.tx}
               aria-hidden
-              className="gauge-mark absolute inset-y-0 left-0 w-full"
-              style={{ "--to": `${pos(s.drawdownPct ?? 0)}%`, "--from": "0%", "--d": `${0.3 + i * 0.15}s` } as CSSProperties}
+              className="gauge-mark absolute inset-y-0 left-0 w-0"
+              style={{ "--to": pos(s.drawdownPct ?? 0).toFixed(3), "--from": 0, "--d": `${0.3 + i * 0.15}s` } as CSSProperties}
             >
               <span className={`absolute top-1/2 block h-4 w-4 -translate-x-1/2 -translate-y-1/2 rotate-45 border-2 border-ink ${breach ? "bg-veto" : "bg-ok"}`} />
               <span className={`meta absolute top-[calc(50%+16px)] -translate-x-1/2 whitespace-nowrap ${breach ? "text-veto" : "text-bone"}`}>

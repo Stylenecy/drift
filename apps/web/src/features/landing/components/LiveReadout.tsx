@@ -26,7 +26,7 @@ export function LiveReadout() {
   return (
     <aside aria-label="MacroGuard, live read" className="hud hud-chain ld-clip relative px-4 pb-4 pt-9 sm:px-5" style={{ "--d": "0.55s" } as CSSProperties}>
       <span className="meta absolute left-3 top-2.5 text-chain">(live read)</span>
-      <span className="meta absolute right-3 top-2.5 flex items-center gap-1.5 text-mute" aria-live="polite">
+      <span className="meta needs-js absolute right-3 top-2.5 flex items-center gap-1.5 text-mute" aria-live="polite">
         {live.status === "live" && <span aria-hidden className="live-dot h-1.5 w-1.5 rounded-full bg-ok" />}
         {live.status === "live" ? "live" : live.status === "loading" ? "reading…" : "not live"}
       </span>

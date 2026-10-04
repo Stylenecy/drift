@@ -447,15 +447,19 @@ html.has-js .no-js-note {
     transition: clip-path 0.8s var(--ease-out);
   }
 
-  /* Halt gauge: a full-width carrier moves each recorded drawdown to its place, so
-     translate percentages are of the track. The −25% marker crosses the gold line. */
+  /* Halt gauge: each recorded drawdown is a zero-width marker moved along the track
+     with container units (1cqw = 1% of the track), so it is a pure transform and
+     nothing sticks out of the page. The −25% marker crosses the gold line. */
+  .gauge-track {
+    container-type: inline-size;
+  }
   .gauge-mark {
-    transform: translate3d(var(--to, 0%), 0, 0);
+    transform: translate3d(calc(var(--to, 0) * 1cqw), 0, 0);
     transition: transform 1.6s var(--ease-move);
     transition-delay: var(--d, 0.3s);
   }
   .js .gauge:not([data-in]) .gauge-mark {
-    transform: translate3d(var(--from, 0%), 0, 0);
+    transform: translate3d(calc(var(--from, 0) * 1cqw), 0, 0);
   }
   .gauge-flag {
     transition:

@@ -243,7 +243,7 @@ export function Count({
 const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
 /**
- * Odometer for block numbers: each digit is a 0–9 strip moved by transform.
+ * Odometer for block numbers: each digit is a 0–9 strip, 1em per digit, moved by transform.
  * Rolls from zero the first time it is seen, and to any later value it is given.
  */
 export function Odometer({ value, className = "" }: { value: number; className?: string }) {
@@ -266,7 +266,7 @@ export function Odometer({ value, className = "" }: { value: number; className?:
         void el.offsetHeight;
         strips.forEach((s) => {
           s.style.transition = "";
-          s.style.transform = `translate3d(0, ${-Number(s.dataset.v) * 100}%, 0)`;
+          s.style.transform = `translate3d(0, ${-Number(s.dataset.v)}em, 0)`;
         });
       },
       "0px",
@@ -289,7 +289,7 @@ export function Odometer({ value, className = "" }: { value: number; className?:
               <span
                 className="odo-s"
                 data-v={n}
-                style={{ "--i": di, transform: `translate3d(0, ${-n * 100}%, 0)` } as CSSProperties}
+                style={{ "--i": di, transform: `translate3d(0, ${-n}em, 0)` } as CSSProperties}
               >
                 {DIGITS.map((d) => (
                   <span key={d}>{d}</span>

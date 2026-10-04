@@ -195,7 +195,7 @@ export function HaltGauge({ maxDrawdownBps }: { maxDrawdownBps: number }) {
 
   return (
     <Reveal kind="gauge" className="mt-10">
-      <div className="relative h-8">
+      <div className="gauge-track relative h-8">
         <div aria-hidden className="absolute inset-x-0 top-1/2 h-px bg-[var(--line-strong)]" />
         <div aria-hidden className="absolute left-0 top-[calc(50%-1px)] h-[3px] bg-ok/45" style={{ width: `${pos(limit)}%` }} />
         <div aria-hidden className="absolute right-0 top-[calc(50%-1px)] h-[3px] bg-veto/55" style={{ left: `${pos(limit)}%` }} />
@@ -206,8 +206,8 @@ export function HaltGauge({ maxDrawdownBps }: { maxDrawdownBps: number }) {
         {dots.map((d, i) => (
           <div
             key={d.tx}
-            className="gauge-mark absolute inset-y-0 left-0 w-full"
-            style={{ "--to": `${pos(d.drawdownPct ?? 0)}%`, "--d": `${0.2 + i * 0.15}s` } as CSSProperties}
+            className="gauge-mark absolute inset-y-0 left-0 w-0"
+            style={{ "--to": pos(d.drawdownPct ?? 0).toFixed(3), "--d": `${0.2 + i * 0.15}s` } as CSSProperties}
           >
             <span
               className={`absolute top-1/2 block h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rotate-45 border-2 border-ink ${

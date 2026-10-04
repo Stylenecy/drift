@@ -68,7 +68,7 @@ export default function Footer() {
           <div
             aria-hidden
             className="select-none font-semibold leading-[0.8] tracking-[-0.06em] text-bone"
-            style={{ fontSize: "clamp(96px, 27vw, 420px)" }}
+            style={{ fontSize: "clamp(96px, 35.5vw, 640px)" }}
           >
             DRIFT
           </div>
