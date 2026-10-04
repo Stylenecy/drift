@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { navGroups, titleFor } from "./nav";
@@ -8,6 +9,16 @@ export function Topbar() {
   const pathname = usePathname();
   const title = titleFor(pathname);
   const items = navGroups.flatMap((g) => g.items);
+  const tabsRef = useRef<HTMLElement>(null);
+
+  // Phone tab strip: bring the current page's tab to the middle (scrolls the strip
+  // only, never the page).
+  useEffect(() => {
+    const nav = tabsRef.current;
+    const active = nav?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!nav || !active) return;
+    nav.scrollLeft = active.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2;
+  }, [pathname]);
 
   return (
     <header className="sticky top-0 z-10 border-b border-[var(--line)] bg-ink/85 backdrop-blur-md">
@@ -26,8 +37,9 @@ export function Topbar() {
 
       {/* Mobile navigation — the sidebar is hidden below md */}
       <nav
+        ref={tabsRef}
         aria-label="Cockpit"
-        className="flex gap-1 overflow-x-auto px-3 pb-2 [mask-image:linear-gradient(to_right,black_82%,transparent)] md:hidden"
+        className="relative flex gap-1 overflow-x-auto px-3 pb-2 [mask-image:linear-gradient(to_right,black_82%,transparent)] md:hidden"
       >
         {items.map((item) => {
           const active = item.href === "/dashboard" ? pathname === "/dashboard" : pathname.startsWith(item.href);
