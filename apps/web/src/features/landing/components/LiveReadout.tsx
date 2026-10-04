@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
-import { Odometer } from "@/features/motion/Motion";
+import { Decode } from "@/features/motion/Motion";
 import { useGuardLive } from "@/features/guard/useGuardLive";
 import { DEX_GUARD, addressUrl } from "@/features/guard/evidence";
 
@@ -35,7 +35,7 @@ export function LiveReadout() {
         <div className="meta text-mute">Block</div>
         <div className="mt-1 font-mono text-[34px] leading-none tracking-[-0.03em] text-bone sm:text-[40px]">
           {live.status === "live" ? (
-            <Odometer value={live.read.block} />
+            <Decode value={live.read.block} />
           ) : (
             live.status === "loading" ? (
               <span aria-hidden className="text-slate-2">

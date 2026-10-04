@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Instrument_Serif } from "next/font/google";
-import { AuthProvider } from "@/components/AuthProvider";
 import { MotionBoot } from "@/features/motion/Motion";
-import { AUTH_ENABLED } from "@/lib/auth";
 import "@/styles/globals.css";
 
 const geistSans = Geist({
@@ -10,9 +8,13 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
+// Only Geist is preloaded: it sets the headline (the LCP element). Mono labels and
+// the serif-italic phrase swap in when ready, sized to their fallbacks by next/font,
+// so they do not compete with the CSS and the headline font on a slow connection.
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  preload: false,
 });
 
 // One serif-italic phrase per screen (DEX-MOTION-LANGUAGE.md §2).
@@ -21,6 +23,7 @@ const instrumentSerif = Instrument_Serif({
   weight: "400",
   style: "italic",
   subsets: ["latin"],
+  preload: false,
 });
 
 const TITLE = "DRIFT — a trading bot whose risk rules you can verify on BNB Chain";
@@ -75,7 +78,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full">
         <MotionBoot />
-        <AuthProvider enabled={AUTH_ENABLED}>{children}</AuthProvider>
+        {children}
       </body>
     </html>
   );

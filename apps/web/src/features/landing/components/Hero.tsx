@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import Link from "next/link";
-import { Lines, Magnetic } from "@/features/motion/Motion";
+import { Magnetic } from "@/features/motion/Motion";
+import { Lines } from "@/features/motion/Lines";
 import { DEX_GUARD, SMOKE_TEST, addressUrl, short } from "@/features/guard/evidence";
 import { LiveReadout } from "./LiveReadout";
 

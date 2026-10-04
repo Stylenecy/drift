@@ -153,48 +153,6 @@ export function SplitWords({
   );
 }
 
-/** Authored lines in masks. mode "load" runs on first paint with CSS only. */
-export function Lines({
-  as = "h2",
-  lines,
-  className = "",
-  mode = "scroll",
-  delay,
-  label,
-}: {
-  as?: ElementType;
-  lines: ReactNode[];
-  className?: string;
-  mode?: "load" | "scroll";
-  delay?: number;
-  label?: string;
-}) {
-  const body = lines.map((line, i) => (
-    <span key={i} className="ln">
-      <span className="ln-i" style={{ "--i": i } as CSSProperties}>
-        {line}
-      </span>
-    </span>
-  ));
-  if (mode === "load") {
-    const Tag = as;
-    return (
-      <Tag
-        className={`ld-lines ${className}`}
-        style={delay !== undefined ? ({ "--d": `${delay}s` } as CSSProperties) : undefined}
-        aria-label={label}
-      >
-        {body}
-      </Tag>
-    );
-  }
-  return (
-    <Reveal as={as} kind="lines" delay={delay} className={className} aria-label={label}>
-      {body}
-    </Reveal>
-  );
-}
-
 /**
  * Number that counts up once when it enters view. Server HTML holds the final
  * value. Props stay serialisable so server components can use it.
@@ -240,64 +198,51 @@ export function Count({
   );
 }
 
-const DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-
 /**
- * Odometer for block numbers: each digit is a 0–9 strip, 1em per digit, moved by transform.
- * Rolls from zero the first time it is seen, and to any later value it is given.
+ * Block number that decodes once when it is seen: digits flicker and settle left
+ * to right in about 0.9 s, then the rAF loop ends. One line of tabular text, so
+ * it never outgrows the headline as a paint (it stays out of LCP's way).
  */
-export function Odometer({ value, className = "" }: { value: number; className?: string }) {
+export function Decode({ value, className = "" }: { value: number; className?: string }) {
   const ref = useRef<HTMLSpanElement>(null);
   const text = value.toLocaleString("en-US");
   useBeforePaint(() => {
     const el = ref.current;
     if (!el || !motionOn()) return;
-    const strips = Array.from(el.querySelectorAll<HTMLElement>(".odo-s"));
-    if (el.dataset.seen) return;
-    // First sight: park every strip at 0 without a transition, then roll.
-    strips.forEach((s) => {
-      s.style.transition = "none";
-      s.style.transform = "translate3d(0,0,0)";
-    });
-    return onceInView(
+    const chars = Array.from(text);
+    const digitAt = chars.map((ch) => ch >= "0" && ch <= "9");
+    const scramble = (settled: number) =>
+      chars
+        .map((ch, i) => (digitAt[i] && i >= settled ? String(Math.floor(Math.random() * 10)) : ch))
+        .join("");
+    el.textContent = scramble(0);
+    let raf = 0;
+    const stop = onceInView(
       el,
       () => {
-        el.dataset.seen = "1";
-        void el.offsetHeight;
-        strips.forEach((s) => {
-          s.style.transition = "";
-          s.style.transform = `translate3d(0, ${-Number(s.dataset.v)}em, 0)`;
-        });
+        const start = performance.now();
+        const settleMs = 900;
+        const frame = (now: number) => {
+          const t = Math.min(1, (now - start) / settleMs);
+          const settled = Math.floor(t * (chars.length + 1));
+          el.textContent = t >= 1 ? text : scramble(settled);
+          if (t < 1) raf = requestAnimationFrame(frame);
+        };
+        raf = requestAnimationFrame(frame);
       },
       "0px",
     );
+    return () => {
+      stop();
+      cancelAnimationFrame(raf);
+      el.textContent = text;
+    };
   }, [text]);
-  const chars = Array.from(text);
-  const isDigit = (ch: string) => ch >= "0" && ch <= "9";
   return (
-    <span className={`odo ${className}`}>
+    <span className={`tnum ${className}`}>
       <span className="sr-only">{text}</span>
-      <span ref={ref} aria-hidden className="odo">
-        {chars.map((ch, i) => {
-          if (!isDigit(ch)) {
-            return <span key={i}>{ch}</span>;
-          }
-          const n = Number(ch);
-          const di = chars.slice(0, i).filter(isDigit).length;
-          return (
-            <span key={i} className="odo-d">
-              <span
-                className="odo-s"
-                data-v={n}
-                style={{ "--i": di, transform: `translate3d(0, ${-n}em, 0)` } as CSSProperties}
-              >
-                {DIGITS.map((d) => (
-                  <span key={d}>{d}</span>
-                ))}
-              </span>
-            </span>
-          );
-        })}
+      <span ref={ref} aria-hidden>
+        {text}
       </span>
     </span>
   );
