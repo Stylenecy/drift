@@ -51,7 +51,7 @@ const figures = [
 
 export function Proof() {
   return (
-    <section id="proof" className="relative scroll-mt-20 px-4 py-24 sm:px-6 sm:py-32">
+    <section id="proof" className="cv-auto relative scroll-mt-20 px-4 py-24 sm:px-6 sm:py-32">
       <div className="mx-auto max-w-[1440px]">
         <Chapter index="02" label="proof" />
         <ScrubWords

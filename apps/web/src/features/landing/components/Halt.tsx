@@ -58,7 +58,7 @@ function Gauge() {
 
 export function Halt() {
   return (
-    <section id="halt" className="relative scroll-mt-16 overflow-hidden border-t border-[var(--line)] px-4 py-24 sm:px-6 sm:py-32">
+    <section id="halt" className="cv-auto relative scroll-mt-16 overflow-hidden border-t border-[var(--line)] px-4 py-24 sm:px-6 sm:py-32">
       <div className="mx-auto max-w-[1440px]">
         <Chapter index="04" label="the halt" />
         <SplitWords

@@ -133,7 +133,7 @@ export function HowItWorks() {
   }, []);
 
   return (
-    <section id="how" className="relative scroll-mt-16 px-4 py-24 sm:px-6 sm:py-32">
+    <section id="how" className="cv-auto relative scroll-mt-16 px-4 py-24 sm:px-6 sm:py-32">
       <div className="mx-auto max-w-[1440px]">
         <Chapter index="03" label="how it works" />
         <div className="mt-10 grid grid-cols-1 gap-6 lg:grid-cols-12">

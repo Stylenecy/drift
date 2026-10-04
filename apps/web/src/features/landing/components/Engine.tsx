@@ -23,7 +23,7 @@ const rules = [
 
 export function Engine() {
   return (
-    <section id="engine" className="relative scroll-mt-16 border-t border-[var(--line)] px-4 py-24 sm:px-6 sm:py-32">
+    <section id="engine" className="cv-auto relative scroll-mt-16 border-t border-[var(--line)] px-4 py-24 sm:px-6 sm:py-32">
       <div className="mx-auto max-w-[1440px]">
         <Chapter index="05" label="the engine" />
         <div className="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-8">

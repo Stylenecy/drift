@@ -29,7 +29,7 @@ const cols = [
 
 export default function Footer() {
   return (
-    <footer className="relative overflow-hidden border-t border-[var(--line)] px-4 pb-10 pt-20 sm:px-6 sm:pt-28">
+    <footer className="cv-auto relative overflow-hidden border-t border-[var(--line)] px-4 pb-10 pt-20 sm:px-6 sm:pt-28">
       <div className="mx-auto max-w-[1440px]">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-8">
           <div className="lg:col-span-7">

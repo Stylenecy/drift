@@ -85,6 +85,13 @@ html.has-js .no-js-note {
   display: none !important;
 }
 
+/* Long page, quick first paint: sections below the fold skip layout and paint until
+   they come near the viewport (sizes are remembered once rendered). */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 1100px;
+}
+
 /* Components live in a layer so Tailwind utilities can still override them. */
 @layer components {
   /* ------------------------------------------------------------ type kit -- */

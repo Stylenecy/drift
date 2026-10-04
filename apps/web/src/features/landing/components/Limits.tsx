@@ -14,7 +14,7 @@ const limits = [
 
 export function Limits() {
   return (
-    <section id="limits" className="relative scroll-mt-16 bg-paper px-4 py-24 text-ink sm:px-6 sm:py-32">
+    <section id="limits" className="cv-auto relative scroll-mt-16 bg-paper px-4 py-24 text-ink sm:px-6 sm:py-32">
       <div className="mx-auto max-w-[1440px]">
         <Chapter index="06" label="limits" tone="ink" />
         <div className="mt-10 grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-8">
