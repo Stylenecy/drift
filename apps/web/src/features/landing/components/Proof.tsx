@@ -1,99 +1,66 @@
 import Link from "next/link";
-import { Count, Reveal } from "@/features/motion/Motion";
-import { ScrubWords } from "@/features/motion/Scrub";
-import { Chapter } from "@/features/ui/hud";
-import { DEX_GUARD, SMOKE_TEST, txUrl } from "@/features/guard/evidence";
+import { Reveal } from "@/features/motion/Motion";
+import { DEX_GUARD, SMOKE_TEST, addressUrl } from "@/features/guard/evidence";
 import { site } from "../site";
 
-// Numbers as the stage. Every figure is evidence with a source a judge can open:
-// the constructor argument, the receipts, the test suite (README, Tests).
+// Proof as four plain sentences, each one link away from its source. Facts only:
+// 6 receipts from the 30 Sep 2026 test, the contract test suite, the Sourcify match,
+// and the contract address itself (gold: it is checkable on BNB Chain).
 
-const TESTS_URL = "https://github.com/Stylenecy/seed-bnb/tree/dex/drift/drift#tests";
-
-const figures = [
+const ROWS = [
   {
-    value: DEX_GUARD.maxDrawdownBps / 100,
-    suffix: "%",
-    label: "halt line",
-    body: "2,000 bps, set in the constructor. A recorded decision at or past it halts the contract.",
-    href: txUrl(DEX_GUARD.deployTx),
-    link: "deploy tx ↗",
-    chain: true,
+    claim: `${SMOKE_TEST.length} of ${SMOKE_TEST.length} public transactions succeeded.`,
+    sub: "The deploy and a five-step test of the brake, 30 September 2026.",
+    link: { label: "See the receipts", href: "/macroguard#trail", internal: true },
   },
   {
-    value: SMOKE_TEST.length,
-    suffix: "",
-    label: "receipts, status 1",
-    body: "Deploy plus a five-call smoke test on 30 Sep 2026, every one on BscScan.",
-    href: "/macroguard#trail",
-    link: "decision trail →",
-    chain: true,
+    claim: "30 of 30 contract tests pass.",
+    sub: "Including random sequences from the bot and from strangers. Every line of the contract is covered.",
+    link: { label: "Read the tests", href: site.repo, internal: false },
   },
   {
-    value: 30,
-    suffix: "",
-    label: "contract tests passing",
-    body: "Unit, event, fuzz and invariant tests over random agent and stranger calls.",
-    href: TESTS_URL,
-    link: "tests ↗",
-    chain: false,
-  },
-  {
-    value: 100,
-    suffix: "%",
-    label: "line and branch coverage",
-    body: "forge coverage of MacroGuard.sol. The contract itself is unchanged from upstream.",
-    href: TESTS_URL,
-    link: "coverage ↗",
-    chain: false,
+    claim: "The source code is verified.",
+    sub: "What runs on BNB Chain is exactly the code anyone can read.",
+    link: { label: "Open on Sourcify", href: site.sourcify, internal: false },
   },
 ];
 
 export function Proof() {
   return (
-    <section id="proof" className="cv-auto relative scroll-mt-20 px-4 py-24 sm:px-6 sm:py-32">
+    <section id="proof" className="cv-auto scroll-mt-16 px-4 py-28 sm:px-8 sm:py-40">
       <div className="mx-auto max-w-[1440px]">
-        <Chapter index="02" label="proof" />
-        <ScrubWords
-          as="h2"
-          className="mt-10 max-w-[30ch] text-[clamp(30px,4.2vw,64px)] font-medium leading-[1.08] tracking-[-0.03em] text-bone"
-          segments={[
-            { text: "Most trading bots" },
-            { text: "ask for your trust.", className: "serif-i" },
-            { text: "DRIFT puts its risk gate" },
-            { text: "on BNB Chain,", className: "text-chain" },
-            { text: "where anyone can read it, ask it a what-if and open every receipt." },
-          ]}
-        />
+        <Reveal as="h2" className="q-h2 max-w-[12ch] text-bone">
+          Proof, not promises.
+        </Reveal>
 
-        <Reveal as="dl" kind="stagger" className="mt-16 grid grid-cols-1 border-t border-[var(--line-strong)] sm:grid-cols-2 lg:grid-cols-4">
-          {figures.map((f, i) => (
-            <div
-              key={f.label}
-              className={`flex flex-col border-b border-[var(--line)] py-8 sm:px-6 lg:border-b-0 ${i > 0 ? "lg:border-l" : ""} ${i % 2 ? "sm:border-l" : ""} border-[var(--line)] sm:first:pl-0`}
-            >
-              <dt className="meta order-2 mt-3 text-mute">{f.label}</dt>
-              <dd className="order-1 font-mono text-[64px] leading-none tracking-[-0.05em] text-bone sm:text-[80px]">
-                <Count value={f.value} suffix={f.suffix} />
-              </dd>
-              <dd className="order-3 mt-4 max-w-[30ch] text-[14px] leading-relaxed text-mute">{f.body}</dd>
-              <dd className="order-4 mt-5">
-                {f.href.startsWith("/") ? (
-                  <Link href={f.href} className={`meta ${f.chain ? "text-chain" : "text-bone"}`}>
-                    <span className="u-draw pb-0.5">{f.link}</span>
+        <ul className="mt-16 border-t border-[var(--line-strong)] sm:mt-24">
+          {ROWS.map((r) => (
+            <Reveal as="li" key={r.claim} className="grid grid-cols-1 gap-4 border-b border-[var(--line-strong)] py-9 sm:grid-cols-12 sm:items-baseline sm:gap-8 sm:py-11">
+              <p className="q-h3 text-bone sm:col-span-6">{r.claim}</p>
+              <p className="max-w-[44ch] text-[16px] leading-relaxed text-mute sm:col-span-4">{r.sub}</p>
+              <div className="sm:col-span-2 sm:text-right">
+                {r.link.internal ? (
+                  <Link href={r.link.href} className="text-[15px] text-bone">
+                    <span className="u-draw pb-0.5">{r.link.label} →</span>
                   </Link>
                 ) : (
-                  <a href={f.href} target="_blank" rel="noopener noreferrer" className={`meta ${f.chain ? "text-chain" : "text-bone"}`}>
-                    <span className="u-draw pb-0.5">{f.link}</span>
+                  <a href={r.link.href} target="_blank" rel="noopener noreferrer" className="text-[15px] text-bone">
+                    <span className="u-draw pb-0.5">{r.link.label} ↗</span>
                   </a>
                 )}
-              </dd>
-            </div>
+              </div>
+            </Reveal>
           ))}
-        </Reveal>
-        <p className="meta mt-6 text-mute">
-          Sources: <a className="text-bone underline-offset-2 hover:underline" href={site.repo} target="_blank" rel="noopener noreferrer">README · proof and tests ↗</a>
-        </p>
+          <Reveal as="li" className="grid grid-cols-1 gap-4 border-b border-[var(--line-strong)] py-9 sm:grid-cols-12 sm:items-baseline sm:gap-8 sm:py-11">
+            <p className="q-h3 text-bone sm:col-span-6">The contract, in public.</p>
+            <p className="font-mono text-[14px] text-chain-soft [overflow-wrap:anywhere] sm:col-span-4">{DEX_GUARD.address}</p>
+            <div className="sm:col-span-2 sm:text-right">
+              <a href={addressUrl(DEX_GUARD.address)} target="_blank" rel="noopener noreferrer" className="text-[15px] text-chain-soft">
+                <span className="u-draw pb-0.5">BscScan ↗</span>
+              </a>
+            </div>
+          </Reveal>
+        </ul>
       </div>
     </section>
   );

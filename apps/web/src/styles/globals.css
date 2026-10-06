@@ -673,3 +673,129 @@ html.has-js .no-js-note {
     }
   }
 }
+
+/* v4 "quiet" landing (2026-10-06): one family, uppercase medium headlines, one pill
+   CTA repeated, alternating ink and paper sections, numbers as statements rather than
+   captioned stats. Gold still marks only what can be checked on BNB Chain. */
+@layer components {
+  .q-h1,
+  .q-h2,
+  .q-h3 {
+    font-weight: 500;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+  .q-h1 {
+    font-size: clamp(44px, 8.2vw, 136px);
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+  }
+  .q-h2 {
+    font-size: clamp(36px, 5.4vw, 88px);
+    line-height: 0.96;
+    letter-spacing: -0.025em;
+  }
+  .q-h3 {
+    font-size: clamp(22px, 2.2vw, 32px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+  }
+  .q-lead {
+    font-size: clamp(17px, 1.35vw, 20px);
+    line-height: 1.5;
+  }
+
+  /* The one call to action: a bone pill on ink, an ink pill on paper. */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-radius: 999px;
+    padding: 16px 26px;
+    font-size: 15px;
+    font-weight: 500;
+    background: var(--bone);
+    color: var(--ink);
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+  .pill:hover {
+    background: #ffffff;
+  }
+  .pill-ink {
+    background: var(--ink);
+    color: var(--bone);
+  }
+  .pill-ink:hover {
+    background: var(--slate-1);
+  }
+  .pill .pill-arrow {
+    transition: transform 400ms var(--ease-out);
+  }
+  .pill:hover .pill-arrow {
+    transform: translateX(4px);
+  }
+
+  /* Nav links: half to full. */
+  .q-nav {
+    color: rgba(225, 229, 229, 0.55);
+    transition: color 200ms ease;
+  }
+  .q-nav:hover,
+  .q-nav[aria-current="page"] {
+    color: var(--bone);
+  }
+
+  /* Numbered rows: the row in the middle of the screen is lit, the rest rest at 40%. */
+  .q-row {
+    transition: opacity 500ms var(--ease-out);
+  }
+  .js .q-rows[data-tracking] .q-row:not([data-active]) {
+    opacity: 0.4;
+  }
+
+  /* Edge fade for the live strip. */
+  .q-fade-x {
+    mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+  }
+
+  /* FAQ: native details; the answer slides open. */
+  .q-faq summary {
+    list-style: none;
+    cursor: pointer;
+  }
+  .q-faq summary::-webkit-details-marker {
+    display: none;
+  }
+  .q-faq .q-plus {
+    transition: transform 300ms var(--ease-out);
+  }
+  .q-faq[open] .q-plus {
+    transform: rotate(45deg);
+  }
+  .q-faq .q-answer {
+    animation: q-open 450ms var(--ease-out) both;
+  }
+  @keyframes q-open {
+    from {
+      opacity: 0;
+      transform: translateY(-6px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pill,
+    .pill .pill-arrow,
+    .q-row,
+    .q-faq .q-plus {
+      transition: none !important;
+    }
+    .q-faq .q-answer {
+      animation: none !important;
+    }
+    .js .q-rows[data-tracking] .q-row:not([data-active]) {
+      opacity: 1;
+    }
+  }
+}
