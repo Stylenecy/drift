@@ -32,7 +32,7 @@ export function Product() {
             </Reveal>
             <Reveal className="mt-8" delay={0.2}>
               <Link href="/macroguard" className="pill">
-                Check the live bot <span aria-hidden className="pill-arrow">→</span>
+                Check the live brake <span aria-hidden className="pill-arrow">→</span>
               </Link>
             </Reveal>
           </div>

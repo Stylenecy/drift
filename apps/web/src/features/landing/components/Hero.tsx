@@ -29,7 +29,7 @@ export default function Hero() {
           </p>
           <div className="ld-up mt-10 flex flex-wrap items-center gap-x-7 gap-y-4" style={{ "--d": "0.7s" } as CSSProperties}>
             <Link href="/macroguard" className="pill">
-              Check the live bot <span aria-hidden className="pill-arrow">→</span>
+              Check the live brake <span aria-hidden className="pill-arrow">→</span>
             </Link>
             <Link href="/#try" className="text-[15px] text-bone">
               <span className="u-draw pb-0.5">Try the brake yourself</span>
