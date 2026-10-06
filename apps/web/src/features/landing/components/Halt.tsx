@@ -51,7 +51,7 @@ export function Halt() {
           <div className="lg:col-span-5 lg:text-right">
             <p className="text-[13px] uppercase tracking-[0.16em] text-mute">Bot&apos;s loss</p>
             <p className={`font-mono text-[clamp(80px,13vw,190px)] leading-[0.9] tracking-[-0.05em] tnum transition-colors duration-300 ${halted ? "text-veto" : "text-bone"}`}>
-              −{loss}%
+              {loss === 0 ? "0%" : `−${loss}%`}
             </p>
             <p
               data-on={halted}

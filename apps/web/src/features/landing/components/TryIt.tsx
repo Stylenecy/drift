@@ -105,7 +105,7 @@ export function TryIt() {
               <label htmlFor={sliderId} className="text-[13px] uppercase tracking-[0.16em] text-mute">
                 Its loss at that moment
               </label>
-              <span className={`font-mono text-[44px] leading-none tracking-[-0.04em] tnum ${loss >= LIMIT ? "text-veto" : "text-bone"}`}>−{loss}%</span>
+              <span className={`font-mono text-[44px] leading-none tracking-[-0.04em] tnum ${loss >= LIMIT ? "text-veto" : "text-bone"}`}>{loss === 0 ? "0%" : `−${loss}%`}</span>
             </div>
             <input
               id={sliderId}
@@ -145,7 +145,7 @@ export function TryIt() {
             {answered && (
               <div key={`${answered.answer.block}-${answered.signal}-${answered.loss}`}>
                 <p className="text-[13px] uppercase tracking-[0.16em] text-mute">
-                  {TRADES.find((t) => t.id === answered.signal)?.label} at −{answered.loss}%
+                  {TRADES.find((t) => t.id === answered.signal)?.label} at {answered.loss === 0 ? "0%" : `−${answered.loss}%`}
                 </p>
                 <p className={`ty-verdict mt-3 text-[clamp(64px,9vw,136px)] font-semibold uppercase leading-[0.9] tracking-[-0.04em] ${answered.answer.allowed ? "text-ok" : "text-veto"}`}>
                   {answered.answer.allowed ? "Allowed" : "Blocked"}
