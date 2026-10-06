@@ -43,7 +43,7 @@ Run date: 2026-09-25. Real BSC Testnet (chain 97), RPC `https://bsc-testnet-rpc.
 
 - **MacroGuard:** [0x8F2CbB56Cc9A46EfC3997146369257Ff9450Fe5A](https://testnet.bscscan.com/address/0x8F2CbB56Cc9A46EfC3997146369257Ff9450Fe5A). Deploy tx [0xd5a98f89…6056](https://testnet.bscscan.com/tx/0xd5a98f89e24d30f1d828e50753d7146fad4aa078cd16af831dc81763b6d66056). `agent()` is the deployer and `maxDrawdownBps()` is 2000.
 - **Command:** `MAX_DRAWDOWN_BPS=2000 forge script script/Deploy.s.sol:Deploy --rpc-url https://bsc-testnet-rpc.publicnode.com --private-key $ETH_PRIVATE_KEY --broadcast --with-gas-price 100000000 --legacy --slow`.
-- **Records:** `contracts/broadcast/Deploy.s.sol/97/run-latest.json` and `contracts/deployments/bsc-testnet.json`. The addresses are also in `apps/trader/.env.bsc-testnet` and `apps/web/.env.bsc-testnet`, which are gitignored and hold no keys. `README.md` and `SHOWCASE.md` now link the address.
+- **Records:** `contracts/broadcast/Deploy.s.sol/97/run-1790289952072.json` and `contracts/deployments/bsc-testnet.json` (`run-latest.json` now holds the later deployment `0x8b09…a83D`, see `docs/deployment-dex.md`). The addresses are also in `apps/trader/.env.bsc-testnet` and `apps/web/.env.bsc-testnet`, which are gitignored and hold no keys. `README.md` and `SHOWCASE.md` now link the address.
 
 ### Smoke flow (cast, all receipts status 1)
 
