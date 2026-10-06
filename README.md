@@ -17,7 +17,7 @@
 
 </div>
 
-![The DRIFT landing: "Risk rules you can check." next to a live loss dial with the 20% limit, and a live read of BNB Chain at the bottom](docs/screens/after/landing-desktop.png)
+![The DRIFT landing: "Risk rules you can check." next to an example loss dial with the 20% limit, and a live read of BNB Chain at the bottom](docs/screens/after/landing-desktop.png)
 
 ---
 
@@ -88,7 +88,7 @@ DRIFT's core (the quant engine, the cockpit and `MacroGuard.sol`) comes from the
 | 2 Oct | Source verified on Sourcify; contract reads straight from the browser, with its first 7 web tests; provenance and honest copy; public demo on Vercel |
 | 3 Oct | "Ask the contract"; labelled Binance data fallback; 23 contract tests, 48 engine tests and 8 web tests added; CI workflow; threat model; share card; this README; deck v2 |
 | 4 Oct | Visual system v3 across the site: landing with a live contract readout, guard panel, cockpit, blog and share card; motion in plain CSS with no animation library (framer-motion and GSAP removed), with reduced-motion and no-JS paths. Live in production on 5 Oct (build `f4cccd8`) |
-| 6 Oct | A calmer product landing in plain language, with motion built in code: a live brake dial, a scroll-driven halt scene, step artwork and "Try the brake", which asks the live contract (eth_call, nothing signed) |
+| 6 Oct | A calmer product landing in plain language, with motion built in code: a brake dial, a scroll-driven halt scene, step artwork and "Try the brake", which asks the live contract (eth_call, nothing signed) |
 | 7 Oct | Final pass before judging: the hero dial is labelled as an example and the live line says only what the contract knows ("Not halted"); a zero loss reads 0%; screenshots recaptured from the live site; the final deck in `docs/submission` |
 
 Commit history: [`main`](https://github.com/Stylenecy/drift/commits/main). This repository was split from `Stylenecy/seed-bnb` (branch `dex/drift`) on 6 Oct 2026 with every commit kept: the first commit (`753b707` here, `52671ce` upstream) is the upstream seed import by its original author, every later commit is this project's own work.

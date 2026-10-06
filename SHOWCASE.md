@@ -46,7 +46,7 @@ With both public RPCs blocked, the panel says so, makes no live claim, and still
 
 The hero says what DRIFT is in one line, next to a loss dial that shows the brake at work: the loss moves, crosses the 20% line, the contract halts the bot and the real halt receipt (block 134,042,283, 30 Sep 2026) slides in. The moving values are an illustration; the limit and the receipt are real, and the strip at the bottom is a live read of BNB Chain. Further down: a scroll-driven halt scene, how it works in five steps, the live guard, the proof, "Try the brake" (it asks the live contract with an `eth_call`, nothing signed) and a short FAQ.
 
-![Landing page at 1440 px: headline, live loss dial with the 20% limit, live read of BNB Chain](docs/screens/after/landing-desktop.png)
+![Landing page at 1440 px: headline, example loss dial with the 20% limit, live read of BNB Chain](docs/screens/after/landing-desktop.png)
 
 <img src="docs/screens/after/landing-mobile.png" alt="Landing page at phone width (390 px)" width="320">
 
