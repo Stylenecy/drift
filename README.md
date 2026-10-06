@@ -6,7 +6,7 @@
 
 *Quant research runs off-chain. The risk gate, MacroGuard, is a public contract on BNB Smart Chain Testnet: anyone can read what the bot is allowed to do right now, ask the contract a what-if, and open every recorded decision on BscScan.*
 
-**[Live demo](https://drift-macroguard.vercel.app)** · **[Public risk gate: `/macroguard`](https://drift-macroguard.vercel.app/macroguard)** · Demo video: not published yet · **[Contract on BscScan (testnet)](https://testnet.bscscan.com/address/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)** · **[Source on Sourcify](https://repo.sourcify.dev/97/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)** · **[Pitch deck (PDF)](docs/submission/DRIFT-pitch.pdf)**
+**[Live demo](https://drift-macroguard.vercel.app)** · **[Public risk gate: `/macroguard`](https://drift-macroguard.vercel.app/macroguard)** · **[Demo video (YouTube)](https://youtu.be/tM7N6LKdUJM)** · **[Contract on BscScan (testnet)](https://testnet.bscscan.com/address/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)** · **[Source on Sourcify](https://repo.sourcify.dev/97/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)** · **[Pitch deck (PDF)](docs/submission/DRIFT-pitch.pdf)**
 
 [![BNB Chain](https://img.shields.io/badge/Chain-BSC%20Testnet%20(97)-F0B90B?logo=binance&logoColor=white)](https://testnet.bscscan.com/address/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)
 [![Sourcify](https://img.shields.io/badge/Sourcify-exact%20match-2ea44f)](https://repo.sourcify.dev/97/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)
@@ -88,6 +88,7 @@ DRIFT's core (the quant engine, the cockpit and `MacroGuard.sol`) comes from the
 | 2 Oct | Source verified on Sourcify; contract reads straight from the browser, with its first 7 web tests; provenance and honest copy; public demo on Vercel |
 | 3 Oct | "Ask the contract"; labelled Binance data fallback; 23 contract tests, 48 engine tests and 8 web tests added; CI workflow; threat model; share card; this README; deck v2 |
 | 4 Oct | Visual system v3 across the site: landing with a live contract readout, guard panel, cockpit, blog and share card; motion in plain CSS with no animation library (framer-motion and GSAP removed), with reduced-motion and no-JS paths. Live in production on 5 Oct (build `9f49d7c`) |
+| 6 Oct | A calmer product landing in plain language, with motion built in code: a live brake dial, a scroll-driven halt scene, step artwork and "Try the brake", which asks the live contract (eth_call, nothing signed) |
 
 Commit history: [`dex/drift`, commits under `drift/`](https://github.com/Stylenecy/seed-bnb/commits/dex/drift/drift).
 
