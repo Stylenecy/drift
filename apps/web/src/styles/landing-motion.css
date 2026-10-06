@@ -60,17 +60,17 @@
   animation: mo-halt 11s linear infinite;
 }
 @keyframes mo-halt {
-  0%, 47% { opacity: 0; }
-  48.5%, 83% { opacity: 1; }
-  85%, 100% { opacity: 0; }
+  0%, 47.6% { opacity: 0; }
+  48.4%, 83% { opacity: 1; }
+  84%, 100% { opacity: 0; }
 }
 .mo-run {
   animation: mo-run 11s linear infinite;
 }
 @keyframes mo-run {
-  0%, 47% { opacity: 1; }
-  48.5%, 83% { opacity: 0; }
-  85%, 100% { opacity: 1; }
+  0%, 46.6% { opacity: 1; }
+  47.4%, 84.4% { opacity: 0; }
+  85.4%, 100% { opacity: 1; }
 }
 .mo-flash {
   animation: mo-flash 11s linear infinite;

@@ -32,7 +32,8 @@ export function HeroDial() {
   const limLabel = pt(LIMIT, R + 48);
 
   return (
-    <div ref={ref} className="mo relative" role="img" aria-label={`An animated loss dial. The loss moves, crosses the ${LIMIT}% limit and the contract halts the bot.`}>
+    <div ref={ref} className="mo relative">
+      <div className="relative" role="img" aria-label={`An animated loss dial. The loss moves, crosses the ${LIMIT}% limit and the contract halts the bot.`}>
       {/* flash on the halt */}
       <div aria-hidden className="mo-flash pointer-events-none absolute inset-[8%] rounded-full bg-veto/30 blur-3xl" />
 
@@ -80,36 +81,41 @@ export function HeroDial() {
 
         {/* needles: bone while running, vermilion once halted */}
         <g className="mo-run">
-          <line className="mo-needle" x1={C.x} y1={C.y} x2={C.x - R + 70} y2={C.y} stroke="var(--bone)" strokeWidth="6" strokeLinecap="round" />
+          <line className="mo-needle" x1={C.x - 300} y1={C.y} x2={C.x - R + 6} y2={C.y} stroke="var(--bone)" strokeWidth="8" strokeLinecap="round" />
         </g>
         <g className="mo-halt">
-          <line className="mo-needle-halt" x1={C.x} y1={C.y} x2={C.x - R + 70} y2={C.y} stroke="var(--veto)" strokeWidth="6" strokeLinecap="round" />
+          <line className="mo-needle-halt" x1={C.x - 300} y1={C.y} x2={C.x - R + 6} y2={C.y} stroke="var(--veto)" strokeWidth="8" strokeLinecap="round" />
         </g>
-        <circle cx={C.x} cy={C.y} r="18" fill="var(--ink)" stroke="var(--bone)" strokeWidth="3" />
       </svg>
 
       {/* readout */}
-      <div className="pointer-events-none absolute inset-x-0 top-[44%] flex flex-col items-center text-center">
+      <div className="pointer-events-none absolute inset-x-0 top-[47%] flex flex-col items-center text-center">
         <span className="mo-run text-[13px] font-medium uppercase tracking-[0.16em] text-ok">● Bot running</span>
         <span className="mo-halt -mt-[1.2em] text-[13px] font-medium uppercase tracking-[0.16em] text-veto">■ Halted · exits only</span>
         <span className="mo-loss mt-2 font-mono text-[clamp(40px,6vw,88px)] leading-none tracking-[-0.04em] text-bone tnum" />
         <span className="mt-2 text-[13px] uppercase tracking-[0.14em] text-mute">Loss right now</span>
       </div>
 
-      {/* the real receipt */}
-      <a
-        href={txUrl(halt.tx)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mo-receipt absolute bottom-[-4%] right-[2%] w-[min(300px,70%)] rounded-2xl border border-chain/50 bg-slate-1/90 p-4 text-left backdrop-blur-sm sm:right-[6%]"
-      >
-        <span className="block text-[11px] uppercase tracking-[0.14em] text-mute">Real receipt · 30 Sep 2026</span>
-        <span className="mt-1.5 block text-[16px] font-medium text-bone">Contract halted the bot</span>
-        <span className="mt-1 block font-mono text-[13px] text-chain-soft tnum">block {halt.block.toLocaleString("en-US")} ↗</span>
-      </a>
-      <span className="mo-resume absolute bottom-[2%] left-[4%] rounded-full border border-[var(--line-strong)] bg-ink/80 px-4 py-2 text-[13px] text-bone">
-        Resumed by the owner&apos;s key · on the record
-      </span>
+      </div>
+
+      {/* the real receipt: its own slot under the dial on phones, over the dial from sm */}
+      <div className="relative mt-3 h-[104px] sm:pointer-events-none sm:absolute sm:inset-0 sm:mt-0 sm:h-auto">
+        <a
+          href={txUrl(halt.tx)}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-hidden
+          tabIndex={-1}
+          className="mo-receipt absolute inset-x-0 top-0 rounded-2xl border border-chain/50 bg-slate-1/90 p-4 text-left backdrop-blur-sm sm:pointer-events-auto sm:inset-x-auto sm:bottom-[-4%] sm:right-[6%] sm:top-auto sm:w-[300px]"
+        >
+          <span className="block text-[11px] uppercase tracking-[0.14em] text-mute">Real receipt · 30 Sep 2026</span>
+          <span className="mt-1.5 block text-[16px] font-medium text-bone">Contract halted the bot</span>
+          <span className="mt-1 block font-mono text-[13px] text-chain-soft tnum">block {halt.block.toLocaleString("en-US")} ↗</span>
+        </a>
+        <span className="mo-resume absolute left-0 top-4 rounded-full border border-[var(--line-strong)] bg-ink/80 px-4 py-2 text-[13px] text-bone sm:bottom-[2%] sm:left-[4%] sm:top-auto">
+          Resumed by the owner&apos;s key · on the record
+        </span>
+      </div>
     </div>
   );
 }

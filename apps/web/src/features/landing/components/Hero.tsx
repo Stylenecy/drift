@@ -13,7 +13,7 @@ const LIMIT = DEX_GUARD.maxDrawdownBps / 100;
 export default function Hero() {
   return (
     <section className="relative isolate overflow-hidden px-4 pb-8 pt-[92px] sm:px-8 sm:pb-10">
-      <div className="mx-auto grid min-h-[calc(100svh-132px)] w-full max-w-[1440px] grid-cols-1 items-center gap-6 lg:grid-cols-12 lg:gap-4">
+      <div className="mx-auto grid min-h-[calc(100svh-210px)] w-full max-w-[1440px] grid-cols-1 items-center gap-6 lg:grid-cols-12 lg:gap-4">
         <div className="order-2 lg:order-1 lg:col-span-6">
           <Lines
             as="h1"

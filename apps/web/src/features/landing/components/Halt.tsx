@@ -50,7 +50,7 @@ export function Halt() {
 
           <div className="lg:col-span-5 lg:text-right">
             <p className="text-[13px] uppercase tracking-[0.16em] text-mute">Bot&apos;s loss</p>
-            <p className={`font-mono text-[clamp(88px,15vw,220px)] leading-[0.9] tracking-[-0.05em] tnum transition-colors duration-300 ${halted ? "text-veto" : "text-bone"}`}>
+            <p className={`font-mono text-[clamp(80px,13vw,190px)] leading-[0.9] tracking-[-0.05em] tnum transition-colors duration-300 ${halted ? "text-veto" : "text-bone"}`}>
               −{loss}%
             </p>
             <p
