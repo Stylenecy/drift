@@ -87,6 +87,7 @@ DRIFT's core (the quant engine, the cockpit and `MacroGuard.sol`) comes from the
 | 1 Oct | PRD and visual direction; redesigned panel (live state, verdicts, receipt trail); landing story; phone layout; first deck |
 | 2 Oct | Source verified on Sourcify; contract reads straight from the browser, with its first 7 web tests; provenance and honest copy; public demo on Vercel |
 | 3 Oct | "Ask the contract"; labelled Binance data fallback; 23 contract tests, 48 engine tests and 8 web tests added; CI workflow; threat model; share card; this README; deck v2 |
+| 4 Oct | Visual system v3 across the site: landing with a live contract readout, guard panel, cockpit, blog and share card; motion in plain CSS with no animation library (framer-motion and GSAP removed), with reduced-motion and no-JS paths. Live in production on 5 Oct (build `9f49d7c`) |
 
 Commit history: [`dex/drift`, commits under `drift/`](https://github.com/Stylenecy/seed-bnb/commits/dex/drift/drift).
 
