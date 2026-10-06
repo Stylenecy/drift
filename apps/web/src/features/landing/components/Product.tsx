@@ -51,7 +51,7 @@ export function Product() {
               </div>
               <Image
                 src="/landing/guard.webp"
-                alt="The DRIFT live guard page: the bot is running, the market mood is neutral, the 20% limit and the contract address."
+                alt="The DRIFT live guard page: the contract is not halted, the market mood is neutral, the 20% limit and the contract address."
                 width={1440}
                 height={900}
                 sizes="(min-width: 1180px) 1180px, 100vw"

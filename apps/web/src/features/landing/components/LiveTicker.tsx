@@ -16,7 +16,7 @@ export function LiveTicker() {
     const s = live.read.state;
     items = [
       { text: "Live on BNB Chain", tone: "ok" },
-      { text: s.halted ? "Bot halted · exits only" : "Bot running" , tone: s.halted ? "veto" : undefined },
+      { text: s.halted ? "Bot halted · exits only" : "Not halted", tone: s.halted ? "veto" : undefined },
       { text: `Loss limit ${limit}%`, tone: "chain" },
       { text: `${s.decision_count ?? "?"} decisions on the public record` },
       { text: "Source code verified" },

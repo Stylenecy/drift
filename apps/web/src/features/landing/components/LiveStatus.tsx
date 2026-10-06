@@ -23,7 +23,7 @@ export function LiveStatus() {
             <span>
               Block <Decode value={live.read.block} className="font-mono text-bone tnum" />
             </span>
-            <span className={state.halted ? "text-veto" : "text-bone"}>{state.halted ? "Bot halted" : "Bot running"}</span>
+            <span className={state.halted ? "text-veto" : "text-bone"}>{state.halted ? "Bot halted" : "Not halted"}</span>
             <span>
               Loss limit <span className="text-chain-soft">{limit}%</span>
             </span>
