@@ -33,7 +33,7 @@ with open(os.path.join(DRIFT, "README.md"), encoding="utf-8") as fh:
 
 CONTRACT = "0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D"
 LIVE_URL = "https://drift-macroguard.vercel.app/macroguard"
-REPO_URL = "https://github.com/Stylenecy/seed-bnb/tree/dex/drift/drift"
+REPO_URL = "https://github.com/Stylenecy/drift"
 BSCSCAN_URL = f"https://testnet.bscscan.com/address/{CONTRACT}"
 SOURCIFY_URL = f"https://repo.sourcify.dev/97/{CONTRACT}"
 

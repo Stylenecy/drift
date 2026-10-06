@@ -10,7 +10,7 @@
 
 [![BNB Chain](https://img.shields.io/badge/Chain-BSC%20Testnet%20(97)-F0B90B?logo=binance&logoColor=white)](https://testnet.bscscan.com/address/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)
 [![Sourcify](https://img.shields.io/badge/Sourcify-exact%20match-2ea44f)](https://repo.sourcify.dev/97/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)
-[![drift-ci](https://github.com/Stylenecy/seed-bnb/actions/workflows/drift-ci.yml/badge.svg?branch=dex/drift)](https://github.com/Stylenecy/seed-bnb/actions/workflows/drift-ci.yml?query=branch%3Adex%2Fdrift)
+[![drift-ci](https://github.com/Stylenecy/drift/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Stylenecy/drift/actions/workflows/ci.yml?query=branch%3Amain)
 [![Python](https://img.shields.io/badge/Engine-Python%203-3776ab?logo=python&logoColor=white)](https://www.python.org/)
 [![Next.js 16](https://img.shields.io/badge/Web-Next.js%2016-black?logo=next.js)](https://nextjs.org)
 [![Foundry](https://img.shields.io/badge/Contracts-Foundry-555)](https://book.getfoundry.sh/)
@@ -90,7 +90,7 @@ DRIFT's core (the quant engine, the cockpit and `MacroGuard.sol`) comes from the
 | 4 Oct | Visual system v3 across the site: landing with a live contract readout, guard panel, cockpit, blog and share card; motion in plain CSS with no animation library (framer-motion and GSAP removed), with reduced-motion and no-JS paths. Live in production on 5 Oct (build `9f49d7c`) |
 | 6 Oct | A calmer product landing in plain language, with motion built in code: a live brake dial, a scroll-driven halt scene, step artwork and "Try the brake", which asks the live contract (eth_call, nothing signed) |
 
-Commit history: [`dex/drift`, commits under `drift/`](https://github.com/Stylenecy/seed-bnb/commits/dex/drift/drift).
+Commit history: [`main`](https://github.com/Stylenecy/drift/commits/main). This repository was split from `Stylenecy/seed-bnb` (branch `dex/drift`) on 6 Oct 2026 with every commit kept: the first commit is the upstream seed import by its original author, every later commit is this project's own work.
 
 ## What came from upstream
 
@@ -108,7 +108,7 @@ The quant engine (`apps/trader`: strategies, backtester, optimizer, regime engin
 
 **No look-ahead, tested as a property.** For every strategy, `positions(df[:k])` equals `positions(df)[:k]` at every cut `k`, and rewriting future candles never changes a past position. A test strategy that cheats by trading on its own candle looks like a money machine without the backtester's one-bar shift and loses that edge with it (asserted on a seeded synthetic random walk in `apps/trader/tests/test_backtester.py`).
 
-**CI.** [`.github/workflows/drift-ci.yml`](../.github/workflows/drift-ci.yml) runs all three layers on every change under `drift/`: forge test and coverage, pytest, then `npm ci`, lint, node tests and `next build`.
+**CI.** [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs all three layers on every push: forge test and coverage, pytest, then `npm ci`, lint, node tests and `next build`.
 
 **Known issues found while testing (not fixed here):** `BNBUSDT` is listed twice in `MARKET_SYMBOLS` (`apps/trader/app/main.py`, `apps/trader/app/cli.py`), so the markets view shows it twice; the live runner records the post-veto target, so a vetoed Long appears on-chain as Flat. Both are pinned by tests; see [`docs/THREAT-MODEL.md`](docs/THREAT-MODEL.md).
 

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { engineAvailable } from "@/features/trade/api";
 
-const QUICK_START = "https://github.com/Stylenecy/seed-bnb/tree/dex/drift/drift#quick-start";
+const QUICK_START = "https://github.com/Stylenecy/drift#quick-start";
 
 // The host never changes while the page is open, so there is nothing to subscribe to.
 const subscribe = () => () => {};
