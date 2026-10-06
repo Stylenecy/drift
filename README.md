@@ -17,7 +17,7 @@
 
 </div>
 
-![The public MacroGuard panel: live regime, halt state, threshold and decision count read from BSC Testnet](docs/screens/after/public-guard-desktop.png)
+![The DRIFT landing: "Risk rules you can check." next to a live loss dial with the 20% limit, and a live read of BNB Chain at the bottom](docs/screens/after/landing-desktop.png)
 
 ---
 
@@ -87,10 +87,10 @@ DRIFT's core (the quant engine, the cockpit and `MacroGuard.sol`) comes from the
 | 1 Oct | PRD and visual direction; redesigned panel (live state, verdicts, receipt trail); landing story; phone layout; first deck |
 | 2 Oct | Source verified on Sourcify; contract reads straight from the browser, with its first 7 web tests; provenance and honest copy; public demo on Vercel |
 | 3 Oct | "Ask the contract"; labelled Binance data fallback; 23 contract tests, 48 engine tests and 8 web tests added; CI workflow; threat model; share card; this README; deck v2 |
-| 4 Oct | Visual system v3 across the site: landing with a live contract readout, guard panel, cockpit, blog and share card; motion in plain CSS with no animation library (framer-motion and GSAP removed), with reduced-motion and no-JS paths. Live in production on 5 Oct (build `9f49d7c`) |
+| 4 Oct | Visual system v3 across the site: landing with a live contract readout, guard panel, cockpit, blog and share card; motion in plain CSS with no animation library (framer-motion and GSAP removed), with reduced-motion and no-JS paths. Live in production on 5 Oct (build `f4cccd8`) |
 | 6 Oct | A calmer product landing in plain language, with motion built in code: a live brake dial, a scroll-driven halt scene, step artwork and "Try the brake", which asks the live contract (eth_call, nothing signed) |
 
-Commit history: [`main`](https://github.com/Stylenecy/drift/commits/main). This repository was split from `Stylenecy/seed-bnb` (branch `dex/drift`) on 6 Oct 2026 with every commit kept: the first commit is the upstream seed import by its original author, every later commit is this project's own work.
+Commit history: [`main`](https://github.com/Stylenecy/drift/commits/main). This repository was split from `Stylenecy/seed-bnb` (branch `dex/drift`) on 6 Oct 2026 with every commit kept: the first commit (`753b707` here, `52671ce` upstream) is the upstream seed import by its original author, every later commit is this project's own work.
 
 ## What came from upstream
 
@@ -102,7 +102,7 @@ The quant engine (`apps/trader`: strategies, backtester, optimizer, regime engin
 
 | Layer | Command | Count | Notes |
 |---|---|---|---|
-| Contract | `cd contracts && forge test` | 30 (7 upstream + 23 added) | Unit and event tests, 5 fuzz tests, 7 invariants over random agent and stranger call sequences. `forge coverage`: 100% of lines, statements, branches and functions in `MacroGuard.sol`. The contract itself is unchanged. |
+| Contract | `cd contracts && forge test` (first fetch `forge-std` into `contracts/lib`, as in [CI](.github/workflows/ci.yml)) | 30 (7 upstream + 23 added) | Unit and event tests, 5 fuzz tests, 7 invariants over random agent and stranger call sequences. `forge coverage`: 100% of lines, statements, branches and functions in `MacroGuard.sol`. The contract itself is unchanged. |
 | Engine | `cd apps && pip install -r trader/requirements-dev.txt && python -m pytest trader/tests -c trader/pytest.ini` | 48 passed, 1 strict xfail | Offline: `.env` loading is disabled and any non-loopback connection or DNS lookup fails the test. Covers no look-ahead as a property, the backtester's one-bar shift, the train/test split, the regime classifier, ChainGuard, the API and the data fallback. The xfail pins a known upstream bug (below). |
 | Web | `cd apps/web && npm test` | 15 (7 added on 2 Oct, 8 on 3 Oct) | Contract reads and the what-if encoder against `cast` fixtures, RPC fallback, reverts, wrong chain. |
 

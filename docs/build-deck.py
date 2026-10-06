@@ -1,9 +1,13 @@
-"""DRIFT pitch deck builder (python-pptx).
+"""DRIFT pitch deck builder (python-pptx): the earlier 10-slide deck of 3 Oct 2026, kept for the record.
+
+The current deck, docs/submission/DRIFT-pitch.pdf and .pptx (11 slides, 6 Oct 2026, the one linked
+from the README and the hackathon submission), was rendered from HTML with headless Chrome. Running
+this script writes the earlier deck to DRIFT-pitch-2026-10-03.pptx and leaves the current one alone.
 
 Uses only verified facts: the real Dex deployment, its receipts (docs/deployment-dex.md),
 test counts from real runs, and the provenance sentence read from README.md.
 Business-model statements are labelled as hypotheses; no market figures are used.
-Output: docs/submission/DRIFT-pitch.pptx (a PDF with embedded fonts is exported from it).
+Output: docs/submission/DRIFT-pitch-2026-10-03.pptx.
 
 Visual rules (docs/VISUAL-DIRECTION.md): colours are the brand tokens; gold marks only what
 a judge can check on-chain (addresses, block numbers, the halt line, "exact match", the
@@ -24,7 +28,7 @@ from pptx.util import Inches, Pt
 
 HERE = os.path.dirname(os.path.abspath(__file__))  # drift/docs
 DRIFT = os.path.dirname(HERE)
-OUT = os.path.join(DRIFT, "docs", "submission", "DRIFT-pitch.pptx")
+OUT = os.path.join(DRIFT, "docs", "submission", "DRIFT-pitch-2026-10-03.pptx")
 SHOTS = os.path.join(HERE, "screens", "after")
 
 # Same wording as README.md "This fork's contribution" (read from it, so the two never drift apart).

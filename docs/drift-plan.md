@@ -3,7 +3,7 @@
 **Deterministic Risk-bounded Intelligent Financial Trading**
 Originally built for the Mantle "AI Trading & Strategy" track; now migrated to BNB Chain (see MIGRATION-BNB.md). Trading-only. CeFi execution on Bybit.
 
-> Status: planned, not started. Last updated 2026-06-12.
+> Upstream plan, kept for the record (last updated 2026-06-12, before the BNB Chain migration). What exists today is described in the [README](../README.md).
 
 ---
 

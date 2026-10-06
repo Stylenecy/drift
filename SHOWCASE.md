@@ -38,15 +38,15 @@ With both public RPCs blocked, the panel says so, makes no live claim, and still
 
 ![MacroGuard panel with the live read unavailable: amber notice, not-live badge, verified receipts still listed](docs/screens/after/public-guard-engine-offline-desktop.png)
 
-*Captures: 3 Oct 2026 from a local production build served on a non-localhost host name (the same mode as the hosted demo). Live values come from BSC Testnet at the block shown in each image.*
+*Captures: 7 Oct 2026 from the production site (build `640fa63`). Live values come from BSC Testnet at the block shown in each image; the view without a live read was made by blocking both public RPCs in the browser.*
 
 ---
 
 ## Landing (`/`)
 
-The hero says what DRIFT is in one line and routes to the live gate. The proof strip under it is static, dated evidence: the contract, the 20% halt line, the six receipts (deploy and smoke test) and the contract test count.
+The hero says what DRIFT is in one line, next to a loss dial that shows the brake at work: the loss moves, crosses the 20% line, the contract halts the bot and the real halt receipt (block 134,042,283, 30 Sep 2026) slides in. The moving values are an illustration; the limit and the receipt are real, and the strip at the bottom is a live read of BNB Chain. Further down: a scroll-driven halt scene, how it works in five steps, the live guard, the proof, "Try the brake" (it asks the live contract with an `eth_call`, nothing signed) and a short FAQ.
 
-![Landing page at 1440 px: headline, live-read badge, proof strip](docs/screens/after/landing-desktop.png)
+![Landing page at 1440 px: headline, live loss dial with the 20% limit, live read of BNB Chain](docs/screens/after/landing-desktop.png)
 
 <img src="docs/screens/after/landing-mobile.png" alt="Landing page at phone width (390 px)" width="320">
 
@@ -84,15 +84,13 @@ Historical simulation on 720 hourly BTCUSDT candles, 3 Sep 10.00 to 3 Oct 09.00 
 
 ## The web cockpit (`apps/web`, run locally)
 
-The cockpit needs the engine on the same machine. On the hosted demo its routes show one notice that links to `/macroguard` and to the README quick start, and they never call the engine.
+The cockpit needs the engine on the same machine. On the hosted demo the MacroGuard page works without it (it reads the chain from the browser); every other cockpit route shows one notice that links to `/macroguard` and to the README quick start, and never calls the engine.
 
-![Research page at 1440 px with the data-source label: historical simulation on public market data, research, not a profit claim](docs/screens/after/research-desktop.png)
+![MacroGuard panel inside the cockpit at 1440 px, read live from BSC Testnet](docs/screens/after/macroguard-desktop.png)
 
-![MacroGuard panel inside the cockpit at 1440 px](docs/screens/after/macroguard-desktop.png)
+![A cockpit route on the hosted demo: the engine runs on your own machine, with links to the live risk gate and the local quick start](docs/screens/after/markets-desktop.png)
 
-![Markets page at 1440 px with the engine stopped: an honest "Engine offline" card](docs/screens/after/markets-desktop.png)
-
-*These cockpit captures were taken with the engine stopped, so they show the empty and offline states. Live prices, candles, research results and bots in the browser have not been recorded for this showcase.*
+*Captured on the hosted demo on 7 Oct 2026. Live prices, candles, research results and bots in the browser need the local engine and have not been recorded for this showcase.*
 
 ---
 
