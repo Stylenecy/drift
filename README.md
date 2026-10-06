@@ -336,7 +336,7 @@ Full-screen alternate-screen REPL — pinned `sys` header + status bar (BTC/ETH/
 
 **Terminal** · Rich · raw ANSI (alternate screen + DECSTBM scroll region)
 
-**Web** · Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 · Framer Motion · GSAP
+**Web** · Next.js 16 (App Router) · React 19 · TypeScript · Tailwind v4 · CSS motion (no animation library)
 
 **Chain** · Solidity 0.8.24 · Foundry · BNB Smart Chain Testnet (chain 97) / Mainnet (chain 56)
 
