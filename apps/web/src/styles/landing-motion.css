@@ -1,0 +1,294 @@
+/* v4 landing motion (2026-10-06). Code-built motion only: CSS keyframes on transform,
+   opacity and stroke offsets, plus one scroll variable (--p) set by a rAF hook.
+   Loops run only while on screen ([data-play]); everything rests under
+   prefers-reduced-motion. */
+
+@property --loss {
+  syntax: "<integer>";
+  inherits: true;
+  initial-value: 1;
+}
+
+/* ------------------------------------------------------------ play gate -- */
+.mo [class*="mo-"] {
+  animation-play-state: paused;
+}
+.mo[data-play] [class*="mo-"] {
+  animation-play-state: running;
+}
+
+/* ------------------------------------------------------- hero brake dial -- */
+/* One 11 s loop: the loss wanders, spikes past the 20% line, the contract halts,
+   the real halt receipt slides in, then the bot is resumed and it starts again. */
+.mo-needle,
+.mo-needle-halt {
+  transform-box: view-box;
+  transform-origin: 500px 500px;
+  animation: mo-needle 11s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+}
+@keyframes mo-needle {
+  0% { transform: rotate(6deg); }
+  9% { transform: rotate(20deg); }
+  16% { transform: rotate(12deg); }
+  26% { transform: rotate(38deg); }
+  33% { transform: rotate(27deg); }
+  42% { transform: rotate(58deg); }
+  48% { transform: rotate(150deg); }
+  50% { transform: rotate(146deg); }
+  52%, 82% { transform: rotate(150deg); }
+  92%, 100% { transform: rotate(6deg); }
+}
+.mo-loss {
+  animation: mo-loss 11s cubic-bezier(0.45, 0, 0.2, 1) infinite;
+  counter-reset: loss var(--loss);
+}
+.mo-loss::after {
+  content: "−" counter(loss) "%";
+}
+@keyframes mo-loss {
+  0% { --loss: 1; }
+  9% { --loss: 3; }
+  16% { --loss: 2; }
+  26% { --loss: 6; }
+  33% { --loss: 4; }
+  42% { --loss: 10; }
+  48%, 82% { --loss: 25; }
+  92%, 100% { --loss: 1; }
+}
+/* halted layer: on between 48% and 84% of the loop */
+.mo-halt {
+  animation: mo-halt 11s linear infinite;
+}
+@keyframes mo-halt {
+  0%, 47% { opacity: 0; }
+  48.5%, 83% { opacity: 1; }
+  85%, 100% { opacity: 0; }
+}
+.mo-run {
+  animation: mo-run 11s linear infinite;
+}
+@keyframes mo-run {
+  0%, 47% { opacity: 1; }
+  48.5%, 83% { opacity: 0; }
+  85%, 100% { opacity: 1; }
+}
+.mo-flash {
+  animation: mo-flash 11s linear infinite;
+}
+@keyframes mo-flash {
+  0%, 47.9% { opacity: 0; }
+  48.4% { opacity: 0.55; }
+  52%, 100% { opacity: 0; }
+}
+.mo-receipt {
+  animation: mo-receipt 11s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+@keyframes mo-receipt {
+  0%, 53% { opacity: 0; transform: translateY(28px); }
+  57%, 81% { opacity: 1; transform: translateY(0); }
+  85%, 100% { opacity: 0; transform: translateY(-10px); }
+}
+.mo-resume {
+  animation: mo-resume 11s linear infinite;
+}
+@keyframes mo-resume {
+  0%, 84% { opacity: 0; }
+  86%, 93% { opacity: 1; }
+  96%, 100% { opacity: 0; }
+}
+/* tick marks shimmer along the arc once per loop */
+.mo-tick {
+  animation: mo-tick 11s linear infinite;
+  animation-delay: calc(var(--i) * 40ms);
+}
+@keyframes mo-tick {
+  0%, 2% { opacity: 0.35; }
+  4% { opacity: 1; }
+  10%, 100% { opacity: 0.35; }
+}
+
+/* --------------------------------------------------------- step artwork -- */
+.mo-draw {
+  stroke-dasharray: 600;
+  animation: mo-draw 4.5s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+@keyframes mo-draw {
+  0% { stroke-dashoffset: 600; }
+  55%, 85% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -600; }
+}
+.mo-pop {
+  animation: mo-pop 4.5s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes mo-pop {
+  0%, 40% { opacity: 0; transform: scale(0.6); }
+  50%, 88% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1); }
+}
+.mo-yes,
+.mo-no {
+  animation: mo-yesno 6s steps(1) infinite;
+}
+.mo-no {
+  animation-delay: -3s;
+}
+@keyframes mo-yesno {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.mo-spin {
+  animation: mo-spin 6s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes mo-spin {
+  0%, 20% { transform: rotate(0deg); }
+  50%, 70% { transform: rotate(180deg); }
+  100% { transform: rotate(360deg); }
+}
+.mo-print {
+  animation: mo-print 5s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+@keyframes mo-print {
+  0% { transform: translateY(-100%); }
+  45%, 85% { transform: translateY(0); }
+  100% { transform: translateY(0); opacity: 0; }
+}
+.mo-dot {
+  animation: mo-dot 1.4s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 180ms);
+}
+@keyframes mo-dot {
+  0%, 60%, 100% { opacity: 0.25; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-4px); }
+}
+.mo-type {
+  animation: mo-type 5s steps(28) infinite;
+}
+@keyframes mo-type {
+  0%, 20% { clip-path: inset(0 100% 0 0); }
+  70%, 92% { clip-path: inset(0 0 0 0); }
+  100% { clip-path: inset(0 0 0 0); opacity: 0; }
+}
+
+/* ------------------------------------------------------- floating chips -- */
+.mo-bob {
+  animation: mo-bob 6s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * -2s);
+}
+@keyframes mo-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+/* ------------------------------------------------- hash texture marquee -- */
+.mo-drift {
+  animation: mo-drift 80s linear infinite;
+}
+.mo-drift-rev {
+  animation: mo-drift 95s linear infinite reverse;
+}
+@keyframes mo-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ------------------------------------------------------- scroll scenes -- */
+/* --p (0..1) is written by useScrollProgress on the scene element. */
+.sc-product {
+  transform: perspective(1600px) rotateX(calc((1 - var(--p, 1)) * 14deg)) scale(calc(0.9 + var(--p, 1) * 0.1));
+  transform-origin: 50% 0%;
+}
+.sc-bar {
+  transform: scaleX(var(--fill, 0));
+  transform-origin: 0 50%;
+}
+.sc-stamp {
+  transition:
+    opacity 400ms ease,
+    transform 600ms var(--ease-pop);
+}
+.sc-stamp[data-on="false"] {
+  opacity: 0;
+  transform: scale(1.25) rotate(-4deg);
+}
+.sc-line {
+  transition:
+    opacity 500ms var(--ease-out),
+    transform 700ms var(--ease-out);
+}
+.sc-line[data-on="false"] {
+  opacity: 0;
+  transform: translateY(24px);
+  pointer-events: none;
+}
+
+/* --------------------------------------------------- try-it verdict pop -- */
+.ty-verdict {
+  animation: ty-pop 600ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+@keyframes ty-pop {
+  from { opacity: 0; transform: scale(0.8) rotate(-3deg); }
+  to { opacity: 1; transform: scale(1) rotate(0); }
+}
+.ty-range {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 44px;
+  background: transparent;
+  cursor: pointer;
+}
+.ty-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--ok) 0 66.66%, var(--veto) 66.66% 100%);
+  opacity: 0.85;
+}
+.ty-range::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--ok) 0 66.66%, var(--veto) 66.66% 100%);
+}
+.ty-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  margin-top: -13px;
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: var(--bone);
+  border: 4px solid var(--ink);
+  box-shadow: 0 0 0 1px rgba(225, 229, 229, 0.6);
+}
+.ty-range::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--bone);
+  border: 4px solid var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mo [class*="mo-"],
+  .ty-verdict {
+    animation: none !important;
+  }
+  .mo-halt,
+  .mo-flash,
+  .mo-receipt,
+  .mo-resume {
+    opacity: 0;
+  }
+  .mo-loss::after {
+    content: "−1%";
+  }
+  .sc-product {
+    transform: none;
+  }
+  .sc-stamp,
+  .sc-line {
+    transition: none !important;
+  }
+}

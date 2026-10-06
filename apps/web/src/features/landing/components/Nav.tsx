@@ -40,7 +40,7 @@ export default function Nav({ solid = false }: { solid?: boolean }) {
         <div className="justify-self-end">
           <Link href="/macroguard" className="pill px-5 py-2.5 text-[14px]">
             <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-chain" />
-            Live guard
+            Live check
           </Link>
         </div>
       </div>

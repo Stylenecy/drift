@@ -3,94 +3,45 @@ import Link from "next/link";
 import { Lines } from "@/features/motion/Lines";
 import { DEX_GUARD } from "@/features/guard/evidence";
 import { LiveStatus } from "./LiveStatus";
+import { HeroDial } from "./HeroDial";
 
-// Hero: one promise, one sentence, one call to action, and the live state of the
-// contract underneath. Behind it, a quiet dial of the rule itself: losses from 0 to
-// 30%, the gold tick is the 20% limit stored in the contract (a rule, not data).
+// Hero: one promise and the instrument that proves it. The dial plays how the brake
+// works; the line underneath is the contract's state right now, read live.
 
-const LIMIT = DEX_GUARD.maxDrawdownBps / 100; // 20
-const SCALE = 30;
-const R = 460;
-const C = { x: 500, y: 500 };
-const pt = (pct: number, r = R) => {
-  const a = Math.PI - (pct / SCALE) * Math.PI;
-  return { x: C.x + r * Math.cos(a), y: C.y - r * Math.sin(a) };
-};
-const arc = (from: number, to: number) => {
-  const a = pt(from);
-  const b = pt(to);
-  return `M ${a.x.toFixed(1)} ${a.y.toFixed(1)} A ${R} ${R} 0 0 1 ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
-};
-
-function Dial() {
-  const ticks = Array.from({ length: 13 }, (_, i) => i * 2.5);
-  const lim0 = pt(LIMIT, R - 70);
-  const lim1 = pt(LIMIT, R + 26);
-  const label = pt(LIMIT, R + 52);
-  return (
-    <svg viewBox="0 0 1000 540" className="h-auto w-full" aria-hidden>
-      <path d={arc(0, LIMIT)} fill="none" stroke="var(--line-strong)" strokeWidth="2" />
-      <path d={arc(LIMIT, SCALE)} fill="none" stroke="var(--veto)" strokeOpacity="0.55" strokeWidth="2" />
-      {ticks.map((t) => {
-        const a = pt(t, R - 14);
-        const b = pt(t, R);
-        return <line key={t} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="var(--line-strong)" strokeWidth="1.5" />;
-      })}
-      <line x1={lim0.x} y1={lim0.y} x2={lim1.x} y2={lim1.y} stroke="var(--chain)" strokeWidth="2.5" />
-      <g className="max-sm:hidden" fontFamily="var(--font-geist-mono), monospace">
-        <text x={label.x + 8} y={label.y} fill="var(--chain)" fontSize="15" letterSpacing="1.5">
-          LOSS LIMIT {LIMIT}%
-        </text>
-        <text x={pt(0).x} y={C.y + 30} fill="var(--mute)" fontSize="14" textAnchor="middle">
-          0%
-        </text>
-        <text x={pt(SCALE).x} y={C.y + 30} fill="var(--mute)" fontSize="14" textAnchor="middle">
-          −{SCALE}%
-        </text>
-      </g>
-    </svg>
-  );
-}
+const LIMIT = DEX_GUARD.maxDrawdownBps / 100;
 
 export default function Hero() {
   return (
-    <section className="relative isolate flex min-h-[100svh] flex-col overflow-hidden px-4 pb-8 pt-[96px] sm:px-8 sm:pb-10">
-      <div
-        aria-hidden
-        className="ld-fade pointer-events-none absolute inset-x-4 top-[11%] -z-10 opacity-45 sm:inset-x-auto sm:right-[3%] sm:top-[12%] sm:w-[60vw] sm:opacity-100 lg:w-[52vw] lg:max-w-[880px]"
-        style={{ "--d": "0.4s" } as CSSProperties}
-      >
-        <Dial />
-      </div>
-
-      <div className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col justify-end">
-        <Lines
-          as="h1"
-          mode="settle"
-          delay={0.05}
-          label="Risk rules you can check."
-          className="q-h1 max-w-[11ch] text-bone"
-          lines={["Risk rules", <>you can <span key="c" className="text-chain">check.</span></>]}
-        />
-
-        <div className="mt-10 grid grid-cols-1 items-end gap-8 lg:grid-cols-12">
-          <p className="q-lead ld-settle-up max-w-[38ch] text-mute lg:col-span-6" style={{ "--d": "0.35s" } as CSSProperties}>
-            DRIFT is a trading bot with a public referee. Its risk rules live in a contract on BNB Chain, so when losses reach{" "}
-            {LIMIT}%, the contract stops the bot on its own. Not its owner. Not a settings page.
+    <section className="relative isolate overflow-hidden px-4 pb-8 pt-[92px] sm:px-8 sm:pb-10">
+      <div className="mx-auto grid min-h-[calc(100svh-132px)] w-full max-w-[1440px] grid-cols-1 items-center gap-6 lg:grid-cols-12 lg:gap-4">
+        <div className="order-2 lg:order-1 lg:col-span-6">
+          <Lines
+            as="h1"
+            mode="settle"
+            delay={0.05}
+            label="Risk rules you can check."
+            className="q-h1 max-w-[11ch] text-bone"
+            lines={["Risk rules", "you can", <span key="c" className="text-chain">check.</span>]}
+          />
+          <p className="q-lead ld-settle-up mt-8 max-w-[38ch] text-mute" style={{ "--d": "0.35s" } as CSSProperties}>
+            DRIFT is a trading bot with a public referee. If losses reach {LIMIT}%, a contract on BNB Chain stops the bot on its
+            own. Not its owner. Not a settings page.
           </p>
-          <div className="ld-up flex flex-wrap items-center gap-x-7 gap-y-4 lg:col-span-6 lg:justify-end" style={{ "--d": "0.7s" } as CSSProperties}>
+          <div className="ld-up mt-10 flex flex-wrap items-center gap-x-7 gap-y-4" style={{ "--d": "0.7s" } as CSSProperties}>
             <Link href="/macroguard" className="pill">
-              See the live guard <span aria-hidden className="pill-arrow">→</span>
+              Check the live bot <span aria-hidden className="pill-arrow">→</span>
             </Link>
-            <Link href="/macroguard#ask" className="text-[15px] text-bone">
-              <span className="u-draw pb-0.5">Ask the contract</span>
+            <Link href="/#try" className="text-[15px] text-bone">
+              <span className="u-draw pb-0.5">Try the brake yourself</span>
             </Link>
           </div>
         </div>
-
-        <div className="ld-fade mt-14 sm:mt-16" style={{ "--d": "0.9s" } as CSSProperties}>
-          <LiveStatus />
+        <div className="ld-fade order-1 lg:order-2 lg:col-span-6" style={{ "--d": "0.3s" } as CSSProperties}>
+          <HeroDial />
         </div>
+      </div>
+      <div className="ld-fade mx-auto mt-10 w-full max-w-[1440px]" style={{ "--d": "0.9s" } as CSSProperties}>
+        <LiveStatus />
       </div>
     </section>
   );

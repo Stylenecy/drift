@@ -12,7 +12,7 @@ export const site = {
   nav: [
     { label: "How it works", href: "/#how" },
     { label: "The limit", href: "/#limit" },
-    { label: "Proof", href: "/#proof" },
+    { label: "Try it", href: "/#try" },
     { label: "FAQ", href: "/#faq" },
   ] as NavLink[],
 } as const;

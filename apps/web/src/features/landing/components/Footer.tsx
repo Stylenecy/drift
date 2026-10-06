@@ -36,7 +36,7 @@ export default function Footer() {
         <div className="flex flex-col items-start gap-10 lg:flex-row lg:items-end lg:justify-between">
           <p className="q-h2 max-w-[14ch] text-bone">Don&apos;t take the bot&apos;s word for it.</p>
           <Link href="/macroguard" className="pill shrink-0">
-            See the live guard <span aria-hidden className="pill-arrow">→</span>
+            Check the live bot <span aria-hidden className="pill-arrow">→</span>
           </Link>
         </div>
 

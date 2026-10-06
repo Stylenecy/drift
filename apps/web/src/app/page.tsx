@@ -3,8 +3,9 @@ import Hero from "@/features/landing/components/Hero";
 import { LiveTicker } from "@/features/landing/components/LiveTicker";
 import { Halt } from "@/features/landing/components/Halt";
 import { HowItWorks } from "@/features/landing/components/HowItWorks";
+import { Product } from "@/features/landing/components/Product";
 import { Proof } from "@/features/landing/components/Proof";
-import { Ask } from "@/features/landing/components/Ask";
+import { TryIt } from "@/features/landing/components/TryIt";
 import { Faq } from "@/features/landing/components/Faq";
 import Footer from "@/features/landing/components/Footer";
 
@@ -17,8 +18,9 @@ export default function Home() {
         <LiveTicker />
         <Halt />
         <HowItWorks />
+        <Product />
         <Proof />
-        <Ask />
+        <TryIt />
         <Faq />
       </main>
       <Footer />

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./landing-motion.css";
 
 /* DRIFT v3 — tokens. House neutrals from DEX-MOTION-LANGUAGE.md §3, DRIFT skin from
    docs/VISUAL-DIRECTION.md. Colour carries meaning: gold = on-chain / checkable,
