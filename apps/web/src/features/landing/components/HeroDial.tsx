@@ -90,10 +90,10 @@ export function HeroDial() {
 
       {/* readout */}
       <div className="pointer-events-none absolute inset-x-0 top-[47%] flex flex-col items-center text-center">
-        <span className="mo-run text-[13px] font-medium uppercase tracking-[0.16em] text-ok">● Bot running</span>
-        <span className="mo-halt -mt-[1.2em] text-[13px] font-medium uppercase tracking-[0.16em] text-veto">■ Halted · exits only</span>
+        <span className="mo-run text-[13px] font-medium uppercase tracking-[0.16em] text-bone">Example · running</span>
+        <span className="mo-halt -mt-[1.2em] text-[13px] font-medium uppercase tracking-[0.16em] text-veto">Example · halted</span>
         <span className="mo-loss mt-2 font-mono text-[clamp(40px,6vw,88px)] leading-none tracking-[-0.04em] text-bone tnum" />
-        <span className="mt-2 text-[13px] uppercase tracking-[0.14em] text-mute">Loss in this example</span>
+        <span className="mt-2 text-[13px] uppercase tracking-[0.14em] text-mute">Bot&apos;s loss</span>
       </div>
 
       </div>
