@@ -37,15 +37,17 @@ function Dial() {
         return <line key={t} x1={a.x} y1={a.y} x2={b.x} y2={b.y} stroke="var(--line-strong)" strokeWidth="1.5" />;
       })}
       <line x1={lim0.x} y1={lim0.y} x2={lim1.x} y2={lim1.y} stroke="var(--chain)" strokeWidth="2.5" />
-      <text x={label.x + 8} y={label.y} fill="var(--chain)" fontSize="15" letterSpacing="1.5" fontFamily="var(--font-geist-mono), monospace">
-        LOSS LIMIT {LIMIT}%
-      </text>
-      <text x={pt(0).x} y={C.y + 30} fill="var(--mute)" fontSize="14" textAnchor="middle" fontFamily="var(--font-geist-mono), monospace">
-        0%
-      </text>
-      <text x={pt(SCALE).x} y={C.y + 30} fill="var(--mute)" fontSize="14" textAnchor="middle" fontFamily="var(--font-geist-mono), monospace">
-        −{SCALE}%
-      </text>
+      <g className="max-sm:hidden" fontFamily="var(--font-geist-mono), monospace">
+        <text x={label.x + 8} y={label.y} fill="var(--chain)" fontSize="15" letterSpacing="1.5">
+          LOSS LIMIT {LIMIT}%
+        </text>
+        <text x={pt(0).x} y={C.y + 30} fill="var(--mute)" fontSize="14" textAnchor="middle">
+          0%
+        </text>
+        <text x={pt(SCALE).x} y={C.y + 30} fill="var(--mute)" fontSize="14" textAnchor="middle">
+          −{SCALE}%
+        </text>
+      </g>
     </svg>
   );
 }
@@ -55,7 +57,7 @@ export default function Hero() {
     <section className="relative isolate flex min-h-[100svh] flex-col overflow-hidden px-4 pb-8 pt-[96px] sm:px-8 sm:pb-10">
       <div
         aria-hidden
-        className="ld-fade pointer-events-none absolute -right-[18%] top-[14%] -z-10 w-[120vw] opacity-60 sm:-right-[6%] sm:top-[10%] sm:w-[72vw] sm:opacity-100 lg:w-[62vw]"
+        className="ld-fade pointer-events-none absolute inset-x-4 top-[11%] -z-10 opacity-45 sm:inset-x-auto sm:right-[3%] sm:top-[12%] sm:w-[60vw] sm:opacity-100 lg:w-[52vw] lg:max-w-[880px]"
         style={{ "--d": "0.4s" } as CSSProperties}
       >
         <Dial />

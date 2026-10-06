@@ -112,7 +112,7 @@ export function AskContract({ live, thresholdBps }: { live: GuardState | null; t
     <Panel
       id="ask"
       className="p-5 pt-6 sm:p-7"
-      label={<Eyebrow>(ask the contract · simulation)</Eyebrow>}
+      label={<Eyebrow>Ask the contract · a simulation</Eyebrow>}
       aside={
         <span className="meta text-mute">
           <span className="text-bone">eth_call</span> · nothing signed, nothing written

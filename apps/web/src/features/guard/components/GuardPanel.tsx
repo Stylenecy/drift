@@ -190,7 +190,7 @@ export function GuardPanel({ variant = "cockpit" }: { variant?: "public" | "cock
           reveal="load"
           delay={0.5}
           className="flex flex-col p-5 pt-6 sm:p-7 lg:col-span-7"
-          label={<Eyebrow>(live risk state)</Eyebrow>}
+          label={<Eyebrow>Right now</Eyebrow>}
           aside={status === "loading" ? <Skeleton className="h-7 w-48" /> : live ? <HaltChip halted={live.halted} /> : null}
         >
           <p className="mt-5 text-[20px] font-medium leading-snug tracking-[-0.01em] text-bone sm:text-[24px]" aria-live="polite">
@@ -220,7 +220,7 @@ export function GuardPanel({ variant = "cockpit" }: { variant?: "public" | "cock
           reveal="load"
           delay={0.62}
           className="p-5 pt-6 sm:p-7 lg:col-span-5"
-          label={<Eyebrow chain>(on-chain proof)</Eyebrow>}
+          label={<Eyebrow chain>The contract</Eyebrow>}
           aside={
             live ? (
               <span className="meta inline-flex items-center gap-1.5 text-ok">
@@ -289,7 +289,7 @@ export function GuardPanel({ variant = "cockpit" }: { variant?: "public" | "cock
       {/* ---------------------------------------------------- signal verdicts */}
       <Panel
         className="p-5 pt-6 sm:p-7"
-        label={<Eyebrow>(why a signal is allowed or blocked)</Eyebrow>}
+        label={<Eyebrow>Why each trade is allowed or blocked</Eyebrow>}
         aside={
           <span className="meta text-mute">
             contract call <span className="text-bone">allowed(signal)</span>
@@ -322,7 +322,7 @@ export function GuardPanel({ variant = "cockpit" }: { variant?: "public" | "cock
         chain
         id="trail"
         className="p-5 pt-6 sm:p-7"
-        label={<Eyebrow chain>(decision trail · verified receipts)</Eyebrow>}
+        label={<Eyebrow chain>Public receipts</Eyebrow>}
         aside={<span className="meta text-mute">smoke test {DEX_GUARD.testedOn} · every row opens BscScan</span>}
       >
         <div className="mt-4">
@@ -332,7 +332,7 @@ export function GuardPanel({ variant = "cockpit" }: { variant?: "public" | "cock
 
       {/* ------------------------------------------- gauge + honest limits */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <Panel className="p-5 pt-6 sm:p-7" label={<Eyebrow>(the halt line)</Eyebrow>}>
+        <Panel className="p-5 pt-6 sm:p-7" label={<Eyebrow>The 20% limit</Eyebrow>}>
           <p className="mt-4 text-[14px] leading-relaxed text-mute">
             Each decision carries its drawdown. At or past {(thresholdBps / 100).toFixed(0)}%, the contract flips{" "}
             <span className="font-mono text-bone">halted = true</span> by itself. The runner checks this gate before every
@@ -341,7 +341,7 @@ export function GuardPanel({ variant = "cockpit" }: { variant?: "public" | "cock
           <HaltGauge maxDrawdownBps={thresholdBps} />
         </Panel>
 
-        <Panel className="p-5 pt-6 sm:p-7" label={<Eyebrow>(what this does not prove)</Eyebrow>}>
+        <Panel className="p-5 pt-6 sm:p-7" label={<Eyebrow>What this does not prove</Eyebrow>}>
           <ul className="mt-4 space-y-3 text-[14px] leading-relaxed text-mute">
             {LIMITS.map((l) => (
               <li key={l} className="flex gap-3">
