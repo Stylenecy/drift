@@ -11,3 +11,27 @@ npm-debug.log*
 !.env.example
 # Foundry simulation output (dry-run only; real broadcast receipts stay tracked as evidence)
 contracts/broadcast/**/dry-run/
+
+# secrets (never commit)
+*.key
+*.p12
+*.keystore
+keystore/
+.secrets/
+*mnemonic*
+*secret*.json
+
+# local tooling and output
+.vercel/
+contracts/lib/
+contracts/cache/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.log
+*.mp4
+
+# internal working notes
+.dex/
