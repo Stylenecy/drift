@@ -36,7 +36,9 @@ function Gauge() {
               style={{ "--to": pos(s.drawdownPct ?? 0).toFixed(3), "--from": 0, "--d": `${0.3 + i * 0.15}s` } as CSSProperties}
             >
               <span className={`absolute top-1/2 block h-3.5 w-3.5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-ink ${breach ? "bg-veto" : "bg-ok"}`} />
-              <span className={`absolute top-[calc(50%+18px)] -translate-x-1/2 whitespace-nowrap text-[14px] ${breach ? "text-veto" : "text-bone"}`}>
+              <span
+                className={`absolute top-[calc(50%+18px)] whitespace-nowrap text-[14px] ${pos(s.drawdownPct ?? 0) < 12 ? "-translate-x-2" : "-translate-x-1/2"} ${breach ? "text-veto" : "text-bone"}`}
+              >
                 {breach ? `−${s.drawdownPct}% · stopped` : `−${s.drawdownPct}% · kept running`}
               </span>
             </div>
