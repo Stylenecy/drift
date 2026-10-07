@@ -599,14 +599,31 @@ def cmd_bot(strat: str, sym: str, tf: str = "1h", qty: float = 0.001, max_dd: fl
         with Live(render(), console=console, refresh_per_second=4) as live:
             while True:
                 df = _data.klines(sym, tf, 200, fallback=False)
-                target = int(strat_obj.positions(df).iloc[-1])
+                intent = int(strat_obj.positions(df).iloc[-1])
                 last_price = float(df["close"].iloc[-1])
-                signal_name = {1: "long", -1: "short", 0: "flat"}[target]
-                # On-chain macro guard: a risk-off regime or active halt vetoes
-                # the signal — clamp to flat (de-risk), enforced on-chain.
-                vetoed = not chain_guard.allowed(target)
-                if vetoed:
-                    target = 0
+                signal_name = {1: "long", -1: "short", 0: "flat"}[intent]
+                # Measure the loss before deciding, so no order goes out on a stale number.
+                try:
+                    equity = _trade.account_equity()
+                    peak = max(peak, equity)
+                except Exception:
+                    pass
+                dd = equity / peak - 1 if peak else 0
+                if dd <= -max_dd:
+                    # Past the line: the exit goes on the record first; `finally` flattens.
+                    verdict = chain_guard.decide(sym, 0, last_price, dd)
+                    if verdict.tx:
+                        chain_tx = verdict.tx
+                    error = f"drawdown stop hit ({dd:.2%})"
+                    tg.send(f"🛑 *Drawdown stop* {sym}\ndd {dd:.2%} · flattening.")
+                    live.update(render())
+                    break
+                # Ask and record in one step, before any order: the contract answers in the
+                # public receipt, and a blocked intent stays on the record (allowed = false).
+                verdict = chain_guard.decide(sym, intent, last_price, dd)
+                if verdict.tx:
+                    chain_tx = verdict.tx
+                target = intent if verdict.allowed else 0
                 if target != position:
                     side = "Buy" if target > position else "Sell"
                     q = round(qty * abs(target - position), 8)
@@ -618,21 +635,7 @@ def cmd_bot(strat: str, sym: str, tf: str = "1h", qty: float = 0.001, max_dd: fl
                         tg.send(f"🟢 *Fill* {sym}\n{side} {q} @ {last_price:,.2f} → {signal_name}")
                     except Exception as e:
                         error = str(e)
-                try:
-                    equity = _trade.account_equity()
-                    peak = max(peak, equity)
-                except Exception:
-                    pass
-                # Record this decision on-chain (best-effort) — the benchmark trail.
-                tx = chain_guard.record(sym, target, last_price, equity / peak - 1 if peak else 0)
-                if tx:
-                    chain_tx = tx
                 live.update(render())
-                if peak and equity / peak - 1 <= -max_dd:
-                    error = f"drawdown stop hit ({equity/peak-1:.2%})"
-                    tg.send(f"🛑 *Drawdown stop* {sym}\ndd {equity/peak-1:.2%} · flattening.")
-                    live.update(render())
-                    break
                 time.sleep(poll)
     except KeyboardInterrupt:
         pass

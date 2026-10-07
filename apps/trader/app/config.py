@@ -64,10 +64,15 @@ ALLOWED_ORIGINS: list[str] = [
 ]
 
 # Optional MacroGuard on BNB Chain (BSC Testnet, chain 97, by default). When a deployed address and
-# the agent key are present the engine logs every bot decision on-chain and checks
-# the on-chain macro/halt rules before trading. Inert if unset — bots run normally.
+# the agent key are present the engine records every bot decision on-chain *before* it trades
+# and acts on the contract's answer (macro regime + drawdown halt). Inert if unset — bots run
+# normally under their local stop.
 MACROGUARD_ADDRESS: str | None = os.getenv("MACROGUARD_ADDRESS")
 ETH_PRIVATE_KEY: str | None = os.getenv("ETH_PRIVATE_KEY")
+# What the bot does when the guard is configured but no on-chain answer can be confirmed
+# (RPC down, transaction failed or reverted): "closed" (default) = only Flat passes, no new
+# risk; "open" = trade on and rely on the local drawdown stop (the behaviour before 7 Oct 2026).
+MACROGUARD_FAIL_MODE: str = os.getenv("MACROGUARD_FAIL_MODE", "closed").strip().lower()
 BSC_RPC_URL: str = os.getenv("BSC_RPC_URL", "https://data-seed-prebsc-1-s1.bnbchain.org:8545")
 BSC_CHAIN_ID: int = int(os.getenv("BSC_CHAIN_ID", "97"))  # 56 = BSC mainnet
 BSC_EXPLORER: str = os.getenv("BSC_EXPLORER", "https://testnet.bscscan.com")  # https://bscscan.com on mainnet

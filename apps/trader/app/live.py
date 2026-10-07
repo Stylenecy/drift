@@ -139,32 +139,24 @@ class BotManager:
         df = await asyncio.to_thread(
             client.klines, bot.config.symbol, bot.config.timeframe, 200
         )
-        target = int(strat.positions(df).iloc[-1])
+        intent = int(strat.positions(df).iloc[-1])
         price = float(df["close"].iloc[-1])
         bot.last_price = price
-        bot.last_signal = {1: "long", -1: "short", 0: "flat"}[target]
+        bot.last_signal = {1: "long", -1: "short", 0: "flat"}[intent]
 
-        # On-chain macro guard: a risk-off regime or an active halt can veto a
-        # signal. A vetoed target is clamped to flat (de-risk), enforced on-chain.
-        bot.chain_vetoed = not await asyncio.to_thread(chain_guard.allowed, target)
-        if bot.chain_vetoed:
-            target = 0
-
-        if target != bot.position:
-            await self._rebalance(bot, client, target, price)
-
+        # Measure the loss before deciding anything, so no order goes out on a stale number.
         bot.equity = await asyncio.to_thread(client.account_equity)
         bot.peak_equity = max(bot.peak_equity, bot.equity)
         bot.drawdown = bot.equity / bot.peak_equity - 1.0 if bot.peak_equity else 0.0
 
-        # Record this decision on-chain (best-effort) — the permanent benchmark trail.
-        tx = await asyncio.to_thread(
-            chain_guard.record, bot.config.symbol, target, price, bot.drawdown
-        )
-        if tx:
-            bot.last_chain_tx = tx
-
         if bot.drawdown <= -bot.config.max_drawdown:
+            # Past the local line: put the exit on the record first (the contract halts
+            # itself when the same loss crosses its line), then flatten and stop.
+            verdict = await asyncio.to_thread(
+                chain_guard.decide, bot.config.symbol, 0, price, bot.drawdown
+            )
+            if verdict.tx:
+                bot.last_chain_tx = verdict.tx
             bot.error = f"drawdown stop hit ({bot.drawdown:.2%})"
             await self._flatten(bot, client)
             bot.running = False
@@ -173,6 +165,22 @@ class BotManager:
                 f"🛑 *Drawdown stop* `{bot.id}` {bot.config.symbol}\n"
                 f"dd {bot.drawdown:.2%} · flattened & halted.",
             )
+            return
+
+        # Ask and record in one step, before any order: the contract applies its drawdown
+        # halt and macro regime to the bot's own intent and answers in the public receipt.
+        # A blocked intent stays on the record (allowed = false) and the bot holds Flat.
+        # No confirmed answer: only Flat passes (MACROGUARD_FAIL_MODE=open to trade on).
+        verdict = await asyncio.to_thread(
+            chain_guard.decide, bot.config.symbol, intent, price, bot.drawdown
+        )
+        if verdict.tx:
+            bot.last_chain_tx = verdict.tx
+        bot.chain_vetoed = not verdict.allowed
+        target = intent if verdict.allowed else 0
+
+        if target != bot.position:
+            await self._rebalance(bot, client, target, price)
 
     async def _rebalance(self, bot: Bot, client: BybitClient, target: int, price: float) -> None:
         delta = target - bot.position  # in units of config.qty

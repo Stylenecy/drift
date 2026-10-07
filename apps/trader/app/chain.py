@@ -1,19 +1,26 @@
-"""Optional on-chain guard: mirrors each bot decision to MacroGuard on BNB Chain.
+"""Optional on-chain guard: every bot decision goes to MacroGuard on BNB Chain before the bot acts.
 
-When MACROGUARD_ADDRESS, ETH_PRIVATE_KEY and an RPC are configured the engine
-records every decision to the contract (a permanent, verifiable benchmark trail)
-and checks the on-chain macro/halt rules before it trades. If anything is unset
-or the chain is unreachable the guard stays inert and fails open, so a bot never
-stalls on chain trouble — the local drawdown stop remains the hard safety.
+When MACROGUARD_ADDRESS, ETH_PRIVATE_KEY and an RPC are configured the engine records
+each decision to the contract first (a permanent, verifiable trail) and acts on the
+answer in that same receipt: the contract applies its drawdown halt and macro regime,
+and its `Decision` event says whether the signal is allowed. The recorded signal is
+the bot's own intent, so a blocked trade shows up on-chain as `allowed = false`.
+
+If the guard is configured but no answer can be confirmed on-chain (RPC down, the
+transaction failed or reverted) it fails closed: only Flat passes. Set
+MACROGUARD_FAIL_MODE=open to trade on under the local drawdown stop instead. If the
+guard is not configured at all it stays inert and the local stop is the only safety.
 """
 from __future__ import annotations
 
 import threading
+from dataclasses import dataclass
 from typing import Optional
 
 from .config import (
     ETH_PRIVATE_KEY,
     MACROGUARD_ADDRESS,
+    MACROGUARD_FAIL_MODE,
     BSC_CHAIN_ID,
     BSC_EXPLORER,
     BSC_RPC_URL,
@@ -74,7 +81,42 @@ _ABI = [
         "inputs": [{"name": "_regime", "type": "uint8"}],
         "outputs": [],
     },
+    # Emitted by recordDecision; `allowed` is the contract's answer after it applied the halt rule.
+    {
+        "type": "event",
+        "name": "Decision",
+        "anonymous": False,
+        "inputs": [
+            {"name": "seq", "type": "uint64", "indexed": True},
+            {"name": "symbol", "type": "string", "indexed": False},
+            {"name": "signal", "type": "uint8", "indexed": False},
+            {"name": "allowed", "type": "bool", "indexed": False},
+            {"name": "price", "type": "uint256", "indexed": False},
+            {"name": "drawdownBps", "type": "int256", "indexed": False},
+            {"name": "regime", "type": "uint8", "indexed": False},
+            {"name": "timestamp", "type": "uint64", "indexed": False},
+        ],
+    },
 ]
+
+
+@dataclass(frozen=True)
+class Verdict:
+    """What the bot may do, and the public receipt behind the answer."""
+
+    allowed: bool
+    tx: Optional[str] = None  # 0x hash of the recordDecision receipt, when one was written
+    confirmed: bool = False  # True when the answer came from a confirmed on-chain receipt
+
+
+def _hex(h) -> str:
+    hx = h.hex() if hasattr(h, "hex") else str(h)
+    return hx if hx.startswith("0x") else f"0x{hx}"
+
+
+def _when_unconfirmed(target: int) -> bool:
+    """No confirmed on-chain answer: fail closed (only Flat) unless MACROGUARD_FAIL_MODE=open."""
+    return True if MACROGUARD_FAIL_MODE == "open" else target == 0
 
 
 class ChainGuard:
@@ -153,16 +195,20 @@ class ChainGuard:
         return result
 
     def allowed(self, target: int) -> bool:
-        """On-chain veto check (free). Fails open so chain trouble never blocks."""
+        """On-chain veto check (free view call). Without an answer it follows MACROGUARD_FAIL_MODE."""
         if not self.enabled:
             return True
         try:
             return bool(self._contract.functions.allowed(_signal_enum(target)).call())
         except Exception:
-            return True
+            return _when_unconfirmed(target)
 
-    def _send(self, fn) -> Optional[str]:
-        """Build, sign, send and confirm a contract call. Returns the 0x tx hash."""
+    def _transact(self, fn):
+        """Build, sign, send and confirm a contract call.
+
+        Returns (0x tx hash, receipt) only for a mined transaction with status 1;
+        (None, None) if it could not be sent, was not confirmed in time, or reverted.
+        """
         with self._lock:  # one agent key → serialise nonces across bots
             try:
                 tx = fn.build_transaction(
@@ -176,12 +222,49 @@ class ChainGuard:
                 )
                 signed = self._account.sign_transaction(tx)
                 h = self._w3.eth.send_raw_transaction(signed.raw_transaction)
-                self._w3.eth.wait_for_transaction_receipt(h, timeout=30)
-                hx = h.hex()
-                return hx if hx.startswith("0x") else f"0x{hx}"
+                receipt = self._w3.eth.wait_for_transaction_receipt(h, timeout=30)
             except Exception as e:
                 print(f"[drift] tx failed: {e}")
-                return None
+                return None, None
+        if receipt["status"] != 1:
+            print(f"[drift] tx reverted: {_hex(h)}")
+            return None, None
+        return _hex(h), receipt
+
+    def _send(self, fn) -> Optional[str]:
+        """Send a contract call; the 0x tx hash of a successful receipt, else None."""
+        return self._transact(fn)[0]
+
+    def _decision_allowed(self, receipt) -> Optional[bool]:
+        """The `allowed` field of the Decision event in a recordDecision receipt."""
+        try:
+            from web3.logs import DISCARD
+
+            events = self._contract.events.Decision().process_receipt(receipt, errors=DISCARD)
+            return bool(events[-1]["args"]["allowed"]) if events else None
+        except Exception as e:
+            print(f"[drift] could not read the Decision event: {e}")
+            return None
+
+    def decide(self, symbol: str, target: int, price: float, drawdown: float) -> Verdict:
+        """Record the bot's intended signal on-chain, then return the contract's answer.
+
+        One transaction both writes the public receipt and applies the contract's rules
+        (a drawdown at or past the line halts it first), so the bot acts on exactly the
+        answer anyone can open on BscScan. Not configured: allowed, no receipt.
+        """
+        if not self.enabled:
+            return Verdict(allowed=True)
+        tx, receipt = self._transact(
+            self._contract.functions.recordDecision(
+                symbol, _signal_enum(target), int(round(price * 1e8)), int(round(drawdown * 10_000))
+            )
+        )
+        if receipt is not None:
+            ok = self._decision_allowed(receipt)
+            if ok is not None:
+                return Verdict(allowed=ok, tx=tx, confirmed=True)
+        return Verdict(allowed=_when_unconfirmed(target), tx=tx)
 
     def record(self, symbol: str, target: int, price: float, drawdown: float) -> Optional[str]:
         """Log one decision on-chain. Returns the tx hash, or None if disabled/failed."""
