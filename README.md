@@ -136,7 +136,7 @@ It ships as three things on one engine:
 ### MacroGuard — on-chain risk gate (BSC Testnet)
 - `MacroGuard.sol` targets BNB Smart Chain Testnet (chain 97); mainnet (chain 56) is a config switch. Dex's deployment: [`0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D`](https://testnet.bscscan.com/address/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D).
 - `allowed(signal)` is the veto gate: a drawdown at or past the line trips the halt until the agent calls `resume()`; risk off blocks new Longs.
-- When configured, the bot attempts `recordDecision(symbol, signal, price, drawdown)` on each tick. Successful transactions create a public decision record; failed or skipped writes do not. The recorded signal is the target after the veto.
+- When configured, the bot sends `recordDecision(symbol, signal, price, drawdown)` on each tick *before* any order and acts on the `allowed` field of that receipt's `Decision` event. Since 7 Oct 2026 the recorded signal is the bot's own intent, so a blocked one shows `allowed = false`. A failed write creates no record and, fail-closed, no new trade. Without `MACROGUARD_ADDRESS` there is no on-chain gate and the local stop is the only safety.
 - A **regime engine** (`regime.py`) classifies BTC 1h candles into risk-on / neutral / risk-off using realised-vol z-score + EWMA trend, and pushes `setRegime` on-chain when the label changes and a key is configured. A regime classified from fallback data is shown, labelled, and never written on-chain.
 
 ### The public panel (`/macroguard`)
@@ -169,7 +169,7 @@ It ships as three things on one engine:
 ### Live bot runner (Bybit testnet)
 - Real market orders via Bybit V5 API; nothing simulated. Live trading never uses fallback data.
 - Per-bot drawdown stop flattens the position and halts on breach.
-- Every tick: signal → MacroGuard veto check → order (if not vetoed) → `recordDecision` on-chain.
+- Every tick: loss measured → `recordDecision` with the intent → order only if the receipt allows it; no confirmed receipt → exits only (fail-closed).
 - Fills, equity, and chain tx streamed live over WebSocket.
 
 ### Telegram alerts + two-way control
@@ -194,7 +194,7 @@ graph TD
   E --> SR["StrategyRegistry<br/>MACD · RSI · Bollinger · Dual Thrust"]
   E --> BT["Backtester<br/>point-in-time · no look-ahead"]
   E --> OPT["Optimizer<br/>param sweep · train/test split"]
-  E --> LR["LiveRunner<br/>signal → MacroGuard → order → drawdown stop"]
+  E --> LR["LiveRunner<br/>loss check → MacroGuard receipt → order"]
   E --> REG["RegimeEngine<br/>vol z-score + EWMA trend"]
   E --> LLM["LLM Analyst<br/>OpenRouter / NVIDIA NIM"]
   E --> TG["Telegram<br/>alerts + control bot"]

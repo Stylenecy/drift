@@ -15,7 +15,7 @@ const halt = SMOKE_TEST.find((s) => s.action.startsWith("Breach"))!;
 const LINES = [
   { title: "Every decision is recorded.", body: "Each time the bot decides, its loss at that moment goes on the public record." },
   { title: `At ${LIMIT}%, the contract steps in.`, body: "No owner to ask, no settings page, no delay. The rule is in the contract." },
-  { title: "The bot stops. Only exits are allowed.", body: "Seen in public on BNB Chain, 30 Sep 2026. Restarting takes the owner's key, also in public." },
+  { title: "The bot stops. Only exits are allowed.", body: "The halt was tested in public on BNB Chain on 30 Sep 2026. Restarting takes the owner's key, also in public." },
 ];
 
 export function Halt() {

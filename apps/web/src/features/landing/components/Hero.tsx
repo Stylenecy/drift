@@ -24,8 +24,8 @@ export default function Hero() {
             lines={["Risk rules", "you can", <span key="c" className="text-chain">check.</span>]}
           />
           <p className="q-lead ld-settle-up mt-8 max-w-[38ch] text-mute" style={{ "--d": "0.35s" } as CSSProperties}>
-            DRIFT is a trading bot with a public referee. If losses reach {LIMIT}%, a contract on BNB Chain halts the bot by
-            itself. Restarting it takes the owner&apos;s key, in public.
+            DRIFT is a trading bot with a public referee. If a recorded loss reaches {LIMIT}%, a contract on BNB Chain halts
+            the bot by itself. Restarting it takes the owner&apos;s key, in public.
           </p>
           <div className="ld-up mt-10 flex flex-wrap items-center gap-x-7 gap-y-4" style={{ "--d": "0.7s" } as CSSProperties}>
             <Link href="/macroguard" className="pill">
