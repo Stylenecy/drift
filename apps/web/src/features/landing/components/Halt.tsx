@@ -79,7 +79,7 @@ export function Halt() {
             <span>−{SCALE}%</span>
           </div>
           <div className={`mt-8 flex flex-wrap items-center justify-between gap-4 transition-opacity duration-500 ${halted ? "opacity-100" : "opacity-0"}`}>
-            <span className="text-[15px] text-mute">The real halt: block {halt.block.toLocaleString("en-US")}, 30 Sep 2026.</span>
+            <span className="text-[15px] text-mute">The on-chain test halt: block {halt.block.toLocaleString("en-US")}, 30 Sep 2026.</span>
             <a href={txUrl(halt.tx)} target="_blank" rel="noopener noreferrer" className="text-[15px] text-chain-soft" tabIndex={halted ? 0 : -1}>
               <span className="u-draw pb-0.5">Open the receipt ↗</span>
             </a>

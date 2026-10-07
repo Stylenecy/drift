@@ -287,7 +287,7 @@ ETH_PRIVATE_KEY=<your deployer key>
 BSC_RPC_URL=https://data-seed-prebsc-1-s1.bnbchain.org:8545   # default (BSC Testnet, chain 97)
 ```
 
-When set, every bot tick calls `recordDecision` on BSC Testnet and the regime engine pushes `setRegime` when the regime changes (checked every 15 minutes).
+When set, each bot tick with a fresh equity reading calls `recordDecision` on BSC Testnet before any order (an exit at the local stop goes first and is recorded right after), and the regime engine pushes `setRegime` when the regime changes (checked every 15 minutes).
 
 ---
 
