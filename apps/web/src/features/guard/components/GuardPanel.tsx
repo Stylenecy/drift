@@ -57,7 +57,7 @@ function headline(state: GuardState | null, status: Status): string {
 
 const LIMITS = [
   "The contract does not execute Bybit orders. Execution stays off-chain.",
-  "If the RPC is down, the runner fails open to its local drawdown stop.",
+  "The drawdown is reported by the agent, not measured by the contract.",
   "The agent can call resume() — a halt is a recorded pause, not a lock.",
   "No live bot tick or profit is claimed. Backtests are research only.",
 ];
@@ -168,7 +168,7 @@ export function GuardPanel({ variant = "cockpit" }: { variant?: "public" | "cock
           </span>
           <p className="min-w-0 leading-relaxed [overflow-wrap:anywhere]">
             <strong className="font-semibold">Live read unavailable.</strong> The live read failed ({error ?? "no response"}), so no
-            live risk claim is shown. In this state the trading runner fails open to its local stop. The contract is still
+            live risk claim is shown. A trading runner that cannot reach BNB Chain takes no new risk: only exits pass. The contract is still
             public:{" "}
             <a className="text-chain-soft underline underline-offset-2" href={addressUrl(DEX_GUARD.address)} target="_blank" rel="noopener noreferrer">
               check it on BscScan ↗
@@ -335,8 +335,8 @@ export function GuardPanel({ variant = "cockpit" }: { variant?: "public" | "cock
         <Panel className="p-5 pt-6 sm:p-7" label={<Eyebrow>The 20% limit</Eyebrow>}>
           <p className="mt-4 text-[14px] leading-relaxed text-mute">
             Each decision carries its drawdown. At or past {(thresholdBps / 100).toFixed(0)}%, the contract flips{" "}
-            <span className="font-mono text-bone">halted = true</span> by itself. The runner checks this gate before every
-            order. If the RPC is unreachable it falls back to its local stop (fail-open).
+            <span className="font-mono text-bone">halted = true</span> by itself. The runner records each decision here before it
+            orders and acts on the answer; with no confirmed answer it takes no new risk (fail-closed).
           </p>
           <HaltGauge maxDrawdownBps={thresholdBps} />
         </Panel>

@@ -8,11 +8,11 @@ const QA = [
   },
   {
     q: "What exactly does the contract do?",
-    a: "It stores two public rules: the current market mood and a 20% loss limit. Before a trade the bot asks it yes or no, and after a trade the bot records the decision. If a recorded loss reaches 20%, the contract halts the bot and only exits are allowed.",
+    a: "It stores two public rules: the current market mood and a 20% loss limit. Before every trade the bot writes its decision and its current loss to the contract, and acts on the yes or no in that same public receipt. If a recorded loss reaches 20%, the contract halts the bot and only exits are allowed.",
   },
   {
     q: "What happens if the blockchain can't be reached?",
-    a: "The bot can't ask the contract, so it falls back to its own built-in 20% stop and keeps going. That is a weaker guarantee, which is why a fail-closed mode (no answer, no trade) is next on the roadmap.",
+    a: "The bot takes no new risk. Without a confirmed answer from the contract, only exits pass (fail-closed), and its own built-in 20% stop keeps running underneath.",
   },
   {
     q: "Can the bot's owner bend the rules?",

@@ -11,8 +11,8 @@ import { StepArt } from "./StepArt";
 const STEPS = [
   { title: "The bot suggests a trade.", body: "DRIFT's engine reads the market and proposes: buy, sell, or stay out.", chain: false },
   { title: "The contract says yes or no.", body: "A public contract on BNB Chain checks the market mood and the 20% loss limit. Anyone can ask it the same question.", chain: true },
-  { title: "Only allowed trades happen.", body: "If the answer is no, the bot stays out. Trading runs on an exchange testnet: no real money moves.", chain: false },
-  { title: "Every decision becomes a receipt.", body: "The decision and the loss at that moment are written to BNB Chain, where anyone can open them.", chain: true },
+  { title: "Only allowed trades happen.", body: "If the answer is no, or no answer comes back, the bot stays out. Trading runs on an exchange testnet: no real money moves.", chain: false },
+  { title: "Every decision becomes a receipt.", body: "The decision, the loss at that moment and the contract's yes or no are written to BNB Chain, where anyone can open them.", chain: true },
   { title: "An AI analyst explains. It never trades.", body: "Ask why the bot stayed out and get a plain answer. The rules decide; the AI only explains.", chain: false },
 ];
 
