@@ -38,7 +38,7 @@ With both public RPCs blocked, the panel says so, makes no live claim, and still
 
 ![MacroGuard panel with the live read unavailable: amber notice, not-live badge, verified receipts still listed](docs/screens/after/public-guard-engine-offline-desktop.png)
 
-*Captures: 7 Oct 2026 from the production site (builds `640fa63`, and `cb40293` for the landing, the whole guard page and the view without a live read). Live values come from BSC Testnet at the block shown in each image; the view without a live read was made by blocking both public RPCs in the browser.*
+*Captures: 7 Oct 2026 from the production site (builds `640fa63`; `cb40293` for the whole guard page and the view without a live read; `85ed1c2` for the landing). Live values come from BSC Testnet at the block shown in each image; the view without a live read was made by blocking both public RPCs in the browser.*
 
 ---
 
