@@ -100,3 +100,27 @@ def test_without_a_confirmed_answer_the_runner_holds_flat(monkeypatch):
     assert bot.position == 0
     assert bot.chain_vetoed is False  # nothing was vetoed on-chain; the bot says why it holds Flat
     assert bot.error == live.NO_ANSWER
+
+
+def test_a_failed_exit_at_the_stop_is_still_recorded_and_retried(monkeypatch):
+    # The exit order is rejected: the breach still goes on the record, and the stop stays
+    # latched, so the next tick only retries the exit even though the account has recovered.
+    timeline: list = []
+
+    class RejectingClient(Client):
+        def place_market_order(self, symbol, side, qty):
+            raise ConnectionError("order rejected")
+
+    monkeypatch.setattr(live, "chain_guard", Guard(timeline, allow=lambda t: True))
+    bot = live.Bot(id="t", config=BotConfig(strategy="macd"))
+    bot.running, bot.position, bot.peak_equity = True, 1, 1000.0
+    manager = live.BotManager(live.Connection())
+
+    asyncio.run(manager._tick(bot, RejectingClient(timeline, equity=750.0), AlwaysLong()))
+    assert timeline == [("decide", 0, -0.25)]
+    assert bot.running is True and bot.position == 1 and "exit failed" in (bot.error or "")
+
+    asyncio.run(manager._tick(bot, Client(timeline, equity=900.0), AlwaysLong()))  # back to -10%
+    assert timeline == [("decide", 0, -0.25), ("order", "Sell")]  # no new Buy, no second record
+    assert bot.running is False and bot.position == 0
+

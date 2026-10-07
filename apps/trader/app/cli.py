@@ -579,7 +579,7 @@ def cmd_bot(strat: str, sym: str, tf: str = "1h", qty: float = 0.001, max_dd: fl
         if chain_guard.enabled:
             chain_line = f"⛓ macroguard {chain_guard.address[:10]}…"
             if chain_tx:
-                chain_line += f" · logged {chain_tx[:10]}…"
+                chain_line += f" · tx {chain_tx[:10]}…"
             lines.append(Text(chain_line, style=ACCENT))
         if error:
             if "10005" in error or "permission" in error.lower():
@@ -635,6 +635,8 @@ def cmd_bot(strat: str, sym: str, tf: str = "1h", qty: float = 0.001, max_dd: fl
                     chain_tx = verdict.tx
                 if chain_guard.enabled and not verdict.confirmed and not verdict.allowed:
                     error = "no on-chain answer: holding Flat (fail-closed)"
+                elif error and (error.startswith("no on-chain answer") or error.startswith("equity unavailable")):
+                    error = None
                 target = intent if verdict.allowed else 0
                 if target != position:
                     side = "Buy" if target > position else "Sell"
@@ -657,8 +659,8 @@ def cmd_bot(strat: str, sym: str, tf: str = "1h", qty: float = 0.001, max_dd: fl
             try:
                 _trade.place_market_order(sym, "Sell" if position > 0 else "Buy", round(qty * abs(position), 8))
                 console.print("[dim]position flattened.[/]")
-            except Exception:
-                pass
+            except Exception as e:
+                console.print(f"[bold red]exit failed: the position may still be open on Bybit — close it there ({e})[/]")
         console.print("[dim]bot stopped.[/]")
         draw_chrome()
 

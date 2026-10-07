@@ -89,3 +89,16 @@ def test_past_the_line_the_terminal_exits_first_then_records(monkeypatch):
     timeline: list = []
     run_bot(monkeypatch, Trade(timeline, [1000.0, 750.0], size=0.001), timeline)  # holding a Long
     assert timeline == [("order", "Sell"), ("decide", 0, -0.25)]  # no new Buy past the line
+
+
+def test_past_the_line_a_failed_exit_is_still_recorded(monkeypatch):
+    timeline: list = []
+
+    class RejectingTrade(Trade):
+        def place_market_order(self, symbol, side, qty):
+            raise ConnectionError("order rejected")
+
+    run_bot(monkeypatch, RejectingTrade(timeline, [1000.0, 750.0], size=0.001), timeline)
+    assert timeline == [("decide", 0, -0.25)]  # the breach is on the record; the exit is retried on stop
+    assert "position may still be open" in cli.console.file.getvalue()
+

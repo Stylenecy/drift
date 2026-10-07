@@ -59,6 +59,7 @@ class Bot:
     fills: list[dict] = field(default_factory=list)
     last_chain_tx: Optional[str] = None
     chain_vetoed: bool = False
+    stop_hit: bool = False  # the local drawdown stop has fired: from here on the bot only exits
     task: Optional[asyncio.Task] = None
 
     def status(self) -> BotStatus:
@@ -150,16 +151,28 @@ class BotManager:
         bot.peak_equity = max(bot.peak_equity, bot.equity)
         bot.drawdown = bot.equity / bot.peak_equity - 1.0 if bot.peak_equity else 0.0
 
-        if bot.drawdown <= -bot.config.max_drawdown:
+        if bot.stop_hit or bot.drawdown <= -bot.config.max_drawdown:
             # Past the local line: exit at once (an exit never waits for the chain), then put
-            # the breach on the record, where the contract halts itself at its own line.
-            await self._flatten(bot, client)
-            verdict = await asyncio.to_thread(
-                chain_guard.decide, bot.config.symbol, 0, price, bot.drawdown
-            )
-            if verdict.tx:
-                bot.last_chain_tx = verdict.tx
-            bot.error = f"drawdown stop hit ({bot.drawdown:.2%})"
+            # the breach on the record, where the contract halts itself at its own line. The
+            # stop is latched: if the exit fails, the breach is still recorded and every later
+            # tick only retries the exit, even if the account recovers above the line.
+            first = not bot.stop_hit
+            bot.stop_hit = True
+            exit_error: Optional[Exception] = None
+            try:
+                await self._flatten(bot, client)
+            except Exception as e:
+                exit_error = e
+            if first:
+                verdict = await asyncio.to_thread(
+                    chain_guard.decide, bot.config.symbol, 0, price, bot.drawdown
+                )
+                if verdict.tx:
+                    bot.last_chain_tx = verdict.tx
+            if exit_error is not None:
+                bot.error = f"exit failed at the drawdown stop, retrying: {exit_error}"
+                return
+            bot.error = f"drawdown stop hit ({bot.drawdown:.2%})" if first else "drawdown stop hit: exit done"
             bot.running = False
             await asyncio.to_thread(
                 tg.send,
