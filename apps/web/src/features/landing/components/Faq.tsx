@@ -8,7 +8,7 @@ const QA = [
   },
   {
     q: "What exactly does the contract do?",
-    a: "It stores two public rules: the current market mood and a 20% loss limit. Before every trade the bot writes its decision and its current loss to the contract, and acts on the yes or no in that same public receipt. If a recorded loss reaches 20%, the contract halts the bot and only exits are allowed.",
+    a: "It stores two public rules: the current market mood and a 20% loss limit. Before each trade the bot writes its decision and its current loss to the contract, and acts on the yes or no in that same public receipt. An exit at the 20% stop never waits: it happens first and is recorded right after. If a recorded loss reaches 20%, the contract halts the bot and only exits are allowed.",
   },
   {
     q: "What happens if the blockchain can't be reached?",

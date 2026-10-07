@@ -21,6 +21,7 @@ from .strategies.registry import get_strategy
 from .telegram import tg
 
 POLL_SECONDS = 15  # how often each bot re-evaluates its signal
+NO_ANSWER = "no on-chain answer: holding Flat (fail-closed)"
 
 
 class Connection:
@@ -150,15 +151,15 @@ class BotManager:
         bot.drawdown = bot.equity / bot.peak_equity - 1.0 if bot.peak_equity else 0.0
 
         if bot.drawdown <= -bot.config.max_drawdown:
-            # Past the local line: put the exit on the record first (the contract halts
-            # itself when the same loss crosses its line), then flatten and stop.
+            # Past the local line: exit at once (an exit never waits for the chain), then put
+            # the breach on the record, where the contract halts itself at its own line.
+            await self._flatten(bot, client)
             verdict = await asyncio.to_thread(
                 chain_guard.decide, bot.config.symbol, 0, price, bot.drawdown
             )
             if verdict.tx:
                 bot.last_chain_tx = verdict.tx
             bot.error = f"drawdown stop hit ({bot.drawdown:.2%})"
-            await self._flatten(bot, client)
             bot.running = False
             await asyncio.to_thread(
                 tg.send,
@@ -176,7 +177,11 @@ class BotManager:
         )
         if verdict.tx:
             bot.last_chain_tx = verdict.tx
-        bot.chain_vetoed = not verdict.allowed
+        bot.chain_vetoed = verdict.confirmed and not verdict.allowed  # a real "no" from the contract
+        if chain_guard.enabled and not verdict.confirmed and not verdict.allowed:
+            bot.error = NO_ANSWER
+        elif bot.error == NO_ANSWER:
+            bot.error = None
         target = intent if verdict.allowed else 0
 
         if target != bot.position:

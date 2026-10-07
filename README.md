@@ -104,7 +104,7 @@ The quant engine (`apps/trader`: strategies, backtester, optimizer, regime engin
 | Layer | Command | Count | Notes |
 |---|---|---|---|
 | Contract | `cd contracts && forge test` (first fetch `forge-std` into `contracts/lib`, as in [CI](.github/workflows/ci.yml)) | 30 (7 upstream + 23 added) | Unit and event tests, 5 fuzz tests, 7 invariants over random agent and stranger call sequences. `forge coverage`: 100% of lines, statements, branches and functions in `MacroGuard.sol`. The contract itself is unchanged. |
-| Engine | `cd apps && pip install -r trader/requirements-dev.txt && python -m pytest trader/tests -c trader/pytest.ini` | 55 passed, 1 strict xfail (48 at the 6 Oct submission; 7 added on 7 Oct for the runner) | Offline: `.env` loading is disabled and any non-loopback connection or DNS lookup fails the test. Covers no look-ahead as a property, the backtester's one-bar shift, the train/test split, the regime classifier, ChainGuard (decoding two real receipts from this contract), the runner's order of operations, the API and the data fallback. The xfail pins a known upstream bug (below). |
+| Engine | `cd apps && pip install -r trader/requirements-dev.txt && python -m pytest trader/tests -c trader/pytest.ini` | 59 passed, 1 strict xfail (48 at the 6 Oct submission; on 7 Oct 12 added and 1 retired for the runner and the terminal bot) | Offline: `.env` loading is disabled and any non-loopback connection or DNS lookup fails the test. Covers no look-ahead as a property, the backtester's one-bar shift, the train/test split, the regime classifier, ChainGuard (decoding two real receipts from this contract, reverted and unconfirmed transactions), the order of operations in the live runner and the terminal bot, the API and the data fallback. The xfail pins a known upstream bug (below). |
 | Web | `cd apps/web && npm test` | 15 (7 added on 2 Oct, 8 on 3 Oct) | Contract reads and the what-if encoder against `cast` fixtures, RPC fallback, reverts, wrong chain. |
 
 **No look-ahead, tested as a property.** For every strategy, `positions(df[:k])` equals `positions(df)[:k]` at every cut `k`, and rewriting future candles never changes a past position. A test strategy that cheats by trading on its own candle looks like a money machine without the backtester's one-bar shift and loses that edge with it (asserted on a seeded synthetic random walk in `apps/trader/tests/test_backtester.py`).
@@ -169,7 +169,7 @@ It ships as three things on one engine:
 ### Live bot runner (Bybit testnet)
 - Real market orders via Bybit V5 API; nothing simulated. Live trading never uses fallback data.
 - Per-bot drawdown stop flattens the position and halts on breach.
-- Every tick: loss measured → `recordDecision` with the intent → order only if the receipt allows it; no confirmed receipt → exits only (fail-closed).
+- Every tick: loss measured → `recordDecision` with the intent → order only if the receipt allows it; no confirmed receipt → exits only (fail-closed). Past the local stop the bot exits at once and records the breach right after; no fresh equity reading → no decision that tick.
 - Fills, equity, and chain tx streamed live over WebSocket.
 
 ### Telegram alerts + two-way control

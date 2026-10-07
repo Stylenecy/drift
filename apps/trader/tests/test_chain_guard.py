@@ -166,7 +166,7 @@ def test_a_reverted_transaction_is_not_a_receipt():
     g._account = SimpleNamespace(address=AGENT, sign_transaction=lambda tx: SimpleNamespace(raw_transaction=b"signed"))
     g._w3 = SimpleNamespace(
         eth=SimpleNamespace(
-            get_transaction_count=lambda address: 7,
+            get_transaction_count=lambda address, block_identifier=None: 7,
             gas_price=100_000_000,
             send_raw_transaction=lambda raw: bytes.fromhex("ab" * 32),
             wait_for_transaction_receipt=lambda h, timeout: {"status": 0},
@@ -175,3 +175,25 @@ def test_a_reverted_transaction_is_not_a_receipt():
     fn = SimpleNamespace(build_transaction=lambda params: params)
     assert g._transact(fn) == (None, None)
     assert g._send(fn) is None
+
+
+def test_an_unconfirmed_transaction_keeps_its_hash_but_gives_no_answer(monkeypatch):
+    """Sent but not mined in time: the hash is kept (it may still land), the bot holds Flat."""
+    monkeypatch.setattr(chain, "MACROGUARD_FAIL_MODE", "closed")
+
+    def too_slow(h, timeout):
+        raise TimeoutError("not mined within 30 s")
+
+    g = decoding_guard()
+    g._account = SimpleNamespace(address=AGENT, sign_transaction=lambda tx: SimpleNamespace(raw_transaction=b"signed"))
+    g._w3 = SimpleNamespace(
+        eth=SimpleNamespace(
+            get_transaction_count=lambda address, block_identifier=None: 7,
+            gas_price=100_000_000,
+            send_raw_transaction=lambda raw: bytes.fromhex("cd" * 32),
+            wait_for_transaction_receipt=too_slow,
+        )
+    )
+    verdict = g.decide("BNB", 1, 97500.0, 0.0)
+    assert verdict == Verdict(allowed=False, tx="0x" + "cd" * 32, confirmed=False)
+    assert g._send(SimpleNamespace(build_transaction=lambda params: params)) is None  # no confirmed receipt

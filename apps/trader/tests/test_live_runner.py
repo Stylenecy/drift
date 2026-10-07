@@ -42,6 +42,8 @@ class Client:
 class Guard:
     """A MacroGuard stand-in: answers like the contract would and logs every decision."""
 
+    enabled = True
+
     def __init__(self, timeline: list, allow):
         self.timeline, self.allow = timeline, allow
 
@@ -75,13 +77,13 @@ def test_a_blocked_intent_stays_on_the_record_as_the_bots_own_signal(monkeypatch
 
 
 def test_the_loss_is_checked_before_any_new_order(monkeypatch):
-    # The account is already 25% under its peak when the tick starts: the exit is recorded
-    # first (the contract halts itself at its 20% line), then the bot flattens and stops.
+    # The account is already 25% under its peak when the tick starts: the bot exits at once
+    # (no new Buy past the line), then the breach goes on the record and the bot stops.
     timeline: list = []
     bot = tick(
         monkeypatch, Guard(timeline, allow=lambda t: True), Client(timeline, equity=750.0), position=1
     )
-    assert timeline == [("decide", 0, -0.25), ("order", "Sell")]  # no new Buy past the line
+    assert timeline == [("order", "Sell"), ("decide", 0, -0.25)]
     assert bot.running is False and "drawdown stop hit" in (bot.error or "")
 
 
@@ -95,4 +97,6 @@ def test_without_a_confirmed_answer_the_runner_holds_flat(monkeypatch):
     monkeypatch.setattr(g, "_transact", lambda fn: (None, None))
     bot = tick(monkeypatch, g, Client(timeline))
     assert timeline == []  # no order: the Long was not confirmed
-    assert bot.chain_vetoed is True and bot.position == 0
+    assert bot.position == 0
+    assert bot.chain_vetoed is False  # nothing was vetoed on-chain; the bot says why it holds Flat
+    assert bot.error == live.NO_ANSWER

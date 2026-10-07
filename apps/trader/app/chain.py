@@ -105,7 +105,7 @@ class Verdict:
     """What the bot may do, and the public receipt behind the answer."""
 
     allowed: bool
-    tx: Optional[str] = None  # 0x hash of the recordDecision receipt, when one was written
+    tx: Optional[str] = None  # 0x hash of the recordDecision transaction, when one was sent
     confirmed: bool = False  # True when the answer came from a confirmed on-chain receipt
 
 
@@ -206,15 +206,17 @@ class ChainGuard:
     def _transact(self, fn):
         """Build, sign, send and confirm a contract call.
 
-        Returns (0x tx hash, receipt) only for a mined transaction with status 1;
-        (None, None) if it could not be sent, was not confirmed in time, or reverted.
+        Returns (0x tx hash, receipt) for a mined transaction with status 1;
+        (0x tx hash, None) if it was sent but not confirmed in time (it may still be mined);
+        (None, None) if it could not be sent or it reverted.
         """
         with self._lock:  # one agent key → serialise nonces across bots
             try:
                 tx = fn.build_transaction(
                     {
                         "from": self._account.address,
-                        "nonce": self._w3.eth.get_transaction_count(self._account.address),
+                        # "pending" so a transaction still in the mempool is not reused
+                        "nonce": self._w3.eth.get_transaction_count(self._account.address, "pending"),
                         "gas": 200_000,
                         "gasPrice": self._w3.eth.gas_price,
                         "chainId": BSC_CHAIN_ID,
@@ -222,18 +224,23 @@ class ChainGuard:
                 )
                 signed = self._account.sign_transaction(tx)
                 h = self._w3.eth.send_raw_transaction(signed.raw_transaction)
-                receipt = self._w3.eth.wait_for_transaction_receipt(h, timeout=30)
             except Exception as e:
                 print(f"[drift] tx failed: {e}")
                 return None, None
+            try:
+                receipt = self._w3.eth.wait_for_transaction_receipt(h, timeout=30)
+            except Exception as e:
+                print(f"[drift] tx not confirmed in time: {_hex(h)} ({e})")
+                return _hex(h), None
         if receipt["status"] != 1:
             print(f"[drift] tx reverted: {_hex(h)}")
             return None, None
         return _hex(h), receipt
 
     def _send(self, fn) -> Optional[str]:
-        """Send a contract call; the 0x tx hash of a successful receipt, else None."""
-        return self._transact(fn)[0]
+        """Send a contract call; the 0x tx hash of a confirmed, successful receipt, else None."""
+        tx, receipt = self._transact(fn)
+        return tx if receipt is not None else None
 
     def _decision_allowed(self, receipt) -> Optional[bool]:
         """The `allowed` field of the Decision event in a recordDecision receipt."""

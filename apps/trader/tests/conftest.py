@@ -17,6 +17,7 @@ from pathlib import Path
 for _key in (
     "ETH_PRIVATE_KEY",
     "MACROGUARD_ADDRESS",
+    "MACROGUARD_FAIL_MODE",
     "BYBIT_API_KEY",
     "BYBIT_API_SECRET",
     "BYBIT_READ_API_KEY",

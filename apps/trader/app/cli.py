@@ -602,15 +602,25 @@ def cmd_bot(strat: str, sym: str, tf: str = "1h", qty: float = 0.001, max_dd: fl
                 intent = int(strat_obj.positions(df).iloc[-1])
                 last_price = float(df["close"].iloc[-1])
                 signal_name = {1: "long", -1: "short", 0: "flat"}[intent]
-                # Measure the loss before deciding, so no order goes out on a stale number.
+                # Measure the loss before deciding: no fresh equity, no decision this tick.
                 try:
                     equity = _trade.account_equity()
                     peak = max(peak, equity)
-                except Exception:
-                    pass
+                except Exception as e:
+                    error = f"equity unavailable, skipping this tick ({e})"
+                    live.update(render())
+                    time.sleep(poll)
+                    continue
                 dd = equity / peak - 1 if peak else 0
                 if dd <= -max_dd:
-                    # Past the line: the exit goes on the record first; `finally` flattens.
+                    # Past the line: exit at once (an exit never waits for the chain), then put
+                    # the breach on the record, where the contract halts itself at its own line.
+                    if position != 0:
+                        try:
+                            _trade.place_market_order(sym, "Sell" if position > 0 else "Buy", round(qty * abs(position), 8))
+                            position = 0
+                        except Exception as e:
+                            error = str(e)  # `finally` tries the exit again
                     verdict = chain_guard.decide(sym, 0, last_price, dd)
                     if verdict.tx:
                         chain_tx = verdict.tx
@@ -623,6 +633,8 @@ def cmd_bot(strat: str, sym: str, tf: str = "1h", qty: float = 0.001, max_dd: fl
                 verdict = chain_guard.decide(sym, intent, last_price, dd)
                 if verdict.tx:
                     chain_tx = verdict.tx
+                if chain_guard.enabled and not verdict.confirmed and not verdict.allowed:
+                    error = "no on-chain answer: holding Flat (fail-closed)"
                 target = intent if verdict.allowed else 0
                 if target != position:
                     side = "Buy" if target > position else "Sell"
