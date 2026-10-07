@@ -16,7 +16,7 @@ const QA = [
   },
   {
     q: "Can the bot's owner bend the rules?",
-    a: "Three trust points remain, and we name them: the bot has to ask the contract (DRIFT's own runner always does; a changed bot could skip it), it reports its own loss, and its key can lift a halt. Every answer, loss and restart that does happen is public and permanent on BNB Chain. Next: losses confirmed by the exchange, and lifting a halt only through a multisig or a time delay.",
+    a: "Three trust points remain, and we name them: the bot has to ask the contract (DRIFT's own runner does whenever it is connected to it; a changed bot could skip it), it reports its own loss, and its key can lift a halt. Every answer, loss and restart that does happen is public and permanent on BNB Chain. Next: losses confirmed by the exchange, and lifting a halt only through a multisig or a time delay.",
   },
   {
     q: "Does the AI place trades?",
