@@ -80,7 +80,7 @@ classification, LLM analyst, Telegram control, the web app.
 ## 8. Honest boundaries (must stay true in every screen, deck, and video)
 
 - The contract does **not** execute Bybit orders. Execution is off-chain.
-- The Python runner **fails open** if the RPC is unavailable (it falls back to its local stop).
+- The Python runner **fails open** if the RPC is unavailable (it falls back to its local stop). Changed on 7 Oct 2026: it now fails closed by default.
 - The agent can call `resume()`; the halt is a recorded pause, not an unbreakable lock.
 - With a private key configured, the engine's regime loop **sends `setRegime` automatically** when
   the off-chain regime changes. Demo/screenshot runs use a read-only engine (no key).

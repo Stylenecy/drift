@@ -27,7 +27,7 @@ None needed. Everything passed as migrated.
 - The engine was verified on Python 3.11, the same version as the Dockerfile. The `./drift` launcher uses the system `python3`, which on this Mac is 3.9 and was not tested. Use 3.11 to match production.
 - When `AUTH_GOOGLE_ID` is set in production, next-auth logs `UntrustedHost` on `/api/auth/session` unless `AUTH_TRUST_HOST=true` (or `AUTH_URL`) is set. This is config only, not chain related.
 - `ChainGuard._send` uses a fixed gas of 200k and legacy `gasPrice`. Both are fine on BSC; `recordDecision` uses well under 200k.
-- The guard fails open by design: if the RPC is down, bots still trade under the local drawdown stop.
+- The guard fails open by design: if the RPC is down, bots still trade under the local drawdown stop. (Changed on 7 Oct 2026: the runner now records first and fails closed by default; see `docs/THREAT-MODEL.md`.)
 
 ## Remaining steps for a real BSC Testnet deploy
 

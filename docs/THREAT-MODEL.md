@@ -1,6 +1,6 @@
 # DRIFT · MacroGuard threat model
 
-Updated 2026-10-03 · Scope: Dex's MacroGuard deployment
+Updated 2026-10-07 · Scope: Dex's MacroGuard deployment
 [`0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D`](https://testnet.bscscan.com/address/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D)
 (BSC Testnet, chain 97; source verified on [Sourcify](https://repo.sourcify.dev/97/0x8b09ebB85Be8Ed55Bb5132d29eABc567c42aa83D), exact match),
 the engine's `ChainGuard` client (`apps/trader/app/chain.py`), the live runner (`apps/trader/app/live.py`)
@@ -16,7 +16,7 @@ are public and checkable; its limits are listed here so nobody has to discover t
 |---|---|---|
 | Agent key `0x2B07…4b81` (one EOA, set at deploy) | `setRegime`, `recordDecision`, `resume` | Change `agent` or `maxDrawdownBps` (both fixed at deploy) |
 | Anyone else | Read every value; simulate any call with `eth_call` | Write: every state-changing call reverts with `NotAgent()` |
-| Runner operator (whoever runs `apps/trader`) | Choose what the runner reports and when it calls the contract | Make the contract execute or stop an exchange order |
+| Runner operator (whoever runs `apps/trader`) | Choose what the runner reports, run a modified runner, or switch to `MACROGUARD_FAIL_MODE=open` | Make the contract execute or stop an exchange order |
 | Public RPC providers | Answer reads for the panel | Sign anything (the panel has no signer) |
 
 ## Properties, mechanisms and limits
@@ -27,8 +27,8 @@ are public and checkable; its limits are listed here so nobody has to discover t
 | A drawdown at or past the limit halts | `recordDecision` sets `halted` when `drawdownBps <= -maxDrawdownBps` (2000 bps) | The drawdown is **self-reported** by the agent; the contract cannot see the exchange account. A buggy or dishonest runner can report 0 | Boundary tested (−1999 vs −2000) · roadmap: attested equity (signed exchange snapshots or an oracle) |
 | A halt allows only Flat | `allowed()` returns `signal == Flat` while halted | `resume()` clears the halt at once, with no delay and no second signer. A halt is a recorded pause, not a lock | `Resumed` is logged on-chain · roadmap: timelock on `resume` |
 | Risk off vetoes new Longs | `allowed()` returns `signal != Long` in `RiskOff` | The regime is classified **off-chain** (BTC 1h realised-vol z-score + EWMA trend) and pushed by the agent; the contract trusts it | `RegimeSet` is logged; only a regime classified from Bybit data is pushed (`should_push_regime`) · roadmap: EIP-712 signed regime verdicts with a hash of their inputs |
-| The runner checks the gate before ordering | `ChainGuard.allowed()` before every order | **Fails open**: if the RPC is unreachable or errors, the runner trades under its local drawdown stop only | Pinned by `test_allowed_fails_open_when_the_rpc_is_down`; shown on the panel · roadmap: a fail-closed mode |
-| Every decision is on the public record | `Decision` event and `decisionCount` | The record holds what the agent sends. The runner records the **post-veto** target, so a vetoed Long appears as Flat (allowed). Failed or skipped writes leave no record. Records are not linked to exchange fills | Pinned by `test_runner_records_the_post_veto_target` · roadmap: record the raw signal plus a veto flag; commit-then-attest hashes of fills |
+| The runner asks before it orders | Since 7 Oct 2026: the runner measures the drawdown first, then `ChainGuard.decide()` records the bot's intent with `recordDecision` and the runner acts on the `allowed` field of that receipt's `Decision` event | **Cooperative**: the contract cannot force a bot to ask; a modified runner, or a second bot on the same exchange account, can trade without it. No confirmed answer (RPC down, tx failed or reverted) means only Flat passes (fail-closed, the default); `MACROGUARD_FAIL_MODE=open` restores the earlier fail-open behaviour | Tested (`test_the_loss_is_checked_before_any_new_order`, `test_an_allowed_intent_is_recorded_before_the_order`, `test_without_a_confirmed_answer_the_runner_holds_flat`, `test_decide_acts_on_the_answer_in_the_receipt` on two real receipts, `test_a_reverted_transaction_is_not_a_receipt`) · roadmap: exchange-side limits (sub-account permissions) and attested fills |
+| Every decision is on the public record | `Decision` event and `decisionCount` | The record holds what the agent sends. Since 7 Oct 2026 the runner records the bot's own intent, so a vetoed Long appears as Long with `allowed = false`. A failed write leaves no record (and, fail-closed, no new trade). Records are not linked to exchange fills | Tested (`test_a_blocked_intent_stays_on_the_record_as_the_bots_own_signal`) · roadmap: commit-then-attest hashes of fills |
 | The panel shows the real contract | Contract address and RPC URLs are code constants (`chainRead.ts`); chain id and code are checked; nothing in the URL or storage can redirect it | The panel trusts the first public RPC that answers; a lying RPC could show false state | Every value links to BscScan; the what-if shows a `cast call` to replay · roadmap: cross-check two RPCs |
 | The what-if cannot write | `eth_call` of `recordDecision` from the agent address; the browser holds no key | The answer is for the state at the block read; the next real decision can see a different state | Labelled "simulation" in the UI; the answer shows its block |
 | Bad inputs are rejected | Solidity's ABI decoder rejects enum values above 2 | — | Fuzzed (`testFuzz_OutOfRangeSignalIsRejected`) |
@@ -46,7 +46,9 @@ must remain byte-identical; this document is the correction.
 - **Upstream bug:** `BNBUSDT` is listed twice in `MARKET_SYMBOLS` (`apps/trader/app/main.py`,
   `apps/trader/app/cli.py`), so `/markets` and the terminal show it twice. Pinned by a strict `xfail`
   test (`tests/test_known_limits.py`) and left unfixed here.
-- **Design limit:** the post-veto record described above.
+- **Fixed on 7 Oct 2026:** the runner used to place its order first and only then measure the loss and
+  write the record, so one order could go out on a stale drawdown, and it recorded a vetoed signal as
+  Flat. It now measures first, records the intent, and acts on that receipt (`tests/test_live_runner.py`).
 
 ## Out of scope
 

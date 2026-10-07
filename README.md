@@ -36,7 +36,7 @@ Dex Bennett's own MacroGuard deployment: [`0x8b09ebB85Be8Ed55Bb5132d29eABc567c42
 
 A `setRegime(2)` sent from any other address (simulated with `eth_call` from `0x…dEaD`) reverts with `NotAgent()` (`0x0d9ab13f`). At the testnet gas price of 0.1 gwei, one recorded decision (33–34k gas) costs about 0.0000034 tBNB.
 
-**What this does not prove.** The contract does not execute exchange orders. The runner fails open to its local stop if the RPC is unreachable. The agent can `resume()` a halt at any time. The drawdown is reported by the agent, not measured by the contract. No live bot tick and no profit are claimed; backtests are research. Details: [`docs/THREAT-MODEL.md`](docs/THREAT-MODEL.md).
+**What this does not prove.** The contract does not execute exchange orders, and it cannot force a bot to ask it: DRIFT's own runner does (since 7 Oct 2026 it records first, acts on that receipt, and takes no new risk without a confirmed answer). The agent can `resume()` a halt at any time. The drawdown is reported by the agent, not measured by the contract. No live bot tick and no profit are claimed; backtests are research. Details: [`docs/THREAT-MODEL.md`](docs/THREAT-MODEL.md).
 
 ## Judge path (3 minutes)
 
@@ -58,16 +58,16 @@ sequenceDiagram
     participant X as Bybit testnet
     participant G as MacroGuard (BSC Testnet)
     participant P as Public panel (/macroguard)
-    R->>R: strategy.positions(candles) gives target -1, 0 or +1
-    R->>G: allowed(signal), a free view call
-    G-->>R: true or false (if the RPC is down, the runner fails open)
-    alt vetoed
-        R->>R: clamp target to Flat
-    end
-    R->>X: market order to reach the target
-    R->>G: recordDecision(symbol, target, price, drawdownBps), signed by the agent
+    R->>R: strategy.positions(candles) gives the intent -1, 0 or +1
+    R->>X: account equity, so the drawdown is measured before deciding
+    R->>G: recordDecision(symbol, intent, price, drawdownBps), signed by the agent
     G->>G: drawdown at or past -2000 bps sets halted = true (Halted event)
-    G-->>R: Decision event (seq, allowed, regime, timestamp)
+    G-->>R: Decision event in the receipt (seq, allowed, regime, timestamp)
+    alt allowed
+        R->>X: market order to reach the intent
+    else blocked, or no confirmed receipt (fail-closed)
+        R->>X: hold or go Flat
+    end
     P->>G: eth_call reads (regime, halted, allowed, decisionCount)
     Note over P,G: Anyone can read or simulate. Only the agent can write.
 ```
@@ -89,7 +89,7 @@ DRIFT's core (the quant engine, the cockpit and `MacroGuard.sol`) comes from the
 | 3 Oct | "Ask the contract"; labelled Binance data fallback; 23 contract tests, 48 engine tests and 8 web tests added; CI workflow; threat model; share card; this README; deck v2 |
 | 4 Oct | Visual system v3 across the site: landing with a live contract readout, guard panel, cockpit, blog and share card; motion in plain CSS with no animation library (framer-motion and GSAP removed), with reduced-motion and no-JS paths. Live in production on 5 Oct (build `f4cccd8`) |
 | 6 Oct | A calmer product landing in plain language, with motion built in code: a brake dial, a scroll-driven halt scene, step artwork and "Try the brake", which asks the live contract (eth_call, nothing signed) |
-| 7 Oct | Final pass before judging: the hero dial reads as an example and the live line says only what the contract knows ("Not halted"); a zero loss reads 0%; screenshots recaptured from the live site; the final deck in `docs/submission` |
+| 7 Oct | Final pass before judging: the hero dial reads as an example and the live line says only what the contract knows ("Not halted"); the site says the owner's key can restart a halt; the runner measures its loss before deciding, records its intent on-chain and acts on that receipt before any order, and takes no new risk without a confirmed answer (fail-closed); a zero loss reads 0%; screenshots recaptured from the live site; the final deck in `docs/submission` |
 
 Commit history: [`main`](https://github.com/Stylenecy/drift/commits/main). This repository was split from `Stylenecy/seed-bnb` (branch `dex/drift`) on 6 Oct 2026 with every commit kept: the first commit (`753b707` here, `52671ce` upstream) is the upstream seed import by its original author, every later commit is this project's own work.
 
@@ -104,14 +104,14 @@ The quant engine (`apps/trader`: strategies, backtester, optimizer, regime engin
 | Layer | Command | Count | Notes |
 |---|---|---|---|
 | Contract | `cd contracts && forge test` (first fetch `forge-std` into `contracts/lib`, as in [CI](.github/workflows/ci.yml)) | 30 (7 upstream + 23 added) | Unit and event tests, 5 fuzz tests, 7 invariants over random agent and stranger call sequences. `forge coverage`: 100% of lines, statements, branches and functions in `MacroGuard.sol`. The contract itself is unchanged. |
-| Engine | `cd apps && pip install -r trader/requirements-dev.txt && python -m pytest trader/tests -c trader/pytest.ini` | 48 passed, 1 strict xfail | Offline: `.env` loading is disabled and any non-loopback connection or DNS lookup fails the test. Covers no look-ahead as a property, the backtester's one-bar shift, the train/test split, the regime classifier, ChainGuard, the API and the data fallback. The xfail pins a known upstream bug (below). |
+| Engine | `cd apps && pip install -r trader/requirements-dev.txt && python -m pytest trader/tests -c trader/pytest.ini` | 55 passed, 1 strict xfail (48 at the 6 Oct submission; 7 added on 7 Oct for the runner) | Offline: `.env` loading is disabled and any non-loopback connection or DNS lookup fails the test. Covers no look-ahead as a property, the backtester's one-bar shift, the train/test split, the regime classifier, ChainGuard (decoding two real receipts from this contract), the runner's order of operations, the API and the data fallback. The xfail pins a known upstream bug (below). |
 | Web | `cd apps/web && npm test` | 15 (7 added on 2 Oct, 8 on 3 Oct) | Contract reads and the what-if encoder against `cast` fixtures, RPC fallback, reverts, wrong chain. |
 
 **No look-ahead, tested as a property.** For every strategy, `positions(df[:k])` equals `positions(df)[:k]` at every cut `k`, and rewriting future candles never changes a past position. A test strategy that cheats by trading on its own candle looks like a money machine without the backtester's one-bar shift and loses that edge with it (asserted on a seeded synthetic random walk in `apps/trader/tests/test_backtester.py`).
 
 **CI.** [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs all three layers on every push: forge test and coverage, pytest, then `npm ci`, lint, node tests and `next build`.
 
-**Known issues found while testing (not fixed here):** `BNBUSDT` is listed twice in `MARKET_SYMBOLS` (`apps/trader/app/main.py`, `apps/trader/app/cli.py`), so the markets view shows it twice; the live runner records the post-veto target, so a vetoed Long appears on-chain as Flat. Both are pinned by tests; see [`docs/THREAT-MODEL.md`](docs/THREAT-MODEL.md).
+**Known issues found while testing (not fixed here):** `BNBUSDT` is listed twice in `MARKET_SYMBOLS` (`apps/trader/app/main.py`, `apps/trader/app/cli.py`), so the markets view shows it twice. Pinned by a strict xfail test; see [`docs/THREAT-MODEL.md`](docs/THREAT-MODEL.md).
 
 ---
 
@@ -368,7 +368,7 @@ drift/
 │   │   │   ├── optimize.py     # Auto-Research param sweep + train/test split
 │   │   │   ├── live.py         # connection + bot manager + runner loop
 │   │   │   ├── regime.py       # HMM-free vol/trend regime classifier
-│   │   │   ├── chain.py        # web3.py MacroGuard client (fails open)
+│   │   │   ├── chain.py        # web3.py MacroGuard client (records first, fails closed)
 │   │   │   ├── llm.py          # LLM analyst (OpenRouter / NVIDIA NIM)
 │   │   │   ├── agent.py        # tool-calling conversational agent
 │   │   │   ├── telegram.py     # alerts + two-way control bot
@@ -465,7 +465,7 @@ AUTH_SECRET=…
 ## Safety & honesty
 
 - **Testnet-first.** Live trading is explicit opt-in; all orders go to Bybit testnet by default.
-- **Risk boundaries are explicit.** The local drawdown stop lives in `LiveRunner`; the bot queries `MacroGuard.allowed()` before orders. The contract cannot stop an exchange order by itself. If the RPC fails, the bot currently fails open under its local stop.
+- **Risk boundaries are explicit.** The local drawdown stop lives in `LiveRunner`; before any order the bot records its intent with `MacroGuard.recordDecision()` and acts on the answer in that receipt. The contract cannot stop an exchange order by itself. Without a confirmed answer the bot takes no new risk (`MACROGUARD_FAIL_MODE=open` restores the old fail-open behaviour).
 - **No look-ahead, no fabricated fills.** Backtests are strictly point-in-time (tested as a property); live equity is read from the real account; the LLM is forbidden from inventing numbers.
 - **Labelled data.** A fallback to Binance public data is named in every response and view; live trading never uses it, and a regime classified from it is never written on-chain.
 - **Secrets stay out of Git.** Keys entered in the web UI are held in memory. Keys supplied through `.env.local` are stored locally in that Git-ignored file; never commit or share it.
